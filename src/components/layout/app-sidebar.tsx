@@ -12,7 +12,14 @@ import {
   SidebarMenu,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { GaugeIcon, UsersIcon } from "lucide-react";
+import {
+  BabyIcon,
+  BlocksIcon,
+  BookMarkedIcon,
+  GaugeIcon,
+  UserRoundCogIcon,
+  UsersRoundIcon,
+} from "lucide-react";
 import { ActiveSidebarMenuItem } from "./active-sidebar-menu-button";
 
 const data = {
@@ -24,12 +31,31 @@ const data = {
           title: "Dashboard",
           url: "/dashboard",
           icon: GaugeIcon,
-          isActive: true,
+        },
+        {
+          title: "Niños",
+          url: "/children",
+          icon: BabyIcon,
+        },
+        {
+          title: "Grupos",
+          url: "/groups",
+          icon: UsersRoundIcon,
+        },
+        {
+          title: "Mentoras",
+          url: "/mentors",
+          icon: BookMarkedIcon,
+        },
+        {
+          title: "Clubes",
+          url: "/clubs",
+          icon: BlocksIcon,
         },
         {
           title: "Usuarios",
           url: "/users",
-          icon: UsersIcon,
+          icon: UserRoundCogIcon,
         },
       ],
     },

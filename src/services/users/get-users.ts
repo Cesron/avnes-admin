@@ -13,7 +13,6 @@ export async function getUsers(): Promise<User[]> {
         "createdAt", 
         "updatedAt"
       FROM "user"
-      ORDER BY "createdAt" DESC
     `);
 
   return result.rows;
