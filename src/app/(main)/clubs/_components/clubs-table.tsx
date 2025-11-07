@@ -1,4 +1,3 @@
-import { getClubs } from "@/services/clubs/get-clubs";
 import {
   Table,
   TableBody,
@@ -7,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { getClubs } from "@/services/clubs/get-clubs";
 
 export async function ClubsTable() {
   const clubs = await getClubs();
@@ -19,7 +18,6 @@ export async function ClubsTable() {
           <TableRow>
             <TableHead>ID</TableHead>
             <TableHead>Nombre del Club</TableHead>
-            <TableHead>Estado</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -28,9 +26,6 @@ export async function ClubsTable() {
               <TableCell className="font-medium">{club.id}</TableCell>
               <TableCell>
                 <div className="font-medium text-base">{club.name}</div>
-              </TableCell>
-              <TableCell>
-                <Badge variant="green-subtle">Activo</Badge>
               </TableCell>
             </TableRow>
           ))}

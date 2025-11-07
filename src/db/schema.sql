@@ -46,8 +46,8 @@ CREATE TABLE children (
   id SERIAL PRIMARY KEY,
   first_name VARCHAR(50) NOT NULL,
   last_name VARCHAR(50) NOT NULL,
-  gender VARCHAR(10),
-  birth_date DATE
+  gender VARCHAR(1) NOT NULL,
+  birth_date DATE NOT NULL
 );
 
 -- ==========================================

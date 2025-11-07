@@ -18,9 +18,8 @@ export async function GroupsTable() {
         <TableHeader className="bg-muted sticky top-0 z-10">
           <TableRow>
             <TableHead>Nombre del Grupo</TableHead>
-            <TableHead>Club</TableHead>
             <TableHead>Mentora</TableHead>
-            <TableHead>Estado</TableHead>
+            <TableHead>Club</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -29,12 +28,9 @@ export async function GroupsTable() {
               <TableCell>
                 <div className="font-medium">{group.name}</div>
               </TableCell>
-              <TableCell>
-                <Badge variant="blue-subtle">{group.club_name}</Badge>
-              </TableCell>
               <TableCell>{group.mentor_name}</TableCell>
               <TableCell>
-                <Badge variant="green-subtle">Activo</Badge>
+                <Badge variant="blue-subtle">{group.club_name}</Badge>
               </TableCell>
             </TableRow>
           ))}

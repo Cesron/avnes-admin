@@ -9,10 +9,26 @@ import {
 import { Separator } from "@/components/ui/separator";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { PlusCircleIcon } from "lucide-react";
+import { CreateGroupForm } from "./create-group-form";
+import { getClubsOptions } from "@/services/clubs/get-clubs-options";
+import { getMentorsOptions } from "@/services/mentors/get-mentors-options";
 
-export function GroupsHeader() {
+export async function GroupsHeader() {
+  const [clubs, mentors] = await Promise.all([
+    getClubsOptions(),
+    getMentorsOptions(),
+  ]);
+
   return (
     <header className="flex flex-wrap gap-3 min-h-20 py-4 shrink-0 items-center transition-all ease-linear border-b">
       <div className="flex flex-1 items-center gap-2">
@@ -36,10 +52,25 @@ export function GroupsHeader() {
         </div>
       </div>
 
-      <Button>
-        <PlusCircleIcon />
-        Agregar Grupo
-      </Button>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button>
+            <PlusCircleIcon />
+            Agregar Grupo
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Crear Nuevo Grupo</DialogTitle>
+            <DialogDescription>
+              Ingresa los datos del nuevo grupo. Debes seleccionar un club y una
+              mentora.
+            </DialogDescription>
+          </DialogHeader>
+
+          <CreateGroupForm clubs={clubs} mentors={mentors} />
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }

@@ -7,8 +7,17 @@ import {
 import { Separator } from "@/components/ui/separator";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { PlusCircleIcon } from "lucide-react";
+import { CreateClubForm } from "./create-club-form";
 
 export function ClubsHeader() {
   return (
@@ -30,10 +39,24 @@ export function ClubsHeader() {
         </div>
       </div>
 
-      <Button>
-        <PlusCircleIcon />
-        Agregar Club
-      </Button>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button>
+            <PlusCircleIcon />
+            Agregar Club
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Crear Nuevo Club</DialogTitle>
+            <DialogDescription>
+              Ingresa el nombre del nuevo club. El nombre debe ser único.
+            </DialogDescription>
+          </DialogHeader>
+
+          <CreateClubForm />
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }

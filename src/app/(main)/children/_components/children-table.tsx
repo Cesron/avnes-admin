@@ -9,24 +9,11 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/utils/format-date";
+import { getGenderLabel } from "@/utils/get-gender-label";
+import { calculateAge } from "@/utils/calculate-age";
 
 export async function ChildrenTable() {
   const children = await getChildren();
-
-  const calculateAge = (birthDate: Date | null): number | null => {
-    if (!birthDate) return null;
-    const today = new Date();
-    const birth = new Date(birthDate);
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birth.getDate())
-    ) {
-      age--;
-    }
-    return age;
-  };
 
   return (
     <div className="overflow-hidden rounded-lg border my-4">
@@ -38,7 +25,6 @@ export async function ChildrenTable() {
             <TableHead>Género</TableHead>
             <TableHead>Fecha de Nacimiento</TableHead>
             <TableHead>Edad</TableHead>
-            <TableHead>Estado</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -51,38 +37,16 @@ export async function ChildrenTable() {
                 </TableCell>
                 <TableCell>{child.last_name}</TableCell>
                 <TableCell>
-                  {child.gender ? (
-                    <Badge
-                      variant={
-                        child.gender.toLowerCase() === "masculino" ||
-                        child.gender.toLowerCase() === "m"
-                          ? "blue-subtle"
-                          : "purple-subtle"
-                      }
-                    >
-                      {child.gender}
-                    </Badge>
-                  ) : (
-                    <span className="text-muted-foreground">No registrado</span>
-                  )}
+                  <Badge
+                    variant={
+                      child.gender === "M" ? "blue-subtle" : "purple-subtle"
+                    }
+                  >
+                    {getGenderLabel(child.gender)}
+                  </Badge>
                 </TableCell>
-                <TableCell>
-                  {child.birth_date ? (
-                    formatDate(child.birth_date)
-                  ) : (
-                    <span className="text-muted-foreground">No registrado</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {age !== null ? (
-                    `${age} años`
-                  ) : (
-                    <span className="text-muted-foreground">-</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Badge variant="green-subtle">Activo</Badge>
-                </TableCell>
+                <TableCell>{formatDate(child.birth_date)}</TableCell>
+                <TableCell>{age} años</TableCell>
               </TableRow>
             );
           })}

@@ -9,8 +9,17 @@ import {
 import { Separator } from "@/components/ui/separator";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { PlusCircleIcon } from "lucide-react";
+import { CreateMentorForm } from "./create-mentor-form";
 
 export function MentorsHeader() {
   return (
@@ -36,10 +45,25 @@ export function MentorsHeader() {
         </div>
       </div>
 
-      <Button>
-        <PlusCircleIcon />
-        Agregar Mentora
-      </Button>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button>
+            <PlusCircleIcon />
+            Agregar Mentora
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Crear Nueva Mentora</DialogTitle>
+            <DialogDescription>
+              Ingresa los datos de la nueva mentora. El teléfono y email son
+              opcionales pero deben ser únicos.
+            </DialogDescription>
+          </DialogHeader>
+
+          <CreateMentorForm />
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }

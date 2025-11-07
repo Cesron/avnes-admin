@@ -9,8 +9,17 @@ import {
 import { Separator } from "@/components/ui/separator";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { PlusCircleIcon } from "lucide-react";
+import { CreateChildForm } from "./create-child-form";
 
 export function ChildrenHeader() {
   return (
@@ -36,10 +45,24 @@ export function ChildrenHeader() {
         </div>
       </div>
 
-      <Button>
-        <PlusCircleIcon />
-        Agregar Niño
-      </Button>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button>
+            <PlusCircleIcon />
+            Agregar Niño
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Crear Nuevo Niño/Niña</DialogTitle>
+            <DialogDescription>
+              Ingresa los datos del nuevo niño o niña.
+            </DialogDescription>
+          </DialogHeader>
+
+          <CreateChildForm />
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }

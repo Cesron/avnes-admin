@@ -1,4 +1,3 @@
-import { getMentors } from "@/services/mentors/get-mentors";
 import {
   Table,
   TableBody,
@@ -7,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { getMentors } from "@/services/mentors/get-mentors";
 
 export async function MentorsTable() {
   const mentors = await getMentors();
@@ -20,7 +19,6 @@ export async function MentorsTable() {
             <TableHead>Nombre</TableHead>
             <TableHead>Teléfono</TableHead>
             <TableHead>Email</TableHead>
-            <TableHead>Estado</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -42,9 +40,6 @@ export async function MentorsTable() {
                 ) : (
                   <span className="text-muted-foreground">No registrado</span>
                 )}
-              </TableCell>
-              <TableCell>
-                <Badge variant="green-subtle">Activa</Badge>
               </TableCell>
             </TableRow>
           ))}
