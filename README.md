@@ -546,7 +546,7 @@ export function [Entidad]Actions({ [entidad] }: [Entidad]ActionsProps) {
             size="icon"
             onClick={() => openEditDialog([entidad])}
           >
-            <EditIcon className="h-4 w-4" />
+            <EditIcon />
           </Button>
         </TooltipTrigger>
         <TooltipContent>Editar [Entidad]</TooltipContent>

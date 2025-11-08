@@ -7,6 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getMentors } from "@/services/mentors/get-mentors";
+import { MentorActions } from "./mentor-actions";
 
 export async function MentorsTable() {
   const mentors = await getMentors();
@@ -19,6 +20,7 @@ export async function MentorsTable() {
             <TableHead>Nombre</TableHead>
             <TableHead>Teléfono</TableHead>
             <TableHead>Email</TableHead>
+            <TableHead className="w-[100px]">Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -40,6 +42,9 @@ export async function MentorsTable() {
                 ) : (
                   <span className="text-muted-foreground">No registrado</span>
                 )}
+              </TableCell>
+              <TableCell>
+                <MentorActions mentor={mentor} />
               </TableCell>
             </TableRow>
           ))}
