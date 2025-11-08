@@ -10,6 +10,7 @@ export async function getChildren(): Promise<Child[]> {
         gender,
         birth_date
       FROM children
+      ORDER BY id ASC
     `);
 
   return result.rows;

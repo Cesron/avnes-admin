@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/utils/format-date";
 import { getGenderLabel } from "@/utils/get-gender-label";
 import { calculateAge } from "@/utils/calculate-age";
+import { ChildActions } from "./child-actions";
 
 export async function ChildrenTable() {
   const children = await getChildren();
@@ -25,6 +26,7 @@ export async function ChildrenTable() {
             <TableHead>Género</TableHead>
             <TableHead>Fecha de Nacimiento</TableHead>
             <TableHead>Edad</TableHead>
+            <TableHead className="w-[100px]">Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -47,6 +49,9 @@ export async function ChildrenTable() {
                 </TableCell>
                 <TableCell>{formatDate(child.birth_date)}</TableCell>
                 <TableCell>{age} años</TableCell>
+                <TableCell>
+                  <ChildActions child={child} />
+                </TableCell>
               </TableRow>
             );
           })}

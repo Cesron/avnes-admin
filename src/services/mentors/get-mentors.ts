@@ -9,6 +9,7 @@ export async function getMentors(): Promise<Mentor[]> {
         phone,
         email
       FROM mentors
+      ORDER BY name ASC
     `);
 
   return result.rows;

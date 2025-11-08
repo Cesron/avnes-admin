@@ -13,6 +13,7 @@ export async function getGroups(): Promise<Group[]> {
       FROM groups g
       INNER JOIN clubs c ON g.club_id = c.id
       INNER JOIN mentors m ON g.mentor_id = m.id
+      ORDER BY g.id ASC
     `);
 
   return result.rows;

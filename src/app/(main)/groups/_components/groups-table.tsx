@@ -8,6 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { GroupActions } from "./group-actions";
 
 export async function GroupsTable() {
   const groups = await getGroups();
@@ -20,6 +21,7 @@ export async function GroupsTable() {
             <TableHead>Nombre del Grupo</TableHead>
             <TableHead>Mentora</TableHead>
             <TableHead>Club</TableHead>
+            <TableHead className="w-[100px]">Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -31,6 +33,9 @@ export async function GroupsTable() {
               <TableCell>{group.mentor_name}</TableCell>
               <TableCell>
                 <Badge variant="blue-subtle">{group.club_name}</Badge>
+              </TableCell>
+              <TableCell>
+                <GroupActions group={group} />
               </TableCell>
             </TableRow>
           ))}
