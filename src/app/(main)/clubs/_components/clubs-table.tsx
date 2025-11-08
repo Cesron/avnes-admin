@@ -7,6 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getClubs } from "@/services/clubs/get-clubs";
+import { ClubActions } from "./club-actions";
 
 export async function ClubsTable() {
   const clubs = await getClubs();
@@ -18,6 +19,7 @@ export async function ClubsTable() {
           <TableRow>
             <TableHead>ID</TableHead>
             <TableHead>Nombre del Club</TableHead>
+            <TableHead className="w-[100px]">Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -26,6 +28,9 @@ export async function ClubsTable() {
               <TableCell className="font-medium">{club.id}</TableCell>
               <TableCell>
                 <div className="font-medium text-base">{club.name}</div>
+              </TableCell>
+              <TableCell>
+                <ClubActions club={club} />
               </TableCell>
             </TableRow>
           ))}
