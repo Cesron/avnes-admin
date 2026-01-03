@@ -25,12 +25,7 @@ export const createClubAction = actionClient
     }
 
     // Crear el nuevo club
-    const result = await sql.query(
-      `INSERT INTO clubs (name) VALUES ($1) RETURNING id, name`,
-      [trimmedName]
-    );
-
-    return {
-      club: result.rows[0],
-    };
+    await sql.query(`INSERT INTO clubs (name) VALUES ($1) RETURNING id, name`, [
+      trimmedName,
+    ]);
   });

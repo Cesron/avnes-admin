@@ -43,12 +43,8 @@ export const createGroupAction = actionClient
     }
 
     // Crear el nuevo grupo
-    const result = await sql.query(
+    await sql.query(
       `INSERT INTO groups (name, club_id, mentor_id) VALUES ($1, $2, $3) RETURNING id, name, club_id, mentor_id`,
       [name, clubId, mentorId]
     );
-
-    return {
-      group: result.rows[0],
-    };
   });

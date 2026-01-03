@@ -41,12 +41,8 @@ export const createMentorAction = actionClient
     }
 
     // Crear el nuevo mentor
-    const result = await sql.query(
+    await sql.query(
       `INSERT INTO mentors (name, phone, email) VALUES ($1, $2, $3) RETURNING id, name, phone, email`,
       [trimmedName, trimmedPhone, trimmedEmail]
     );
-
-    return {
-      mentor: result.rows[0],
-    };
   });

@@ -12,13 +12,9 @@ export const createChildAction = actionClient
       const trimmedLastName = lastName.trim();
 
       // Crear el nuevo niño/niña
-      const result = await sql.query(
+      await sql.query(
         `INSERT INTO children (first_name, last_name, gender, birth_date) VALUES ($1, $2, $3, $4) RETURNING id, first_name, last_name, gender, birth_date`,
         [trimmedFirstName, trimmedLastName, gender, birthDate]
       );
-
-      return {
-        child: result.rows[0],
-      };
     }
   );
