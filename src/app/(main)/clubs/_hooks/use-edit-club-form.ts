@@ -13,7 +13,7 @@ export function useEditClubForm() {
   const form = useForm<EditClubFormData>({
     resolver: zodResolver(editClubSchema),
     defaultValues: {
-      id: 0,
+      id: "",
       name: "",
     },
   });

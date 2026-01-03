@@ -16,7 +16,7 @@ export function useEditMentorForm() {
   const form = useForm<EditMentorFormData>({
     resolver: zodResolver(editMentorSchema),
     defaultValues: {
-      id: 0,
+      id: "",
       name: "",
       phone: "",
       email: "",

@@ -17,6 +17,7 @@ import {
   BlocksIcon,
   BookMarkedIcon,
   GaugeIcon,
+  HomeIcon,
   UserRoundCogIcon,
   UsersRoundIcon,
 } from "lucide-react";
@@ -31,6 +32,11 @@ const data = {
           title: "Dashboard",
           url: "/dashboard",
           icon: GaugeIcon,
+        },
+        {
+          title: "Familias",
+          url: "/families",
+          icon: HomeIcon,
         },
         {
           title: "Niños",

@@ -1,12 +1,12 @@
 "use client";
 
-import type { Child } from "@/types/child";
+import type { ChildWithFamily } from "@/services/children/get-children";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
 type EditChildContextType = {
   isOpen: boolean;
-  childToEdit: Child | null;
-  openEditDialog: (child: Child) => void;
+  childToEdit: ChildWithFamily | null;
+  openEditDialog: (child: ChildWithFamily) => void;
   closeEditDialog: () => void;
 };
 
@@ -16,9 +16,9 @@ const EditChildContext = createContext<EditChildContextType | undefined>(
 
 export function EditChildProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [childToEdit, setChildToEdit] = useState<Child | null>(null);
+  const [childToEdit, setChildToEdit] = useState<ChildWithFamily | null>(null);
 
-  const openEditDialog = (child: Child) => {
+  const openEditDialog = (child: ChildWithFamily) => {
     setChildToEdit(child);
     setIsOpen(true);
   };

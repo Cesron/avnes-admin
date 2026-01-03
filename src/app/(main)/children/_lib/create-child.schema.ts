@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const createChildSchema = z.object({
+  familyId: z.string().min(1, "Debes seleccionar una familia"),
   firstName: z
     .string()
     .min(3, "El nombre debe tener al menos 3 caracteres")
@@ -28,6 +29,16 @@ export const createChildSchema = z.object({
       },
       { message: "La fecha de nacimiento no puede ser futura" }
     ),
+  pamphletUrl: z
+    .string()
+    .url("Debe ser una URL válida")
+    .optional()
+    .or(z.literal("")),
+  childPhotoUrl: z
+    .string()
+    .url("Debe ser una URL válida")
+    .optional()
+    .or(z.literal("")),
 });
 
 export type CreateChildFormData = z.infer<typeof createChildSchema>;

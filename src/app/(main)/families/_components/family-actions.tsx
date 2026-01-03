@@ -6,16 +6,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { ChildWithFamily } from "@/services/children/get-children";
+import type { Family } from "@/types/family";
 import { EditIcon } from "lucide-react";
-import { useEditChild } from "../_context/edit-child-context";
+import { useEditFamily } from "../_context/edit-family-context";
 
-type ChildActionsProps = {
-  child: ChildWithFamily;
+type FamilyActionsProps = {
+  family: Family;
 };
 
-export function ChildActions({ child }: ChildActionsProps) {
-  const { openEditDialog } = useEditChild();
+export function FamilyActions({ family }: FamilyActionsProps) {
+  const { openEditDialog } = useEditFamily();
 
   return (
     <div className="flex items-center gap-2">
@@ -24,12 +24,12 @@ export function ChildActions({ child }: ChildActionsProps) {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => openEditDialog(child)}
+            onClick={() => openEditDialog(family)}
           >
-            <EditIcon className="h-4 w-4" />
+            <EditIcon />
           </Button>
         </TooltipTrigger>
-        <TooltipContent>Editar Niño/Niña</TooltipContent>
+        <TooltipContent>Editar Familia</TooltipContent>
       </Tooltip>
     </div>
   );

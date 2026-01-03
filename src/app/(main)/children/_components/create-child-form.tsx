@@ -15,15 +15,49 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { FamilyOption } from "@/services/families/get-families-options";
 import { Controller } from "react-hook-form";
 import { useCreateChildForm } from "../_hooks/use-create-child-form";
 
-export function CreateChildForm() {
+interface CreateChildFormProps {
+  familiesOptions: FamilyOption[];
+}
+
+export function CreateChildForm({ familiesOptions }: CreateChildFormProps) {
   const { form, onSubmit, loading } = useCreateChildForm();
 
   return (
     <form id="form-create-child" onSubmit={form.handleSubmit(onSubmit)}>
       <FieldGroup>
+        <Controller
+          name="familyId"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="form-create-child-family">
+                Familia
+              </FieldLabel>
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger
+                  id="form-create-child-family"
+                  aria-invalid={fieldState.invalid}
+                >
+                  <SelectValue placeholder="Selecciona una familia" />
+                </SelectTrigger>
+                <SelectContent>
+                  {familiesOptions.map((family) => (
+                    <SelectItem key={family.id} value={family.id}>
+                      {family.penpal_code}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
         <Controller
           name="firstName"
           control={form.control}
@@ -103,6 +137,48 @@ export function CreateChildForm() {
                 type="date"
                 id="form-create-child-birth-date"
                 aria-invalid={fieldState.invalid}
+              />
+
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="childPhotoUrl"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="form-create-child-photo-url">
+                URL Foto Individual (opcional)
+              </FieldLabel>
+              <Input
+                {...field}
+                id="form-create-child-photo-url"
+                aria-invalid={fieldState.invalid}
+                placeholder="https://ejemplo.com/foto.jpg"
+                autoComplete="off"
+              />
+
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="pamphletUrl"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="form-create-child-pamphlet-url">
+                URL Panfleto (opcional)
+              </FieldLabel>
+              <Input
+                {...field}
+                id="form-create-child-pamphlet-url"
+                aria-invalid={fieldState.invalid}
+                placeholder="https://ejemplo.com/panfleto.pdf"
+                autoComplete="off"
               />
 
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

@@ -13,7 +13,7 @@ export function useEditGroupForm() {
   const form = useForm<EditGroupFormData>({
     resolver: zodResolver(editGroupSchema),
     defaultValues: {
-      id: 0,
+      id: "",
       name: "",
       clubId: "",
       mentorId: "",
@@ -26,8 +26,8 @@ export function useEditGroupForm() {
       form.reset({
         id: groupToEdit.id,
         name: groupToEdit.name,
-        clubId: groupToEdit.club_id.toString(),
-        mentorId: groupToEdit.mentor_id.toString(),
+        clubId: groupToEdit.club_id,
+        mentorId: groupToEdit.mentor_id,
       });
     }
   }, [groupToEdit, form]);

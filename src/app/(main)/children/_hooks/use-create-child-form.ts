@@ -14,10 +14,13 @@ export function useCreateChildForm() {
   const form = useForm<CreateChildFormData>({
     resolver: zodResolver(createChildSchema),
     defaultValues: {
+      familyId: "",
       firstName: "",
       lastName: "",
       gender: "",
       birthDate: "",
+      pamphletUrl: "",
+      childPhotoUrl: "",
     },
   });
 

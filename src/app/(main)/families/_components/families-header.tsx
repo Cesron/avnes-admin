@@ -18,15 +18,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import type { FamilyOption } from "@/services/families/get-families-options";
 import { PlusCircleIcon } from "lucide-react";
-import { CreateChildForm } from "./create-child-form";
+import { CreateFamilyForm } from "./create-family-form";
+import { getNextPenpalCode } from "@/services/families/get-next-penpal-code";
 
-interface ChildrenHeaderProps {
-  familiesOptions: FamilyOption[];
-}
+export async function FamiliesHeader() {
+  const suggestedPenpalCode = await getNextPenpalCode();
 
-export function ChildrenHeader({ familiesOptions }: ChildrenHeaderProps) {
   return (
     <header className="flex flex-wrap gap-3 min-h-20 py-4 shrink-0 items-center transition-all ease-linear border-b">
       <div className="flex flex-1 items-center gap-2">
@@ -43,7 +41,7 @@ export function ChildrenHeader({ familiesOptions }: ChildrenHeaderProps) {
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
-                <BreadcrumbPage>Niños</BreadcrumbPage>
+                <BreadcrumbPage>Familias</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -54,18 +52,18 @@ export function ChildrenHeader({ familiesOptions }: ChildrenHeaderProps) {
         <DialogTrigger asChild>
           <Button>
             <PlusCircleIcon />
-            Agregar Niño
+            Agregar Familia
           </Button>
         </DialogTrigger>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle>Crear Nuevo Niño/Niña</DialogTitle>
+            <DialogTitle>Crear Nueva Familia</DialogTitle>
             <DialogDescription>
-              Ingresa los datos del nuevo niño o niña.
+              Ingresa los datos de la nueva familia.
             </DialogDescription>
           </DialogHeader>
 
-          <CreateChildForm familiesOptions={familiesOptions} />
+          <CreateFamilyForm suggestedPenpalCode={suggestedPenpalCode} />
         </DialogContent>
       </Dialog>
     </header>

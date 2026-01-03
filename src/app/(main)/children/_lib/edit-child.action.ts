@@ -9,7 +9,18 @@ import { editChildSchema } from "./edit-child.schema";
 export const editChildAction = actionClient
   .inputSchema(editChildSchema)
   .action(
-    async ({ parsedInput: { id, firstName, lastName, gender, birthDate } }) => {
+    async ({
+      parsedInput: {
+        id,
+        familyId,
+        firstName,
+        lastName,
+        gender,
+        birthDate,
+        pamphletUrl,
+        childPhotoUrl,
+      },
+    }) => {
       const trimmedFirstName = firstName.trim();
       const trimmedLastName = lastName.trim();
 
@@ -21,6 +32,16 @@ export const editChildAction = actionClient
 
       if (childExists.rows.length === 0) {
         throw CustomError.notFound("El niño/niña no existe");
+      }
+
+      // Verificar que la familia existe
+      const familyExists = await sql.query(
+        `SELECT id FROM families WHERE id = $1`,
+        [familyId]
+      );
+
+      if (familyExists.rows.length === 0) {
+        throw CustomError.badRequest("La familia seleccionada no existe");
       }
 
       // Validar que la fecha de nacimiento no sea futura
@@ -35,8 +56,17 @@ export const editChildAction = actionClient
 
       // Actualizar el niño
       const result = await sql.query(
-        `UPDATE children SET first_name = $1, last_name = $2, gender = $3, birth_date = $4 WHERE id = $5 RETURNING id, first_name, last_name, gender, birth_date`,
-        [trimmedFirstName, trimmedLastName, gender, birthDate, id]
+        `UPDATE children SET first_name = $1, last_name = $2, gender = $3, birth_date = $4, family_id = $5, pamphlet_url = $6, child_photo_url = $7, updated_at = NOW() WHERE id = $8 RETURNING id`,
+        [
+          trimmedFirstName,
+          trimmedLastName,
+          gender,
+          birthDate,
+          familyId,
+          pamphletUrl || null,
+          childPhotoUrl || null,
+          id,
+        ]
       );
 
       // Revalidar la página para mostrar los cambios

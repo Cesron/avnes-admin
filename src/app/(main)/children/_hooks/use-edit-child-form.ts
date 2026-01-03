@@ -13,11 +13,14 @@ export function useEditChildForm() {
   const form = useForm<EditChildFormData>({
     resolver: zodResolver(editChildSchema),
     defaultValues: {
-      id: 0,
+      id: "",
+      familyId: "",
       firstName: "",
       lastName: "",
       gender: "",
       birthDate: "",
+      pamphletUrl: "",
+      childPhotoUrl: "",
     },
   });
 
@@ -32,10 +35,13 @@ export function useEditChildForm() {
 
       form.reset({
         id: childToEdit.id,
+        familyId: childToEdit.family_id,
         firstName: childToEdit.first_name,
         lastName: childToEdit.last_name,
         gender: childToEdit.gender,
         birthDate: birthDateStr,
+        pamphletUrl: childToEdit.pamphlet_url || "",
+        childPhotoUrl: childToEdit.child_photo_url || "",
       });
     }
   }, [childToEdit, form]);
