@@ -15,8 +15,7 @@ export function useEditChildForm() {
     defaultValues: {
       id: "",
       familyId: "",
-      firstName: "",
-      lastName: "",
+      name: "",
       gender: "",
       birthDate: "",
       pamphletUrl: "",
@@ -35,9 +34,8 @@ export function useEditChildForm() {
 
       form.reset({
         id: childToEdit.id,
-        familyId: childToEdit.family_id,
-        firstName: childToEdit.first_name,
-        lastName: childToEdit.last_name,
+        familyId: childToEdit.family_id || "",
+        name: childToEdit.name,
         gender: childToEdit.gender,
         birthDate: birthDateStr,
         pamphletUrl: childToEdit.pamphlet_url || "",

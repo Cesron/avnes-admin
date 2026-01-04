@@ -10,6 +10,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { GroupActions } from "./group-actions";
 
+function getClubBadgeVariant(clubName: string) {
+  if (clubName === "Jouse") return "blue-subtle";
+  if (clubName === "Samuel") return "green-subtle";
+  if (clubName === "Moises Parvulos") return "purple-subtle";
+  if (clubName === "Moises Maternal") return "pink-subtle";
+
+  return "blue-subtle";
+}
+
 export async function GroupsTable() {
   const groups = await getGroups();
 
@@ -18,7 +27,7 @@ export async function GroupsTable() {
       <Table>
         <TableHeader className="bg-muted sticky top-0 z-10">
           <TableRow>
-            <TableHead>Nombre del Grupo</TableHead>
+            <TableHead>Grupo</TableHead>
             <TableHead>Mentora</TableHead>
             <TableHead>Club</TableHead>
             <TableHead className="w-[100px]">Acciones</TableHead>
@@ -32,7 +41,9 @@ export async function GroupsTable() {
               </TableCell>
               <TableCell>{group.mentor_name}</TableCell>
               <TableCell>
-                <Badge variant="blue-subtle">{group.club_name}</Badge>
+                <Badge variant={getClubBadgeVariant(group.club_name)}>
+                  {group.club_name}
+                </Badge>
               </TableCell>
               <TableCell>
                 <GroupActions group={group} />

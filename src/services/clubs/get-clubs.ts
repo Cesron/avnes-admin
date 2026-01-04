@@ -7,7 +7,6 @@ export async function getClubs(): Promise<Club[]> {
         id, 
         name
       FROM clubs
-      ORDER BY id ASC
     `);
 
   return result.rows;

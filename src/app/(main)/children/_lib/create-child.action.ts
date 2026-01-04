@@ -11,36 +11,35 @@ export const createChildAction = actionClient
     async ({
       parsedInput: {
         familyId,
-        firstName,
-        lastName,
+        name,
         gender,
         birthDate,
         pamphletUrl,
         childPhotoUrl,
       },
     }) => {
-      const trimmedFirstName = firstName.trim();
-      const trimmedLastName = lastName.trim();
+      const trimmedName = name.trim();
 
-      // Verificar que la familia existe
-      const familyExists = await sql.query(
-        `SELECT id FROM families WHERE id = $1`,
-        [familyId]
-      );
+      // Verificar que la familia existe (solo si se proporciona)
+      if (familyId) {
+        const familyExists = await sql.query(
+          `SELECT id FROM families WHERE id = $1`,
+          [familyId]
+        );
 
-      if (familyExists.rows.length === 0) {
-        throw CustomError.badRequest("La familia seleccionada no existe");
+        if (familyExists.rows.length === 0) {
+          throw CustomError.badRequest("La familia seleccionada no existe");
+        }
       }
 
       // Crear el nuevo niño/niña
       await sql.query(
-        `INSERT INTO children (first_name, last_name, gender, birth_date, family_id, pamphlet_url, child_photo_url) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+        `INSERT INTO children (name, gender, birth_date, family_id, pamphlet_url, child_photo_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
         [
-          trimmedFirstName,
-          trimmedLastName,
+          trimmedName,
           gender,
           birthDate,
-          familyId,
+          familyId || null,
           pamphletUrl || null,
           childPhotoUrl || null,
         ]

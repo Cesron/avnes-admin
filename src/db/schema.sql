@@ -24,11 +24,6 @@ CREATE TABLE clubs (
   name VARCHAR(50) NOT NULL UNIQUE
 );
 
-INSERT INTO clubs (name) VALUES
-  ('Moisés'),
-  ('Samuel'),
-  ('Josué');
-
 -- ==========================================
 -- Table: mentors
 -- ==========================================
@@ -72,13 +67,12 @@ CREATE TABLE families (
 CREATE TABLE children (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
-  first_name VARCHAR(50) NOT NULL,
-  last_name VARCHAR(50) NOT NULL,
+  name VARCHAR(100) NOT NULL,
   gender CHAR(1) NOT NULL,
   birth_date DATE NOT NULL,
 
-  -- Relación familiar
-  family_id UUID NOT NULL REFERENCES families(id) ON DELETE RESTRICT,
+  -- Relación familiar (opcional)
+  family_id UUID REFERENCES families(id) ON DELETE RESTRICT,
 
   -- Recursos individuales
   pamphlet_url TEXT,

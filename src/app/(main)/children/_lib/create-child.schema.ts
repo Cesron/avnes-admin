@@ -1,16 +1,11 @@
 import { z } from "zod";
 
 export const createChildSchema = z.object({
-  familyId: z.string().min(1, "Debes seleccionar una familia"),
-  firstName: z
+  familyId: z.string().optional(),
+  name: z
     .string()
     .min(3, "El nombre debe tener al menos 3 caracteres")
-    .max(50, "El nombre no puede exceder los 50 caracteres")
-    .trim(),
-  lastName: z
-    .string()
-    .min(3, "El apellido debe tener al menos 3 caracteres")
-    .max(50, "El apellido no puede exceder los 50 caracteres")
+    .max(100, "El nombre no puede exceder los 100 caracteres")
     .trim(),
   gender: z
     .string()

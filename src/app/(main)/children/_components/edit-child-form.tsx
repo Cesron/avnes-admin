@@ -53,7 +53,7 @@ export function EditChildForm({ familiesOptions }: EditChildFormProps) {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="form-edit-child-family">
-                    Familia
+                    Familia (opcional)
                   </FieldLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger
@@ -79,41 +79,18 @@ export function EditChildForm({ familiesOptions }: EditChildFormProps) {
             />
 
             <Controller
-              name="firstName"
+              name="name"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-edit-child-first-name">
-                    Nombre
+                  <FieldLabel htmlFor="form-edit-child-name">
+                    Nombre Completo
                   </FieldLabel>
                   <Input
                     {...field}
-                    id="form-edit-child-first-name"
+                    id="form-edit-child-name"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Ej: Juan"
-                    autoComplete="off"
-                  />
-
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-
-            <Controller
-              name="lastName"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-edit-child-last-name">
-                    Apellido
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="form-edit-child-last-name"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="Ej: Pérez"
+                    placeholder="Ej: Juan Pérez"
                     autoComplete="off"
                   />
 

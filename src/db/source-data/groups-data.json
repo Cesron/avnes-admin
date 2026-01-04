@@ -1,0 +1,74 @@
+[
+  {
+    "id": "3c88a9c5-c21e-444b-8eae-67243d9354a0",
+    "name": "Grupo de Andrea",
+    "club_id": "92db0fa2-6ec1-4881-aa52-32c525b4b4e7",
+    "mentor_id": "cc78c167-54d3-4e55-b7fa-d70323b8d974"
+  },
+  {
+    "id": "90d88a87-c3a3-4a89-afcb-7a3c64f49e9c",
+    "name": "Grupo de Carolina",
+    "club_id": "92db0fa2-6ec1-4881-aa52-32c525b4b4e7",
+    "mentor_id": "430e16c8-e74a-474c-b0eb-0e564f6d70f0"
+  },
+  {
+    "id": "2a587ef3-0ed8-4260-9ce1-b59c6ac1873c",
+    "name": "Grupo de Claudia",
+    "club_id": "86dd20aa-1412-4c67-a7e7-6360a581df8b",
+    "mentor_id": "c6f8d245-d4d2-4995-8871-023ba1363f00"
+  },
+  {
+    "id": "22692254-0a64-4c5e-a131-a915422d9fbe",
+    "name": "Grupo de Esther",
+    "club_id": "92db0fa2-6ec1-4881-aa52-32c525b4b4e7",
+    "mentor_id": "8f9e492b-73f6-4643-b7f6-abbcde5cbef2"
+  },
+  {
+    "id": "eed32780-820b-4cc2-bb0c-cd1cc7035c30",
+    "name": "Grupo de Eva",
+    "club_id": "86dd20aa-1412-4c67-a7e7-6360a581df8b",
+    "mentor_id": "5ce76151-baaa-4fcf-8928-636d0db825da"
+  },
+  {
+    "id": "26d83e0b-6aac-4667-9ec1-6d3af149461a",
+    "name": "Grupo de Lilian",
+    "club_id": "86dd20aa-1412-4c67-a7e7-6360a581df8b",
+    "mentor_id": "e60c6090-ebd5-4058-9f92-f174c664d1b2"
+  },
+  {
+    "id": "2c1e5e71-c176-4d34-a5cd-e6da351c71e6",
+    "name": "Grupo de Lissette",
+    "club_id": "86dd20aa-1412-4c67-a7e7-6360a581df8b",
+    "mentor_id": "1efb96ca-765d-4d7a-87e9-bf305ba748c1"
+  },
+  {
+    "id": "035d4ad0-4513-4edb-9316-8b5ebb4d7169",
+    "name": "Grupo de Lorena",
+    "club_id": "92208dca-0031-48ee-bf91-ca3d31c627ca",
+    "mentor_id": "3da58199-b117-42f8-a83a-40ade678b8d8"
+  },
+  {
+    "id": "7271e62d-3b78-4035-ac0b-fb22e6899989",
+    "name": "Grupo de Morena",
+    "club_id": "92208dca-0031-48ee-bf91-ca3d31c627ca",
+    "mentor_id": "a554a29c-0549-4891-bbdf-132d022e65cc"
+  },
+  {
+    "id": "f130f281-6f49-4248-a2a3-50ab57ce0517",
+    "name": "Grupo de Noemy",
+    "club_id": "92208dca-0031-48ee-bf91-ca3d31c627ca",
+    "mentor_id": "da42d4f1-0680-455f-861b-1893e1255654"
+  },
+  {
+    "id": "edf26ad2-4e20-48fd-9916-a6b751e80a60",
+    "name": "Grupo de Rosario",
+    "club_id": "92db0fa2-6ec1-4881-aa52-32c525b4b4e7",
+    "mentor_id": "2a7a4f7a-d510-49ab-b29c-97ff5b04ea7c"
+  },
+  {
+    "id": "deab58be-4f5a-4f98-985e-f8f716d74f16",
+    "name": "Grupo de Zuleyma",
+    "club_id": "92db0fa2-6ec1-4881-aa52-32c525b4b4e7",
+    "mentor_id": "1d6ea8f9-d54d-40ee-9a39-3ae73dff3108"
+  }
+]

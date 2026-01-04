@@ -15,8 +15,7 @@ export function useCreateChildForm() {
     resolver: zodResolver(createChildSchema),
     defaultValues: {
       familyId: "",
-      firstName: "",
-      lastName: "",
+      name: "",
       gender: "",
       birthDate: "",
       pamphletUrl: "",

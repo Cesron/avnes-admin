@@ -23,6 +23,8 @@ const badgeVariants = cva(
           "border-transparent bg-blue-subtle text-blue-subtle-foreground [a&]:hover:bg-blue-subtle/90",
         "purple-subtle":
           "border-transparent bg-purple-subtle text-purple-subtle-foreground [a&]:hover:bg-purple-subtle/90",
+        "pink-subtle":
+          "border-transparent bg-pink-subtle text-pink-subtle-foreground [a&]:hover:bg-pink-subtle/90",
       },
     },
     defaultVariants: {

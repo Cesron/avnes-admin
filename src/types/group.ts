@@ -3,6 +3,6 @@ export type Group = {
   name: string;
   club_id: string;
   mentor_id: string;
-  club_name?: string;
-  mentor_name?: string;
+  club_name: string;
+  mentor_name: string;
 };

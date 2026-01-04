@@ -13,16 +13,14 @@ export const editChildAction = actionClient
       parsedInput: {
         id,
         familyId,
-        firstName,
-        lastName,
+        name,
         gender,
         birthDate,
         pamphletUrl,
         childPhotoUrl,
       },
     }) => {
-      const trimmedFirstName = firstName.trim();
-      const trimmedLastName = lastName.trim();
+      const trimmedName = name.trim();
 
       // Verificar si el niño existe
       const childExists = await sql.query(
@@ -34,14 +32,16 @@ export const editChildAction = actionClient
         throw CustomError.notFound("El niño/niña no existe");
       }
 
-      // Verificar que la familia existe
-      const familyExists = await sql.query(
-        `SELECT id FROM families WHERE id = $1`,
-        [familyId]
-      );
+      // Verificar que la familia existe (solo si se proporciona)
+      if (familyId) {
+        const familyExists = await sql.query(
+          `SELECT id FROM families WHERE id = $1`,
+          [familyId]
+        );
 
-      if (familyExists.rows.length === 0) {
-        throw CustomError.badRequest("La familia seleccionada no existe");
+        if (familyExists.rows.length === 0) {
+          throw CustomError.badRequest("La familia seleccionada no existe");
+        }
       }
 
       // Validar que la fecha de nacimiento no sea futura
@@ -56,13 +56,12 @@ export const editChildAction = actionClient
 
       // Actualizar el niño
       const result = await sql.query(
-        `UPDATE children SET first_name = $1, last_name = $2, gender = $3, birth_date = $4, family_id = $5, pamphlet_url = $6, child_photo_url = $7, updated_at = NOW() WHERE id = $8 RETURNING id`,
+        `UPDATE children SET name = $1, gender = $2, birth_date = $3, family_id = $4, pamphlet_url = $5, child_photo_url = $6, updated_at = NOW() WHERE id = $7 RETURNING id`,
         [
-          trimmedFirstName,
-          trimmedLastName,
+          trimmedName,
           gender,
           birthDate,
-          familyId,
+          familyId || null,
           pamphletUrl || null,
           childPhotoUrl || null,
           id,

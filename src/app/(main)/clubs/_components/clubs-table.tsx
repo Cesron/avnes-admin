@@ -17,7 +17,6 @@ export async function ClubsTable() {
       <Table>
         <TableHeader className="bg-muted sticky top-0 z-10">
           <TableRow>
-            <TableHead>ID</TableHead>
             <TableHead>Nombre del Club</TableHead>
             <TableHead className="w-[100px]">Acciones</TableHead>
           </TableRow>
@@ -25,7 +24,6 @@ export async function ClubsTable() {
         <TableBody>
           {clubs.map((club) => (
             <TableRow key={club.id}>
-              <TableCell className="font-medium">{club.id}</TableCell>
               <TableCell>
                 <div className="font-medium text-base">{club.name}</div>
               </TableCell>

@@ -42,16 +42,15 @@ export async function ChildrenTable() {
       <Table>
         <TableHeader className="bg-muted sticky top-0 z-10">
           <TableRow>
-            <TableHead>Código Penpal</TableHead>
+            <TableHead>Código</TableHead>
             <TableHead>Nombre</TableHead>
-            <TableHead>Apellido</TableHead>
             <TableHead>Género</TableHead>
-            <TableHead>Fecha de Nacimiento</TableHead>
+            <TableHead>Fecha de nacimiento</TableHead>
             <TableHead>Edad</TableHead>
-            <TableHead>Foto Individual</TableHead>
+            {/* <TableHead>Foto Individual</TableHead> */}
             <TableHead>Panfleto</TableHead>
-            <TableHead>Biografía Familiar</TableHead>
-            <TableHead>Foto Familiar</TableHead>
+            <TableHead>Biografía</TableHead>
+            <TableHead>Foto</TableHead>
             <TableHead className="w-[100px]">Acciones</TableHead>
           </TableRow>
         </TableHeader>
@@ -60,13 +59,10 @@ export async function ChildrenTable() {
             const age = calculateAge(child.birth_date);
             return (
               <TableRow key={child.id}>
+                <TableCell>{child.penpal_code ?? "—"}</TableCell>
                 <TableCell>
-                  <Badge variant="outline">{child.penpal_code}</Badge>
+                  <div className="font-medium">{child.name}</div>
                 </TableCell>
-                <TableCell>
-                  <div className="font-medium">{child.first_name}</div>
-                </TableCell>
-                <TableCell>{child.last_name}</TableCell>
                 <TableCell>
                   <Badge
                     variant={
@@ -78,20 +74,17 @@ export async function ChildrenTable() {
                 </TableCell>
                 <TableCell>{formatDate(child.birth_date)}</TableCell>
                 <TableCell>{age} años</TableCell>
-                <TableCell>
+                {/* <TableCell>
                   <UrlLink url={child.child_photo_url} label="Ver foto" />
+                </TableCell> */}
+                <TableCell>
+                  <UrlLink url={child.pamphlet_url} label="Panfleto" />
                 </TableCell>
                 <TableCell>
-                  <UrlLink url={child.pamphlet_url} label="Ver panfleto" />
+                  <UrlLink url={child.family_biography_url} label="Biografía" />
                 </TableCell>
                 <TableCell>
-                  <UrlLink
-                    url={child.family_biography_url}
-                    label="Ver biografía"
-                  />
-                </TableCell>
-                <TableCell>
-                  <UrlLink url={child.family_photo_url} label="Ver foto" />
+                  <UrlLink url={child.family_photo_url} label="Foto" />
                 </TableCell>
                 <TableCell>
                   <ChildActions child={child} />
@@ -103,7 +96,7 @@ export async function ChildrenTable() {
           {children.length === 0 && (
             <TableRow>
               <TableCell
-                colSpan={11}
+                colSpan={10}
                 className="text-center text-muted-foreground"
               >
                 No hay niños registrados
