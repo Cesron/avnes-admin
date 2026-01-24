@@ -16,6 +16,8 @@ import {
   BabyIcon,
   BlocksIcon,
   BookMarkedIcon,
+  CalendarDaysIcon,
+  ClipboardCheckIcon,
   GaugeIcon,
   HomeIcon,
   UserRoundCogIcon,
@@ -47,6 +49,16 @@ const data = {
           title: "Grupos",
           url: "/groups",
           icon: UsersRoundIcon,
+        },
+        {
+          title: "Actividades",
+          url: "/activities",
+          icon: CalendarDaysIcon,
+        },
+        {
+          title: "Asistencia",
+          url: "/attendance",
+          icon: ClipboardCheckIcon,
         },
         {
           title: "Mentoras",
