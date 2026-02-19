@@ -39,6 +39,7 @@ export const editActivitySchema = baseEditActivitySchema.refine(
       data.daysOfWeek &&
       data.daysOfWeek.length > 0 &&
       !!data.startDate &&
+      !!data.endDate &&
       !!data.startTime &&
       !!data.endTime
     );

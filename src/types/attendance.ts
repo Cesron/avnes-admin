@@ -26,6 +26,20 @@ export type TodayActivity = {
   has_occurrence_today: boolean;
 };
 
+// For the weekly attendance view - pre-generated occurrences
+export type WeekOccurrence = {
+  occurrence_id: string;
+  activity_id: string;
+  activity_name: string;
+  is_recurring: boolean;
+  start_datetime: string;
+  end_datetime: string;
+  status: string;
+  group_names: string;
+  club_names: string;
+  attendance_count: number;
+};
+
 // For the attendance marking page
 export type ChildAttendance = {
   child_id: string;

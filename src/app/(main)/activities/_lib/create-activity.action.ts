@@ -3,6 +3,7 @@
 import { actionClient } from "@/lib/safe-action";
 import { sql } from "@/lib/sql";
 import { CustomError } from "@/utils/custom-error";
+import { generateOccurrences } from "@/utils/generate-occurrences";
 import { revalidatePath } from "next/cache";
 import { createActivitySchema } from "./create-activity.schema";
 
@@ -80,11 +81,40 @@ export const createActivityAction = actionClient
             interval || 1,
             daysOfWeek?.join(",") || null,
             startDate,
-            endDate || null,
+            endDate,
             startTime,
             endTime,
           ],
         );
+
+        // Pre-generate all occurrences from start_date to end_date
+        const occurrences = generateOccurrences({
+          frequency: frequency!,
+          interval: interval || 1,
+          daysOfWeek: daysOfWeek || null,
+          startDate: startDate!,
+          endDate: endDate!,
+          startTime: startTime!,
+          endTime: endTime!,
+        });
+
+        if (occurrences.length > 0) {
+          // Bulk insert all occurrences
+          const values = occurrences
+            .map((_, i) => `($1, $${i * 2 + 2}, $${i * 2 + 3}, 'scheduled')`)
+            .join(", ");
+
+          const params: string[] = [activityId];
+          for (const occ of occurrences) {
+            params.push(occ.startDatetime, occ.endDatetime);
+          }
+
+          await sql.query(
+            `INSERT INTO activity_occurrences (activity_id, start_datetime, end_datetime, status)
+             VALUES ${values}`,
+            params,
+          );
+        }
       } else {
         // Create a single occurrence for non-recurring activity
         const startDatetime = `${singleDate} ${singleStartTime}`;

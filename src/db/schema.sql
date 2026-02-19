@@ -31,7 +31,8 @@ CREATE TABLE mentors (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(100) NOT NULL,
   phone VARCHAR(20),
-  email VARCHAR(100)
+  email VARCHAR(100),
+  user_id TEXT UNIQUE REFERENCES "user"(id) ON DELETE SET NULL
 );
 
 -- ==========================================

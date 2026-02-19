@@ -3,6 +3,7 @@
 import { actionClient } from "@/lib/safe-action";
 import { sql } from "@/lib/sql";
 import { CustomError } from "@/utils/custom-error";
+import { generateOccurrences } from "@/utils/generate-occurrences";
 import { revalidatePath } from "next/cache";
 import { editActivitySchema } from "./edit-activity.schema";
 
@@ -76,6 +77,7 @@ export const editActivityAction = actionClient
 
       // Handle recurrence changes
       const wasRecurring = activityExists.rows[0].is_recurring;
+      const today = new Date().toISOString().split("T")[0];
 
       if (isRecurring) {
         if (wasRecurring) {
@@ -91,7 +93,7 @@ export const editActivityAction = actionClient
               interval || 1,
               daysOfWeek?.join(",") || null,
               startDate,
-              endDate || null,
+              endDate,
               startTime,
               endTime,
               id,
@@ -110,16 +112,52 @@ export const editActivityAction = actionClient
               interval || 1,
               daysOfWeek?.join(",") || null,
               startDate,
-              endDate || null,
+              endDate,
               startTime,
               endTime,
             ],
           );
-          // Delete any existing occurrences since it's now recurring
-          await sql.query(
-            `DELETE FROM activity_occurrences WHERE activity_id = $1`,
-            [id],
-          );
+        }
+
+        // Delete only future occurrences that have NO attendance records
+        await sql.query(
+          `DELETE FROM activity_occurrences 
+           WHERE activity_id = $1 
+             AND start_datetime::date >= $2::date
+             AND id NOT IN (
+               SELECT DISTINCT activity_occurrence_id FROM attendances
+             )`,
+          [id, today],
+        );
+
+        // Regenerate future occurrences
+        const occurrences = generateOccurrences({
+          frequency: frequency!,
+          interval: interval || 1,
+          daysOfWeek: daysOfWeek || null,
+          startDate: startDate! < today ? today : startDate!,
+          endDate: endDate!,
+          startTime: startTime!,
+          endTime: endTime!,
+        });
+
+        if (occurrences.length > 0) {
+          // Filter out occurrences that already exist (e.g., kept because they have attendance)
+          for (const occ of occurrences) {
+            const existing = await sql.query(
+              `SELECT id FROM activity_occurrences 
+               WHERE activity_id = $1 AND start_datetime::date = $2::date`,
+              [id, occ.startDatetime.split(" ")[0]],
+            );
+
+            if (existing.rows.length === 0) {
+              await sql.query(
+                `INSERT INTO activity_occurrences (activity_id, start_datetime, end_datetime, status)
+                 VALUES ($1, $2, $3, 'scheduled')`,
+                [id, occ.startDatetime, occ.endDatetime],
+              );
+            }
+          }
         }
       } else {
         if (wasRecurring) {
@@ -130,15 +168,19 @@ export const editActivityAction = actionClient
           );
         }
 
-        // Update or create single occurrence
-        const startDatetime = `${singleDate} ${singleStartTime}`;
-        const endDatetime = `${singleDate} ${singleEndTime}`;
-
-        // Delete existing occurrences and create new one
+        // Delete future occurrences without attendance, keep past ones
         await sql.query(
-          `DELETE FROM activity_occurrences WHERE activity_id = $1`,
+          `DELETE FROM activity_occurrences 
+           WHERE activity_id = $1
+             AND id NOT IN (
+               SELECT DISTINCT activity_occurrence_id FROM attendances
+             )`,
           [id],
         );
+
+        // Create single occurrence
+        const startDatetime = `${singleDate} ${singleStartTime}`;
+        const endDatetime = `${singleDate} ${singleEndTime}`;
 
         await sql.query(
           `INSERT INTO activity_occurrences (

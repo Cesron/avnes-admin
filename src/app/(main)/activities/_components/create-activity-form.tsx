@@ -359,7 +359,7 @@ export function CreateActivityForm({ groupsOptions }: CreateActivityFormProps) {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="form-create-activity-end-date">
-                      Fecha de fin (opcional)
+                      Fecha de fin
                     </FieldLabel>
                     <Input
                       {...field}

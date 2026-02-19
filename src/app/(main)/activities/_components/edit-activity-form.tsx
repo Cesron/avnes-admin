@@ -386,7 +386,7 @@ export function EditActivityForm({ groupsOptions }: EditActivityFormProps) {
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel htmlFor="form-edit-activity-end-date">
-                          Fecha de fin (opcional)
+                          Fecha de fin
                         </FieldLabel>
                         <Input
                           {...field}

@@ -3,4 +3,5 @@ export type Mentor = {
   name: string;
   phone: string | null;
   email: string | null;
+  user_id: string | null;
 };
