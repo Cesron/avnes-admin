@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDate } from "@/utils/format-date";
 import type { UserRole } from "@/types/user";
+import { UserActions } from "./user-actions";
 
 const ROLE_CONFIG: Record<
   string,
@@ -41,6 +42,7 @@ export async function UsersTable() {
             <TableHead>Rol</TableHead>
             <TableHead>Mentora vinculada</TableHead>
             <TableHead>Fecha de Creación</TableHead>
+            <TableHead className="w-[100px]">Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -80,6 +82,9 @@ export async function UsersTable() {
                   )}
                 </TableCell>
                 <TableCell>{formatDate(user.createdAt)}</TableCell>
+                <TableCell>
+                  <UserActions user={user} />
+                </TableCell>
               </TableRow>
             );
           })}
@@ -87,7 +92,7 @@ export async function UsersTable() {
           {users.length === 0 && (
             <TableRow>
               <TableCell
-                colSpan={5}
+                colSpan={6}
                 className="text-center text-muted-foreground"
               >
                 No hay usuarios registrados

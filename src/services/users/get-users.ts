@@ -2,6 +2,7 @@ import { sql } from "@/lib/sql";
 import type { User } from "@/types/user";
 
 export type UserWithMentor = User & {
+  mentor_id: string | null;
   mentor_name: string | null;
 };
 
@@ -16,6 +17,7 @@ export async function getUsers(): Promise<UserWithMentor[]> {
         u.role,  
         u."createdAt", 
         u."updatedAt",
+        m.id AS mentor_id,
         m.name AS mentor_name
       FROM "user" u
       LEFT JOIN mentors m ON m.user_id = u.id
