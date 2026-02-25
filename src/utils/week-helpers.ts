@@ -41,3 +41,41 @@ export function getWeekDays(date: Date): Date[] {
     return d;
   });
 }
+
+/**
+ * Returns the first day of the month for the given date.
+ */
+export function getMonthStart(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+/**
+ * Returns the last day of the month for the given date.
+ */
+export function getMonthEnd(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+}
+
+/**
+ * Returns the calendar grid dates for a month view.
+ * Includes padding days from previous/next months so the grid starts on Monday
+ * and ends on Sunday (complete weeks).
+ */
+export function getCalendarDays(date: Date): Date[] {
+  const monthStart = getMonthStart(date);
+  const monthEnd = getMonthEnd(date);
+
+  // Find the Monday on or before the 1st
+  const calendarStart = getWeekMonday(monthStart);
+
+  // Find the Sunday on or after the last day
+  const calendarEnd = getWeekSunday(monthEnd);
+
+  const days: Date[] = [];
+  const current = new Date(calendarStart);
+  while (current <= calendarEnd) {
+    days.push(new Date(current));
+    current.setDate(current.getDate() + 1);
+  }
+  return days;
+}

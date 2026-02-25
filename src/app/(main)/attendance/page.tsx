@@ -4,18 +4,18 @@ import { getGroupsOptions } from "@/services/groups/get-groups-options";
 import { getWeekOccurrences } from "@/services/attendance/get-week-occurrences";
 import {
   formatDateLocal,
-  getWeekMonday,
-  getWeekSunday,
+  getMonthEnd,
+  getMonthStart,
 } from "@/utils/week-helpers";
-import { AttendanceWeekView } from "./_components/attendance-week-view";
+import { AttendanceMonthView } from "./_components/attendance-month-view";
 import { AttendanceHeader } from "./_components/attendance-header";
 
 export default async function AttendancePage() {
   const userInfo = await getSessionUserInfo();
 
   const today = new Date();
-  const weekStart = formatDateLocal(getWeekMonday(today));
-  const weekEnd = formatDateLocal(getWeekSunday(today));
+  const monthStart = formatDateLocal(getMonthStart(today));
+  const monthEnd = formatDateLocal(getMonthEnd(today));
 
   // Mentors only see their groups
   const mentorGroupIds =
@@ -27,8 +27,8 @@ export default async function AttendancePage() {
     getClubsOptions(),
     getGroupsOptions(),
     getWeekOccurrences({
-      startDate: weekStart,
-      endDate: weekEnd,
+      startDate: monthStart,
+      endDate: monthEnd,
       mentorGroupIds,
     }),
   ]);
@@ -43,9 +43,9 @@ export default async function AttendancePage() {
       <AttendanceHeader />
 
       <div className="py-6">
-        <AttendanceWeekView
+        <AttendanceMonthView
           initialOccurrences={occurrences}
-          initialWeekStart={weekStart}
+          initialMonthStart={monthStart}
           clubs={clubs}
           groups={filteredGroups}
           mentorGroupIds={mentorGroupIds}

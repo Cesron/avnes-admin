@@ -1,7 +1,13 @@
 "use client";
 
 import type { WeekOccurrence } from "@/types/attendance";
-import { ClipboardCheckIcon, ClockIcon, UsersIcon } from "lucide-react";
+import { getClubDotColor } from "@/utils/club-colors";
+import {
+  BlocksIcon,
+  ClipboardCheckIcon,
+  ClockIcon,
+  UsersIcon,
+} from "lucide-react";
 import Link from "next/link";
 
 interface OccurrenceCardProps {
@@ -43,8 +49,12 @@ export function OccurrenceCard({ occurrence }: OccurrenceCardProps) {
           <span>{occurrence.group_names}</span>
         </div>
 
-        <div className="text-xs text-muted-foreground">
-          {occurrence.club_names}
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <BlocksIcon className="size-3" />
+          <span
+            className={`size-2 rounded-full shrink-0 ${getClubDotColor(occurrence.club_names)}`}
+          />
+          <span>{occurrence.club_names}</span>
         </div>
 
         {hasAttendance && (

@@ -9,15 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { GroupActions } from "./group-actions";
-
-function getClubBadgeVariant(clubName: string) {
-  if (clubName === "Jouse") return "blue-subtle";
-  if (clubName === "Samuel") return "green-subtle";
-  if (clubName === "Moises Parvulos") return "purple-subtle";
-  if (clubName === "Moises Maternal") return "pink-subtle";
-
-  return "blue-subtle";
-}
+import { getClubBadgeVariant } from "@/utils/club-colors";
 
 export async function GroupsTable() {
   const groups = await getGroups();
