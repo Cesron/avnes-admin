@@ -96,14 +96,16 @@ export function AttendanceMonthView({
 
   return (
     <div className="space-y-6">
-      <AttendanceFilters
-        clubs={clubs}
-        groups={groups}
-        selectedClubId={selectedClubId}
-        selectedGroupId={selectedGroupId}
-        onClubChange={handleClubChange}
-        onGroupChange={handleGroupChange}
-      />
+      {!mentorGroupIds && (
+        <AttendanceFilters
+          clubs={clubs}
+          groups={groups}
+          selectedClubId={selectedClubId}
+          selectedGroupId={selectedGroupId}
+          onClubChange={handleClubChange}
+          onGroupChange={handleGroupChange}
+        />
+      )}
 
       <MonthNavigator
         currentMonthStart={currentMonthStart}

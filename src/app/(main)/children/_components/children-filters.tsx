@@ -27,6 +27,7 @@ interface ChildrenFiltersProps {
   selectedClubId: string;
   selectedGroupId: string;
   searchValue: string;
+  showGroupFilters: boolean;
   onClubChange: (clubId: string) => void;
   onGroupChange: (groupId: string) => void;
   onSearchChange: (value: string) => void;
@@ -38,6 +39,7 @@ export function ChildrenFilters({
   selectedClubId,
   selectedGroupId,
   searchValue,
+  showGroupFilters,
   onClubChange,
   onGroupChange,
   onSearchChange,
@@ -67,46 +69,50 @@ export function ChildrenFilters({
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 min-w-[200px]">
-        <label className="text-sm font-medium text-muted-foreground">
-          Club
-        </label>
-        <Select value={selectedClubId} onValueChange={onClubChange}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Seleccionar club" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos los clubes</SelectItem>
-            {clubs.map((club) => (
-              <SelectItem key={club.id} value={club.id}>
-                {club.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {showGroupFilters && (
+        <div className="flex flex-col gap-2 min-w-[200px]">
+          <label className="text-sm font-medium text-muted-foreground">
+            Club
+          </label>
+          <Select value={selectedClubId} onValueChange={onClubChange}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Seleccionar club" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los clubes</SelectItem>
+              {clubs.map((club) => (
+                <SelectItem key={club.id} value={club.id}>
+                  {club.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
-      <div className="flex flex-col gap-2 min-w-[200px]">
-        <label className="text-sm font-medium text-muted-foreground">
-          Grupo
-        </label>
-        <Select value={selectedGroupId} onValueChange={onGroupChange}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Seleccionar grupo" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos los grupos</SelectItem>
-            {filteredGroups.map((group) => (
-              <SelectItem key={group.id} value={group.id}>
-                {group.name}{" "}
-                <span className="text-muted-foreground">
-                  ({group.club_name})
-                </span>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {showGroupFilters && (
+        <div className="flex flex-col gap-2 min-w-[200px]">
+          <label className="text-sm font-medium text-muted-foreground">
+            Grupo
+          </label>
+          <Select value={selectedGroupId} onValueChange={onGroupChange}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Seleccionar grupo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los grupos</SelectItem>
+              {filteredGroups.map((group) => (
+                <SelectItem key={group.id} value={group.id}>
+                  {group.name}{" "}
+                  <span className="text-muted-foreground">
+                    ({group.club_name})
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
     </div>
   );
 }

@@ -12,6 +12,8 @@ import {
   SidebarMenu,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { hasAccess } from "@/lib/permissions";
+import type { UserRole } from "@/types/user";
 import {
   BabyIcon,
   BlocksIcon,
@@ -117,14 +119,25 @@ function SidebarLogo() {
   );
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
+  userRole: UserRole | null;
+};
+
+export function AppSidebar({ userRole, ...props }: AppSidebarProps) {
+  const filteredNav = data.navMain
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => hasAccess(userRole, item.url)),
+    }))
+    .filter((group) => group.items.length > 0);
+
   return (
     <Sidebar collapsible="icon" variant="inset" {...props}>
       <SidebarHeader className="h-16 max-md:mt-2 mb-2 justify-center">
         <SidebarLogo />
       </SidebarHeader>
       <SidebarContent className="-mt-2">
-        {data.navMain.map((item) => (
+        {filteredNav.map((item) => (
           <SidebarGroup key={item.title}>
             <SidebarGroupLabel className="uppercase text-muted-foreground/65">
               {item.title}

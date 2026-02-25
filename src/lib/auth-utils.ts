@@ -3,6 +3,7 @@ import { auth } from "./auth";
 import { redirect } from "next/navigation";
 import { sql } from "./sql";
 import type { UserRole } from "@/types/user";
+import { hasAccess } from "./permissions";
 
 export async function verifySession() {
   const session = await auth.api.getSession({
@@ -11,6 +12,21 @@ export async function verifySession() {
 
   if (!session) {
     redirect("/login");
+  }
+
+  return session;
+}
+
+/**
+ * Verify that the current user has access to the given pathname.
+ * Redirects to /dashboard if the user lacks permission.
+ */
+export async function authorize(pathname: string) {
+  const session = await verifySession();
+  const role = (session.user.role as UserRole) || null;
+
+  if (!hasAccess(role, pathname)) {
+    redirect("/dashboard");
   }
 
   return session;

@@ -74,6 +74,7 @@ export function ChildrenListView({
         selectedClubId={selectedClubId}
         selectedGroupId={selectedGroupId}
         searchValue={search}
+        showGroupFilters={!mentorGroupIds}
         onClubChange={handleClubChange}
         onGroupChange={handleGroupChange}
         onSearchChange={handleSearchChange}
