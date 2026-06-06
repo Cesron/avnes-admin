@@ -25,12 +25,12 @@ export const editGroupAction = actionClient
     // Verificar si ya existe otro grupo con el mismo nombre (normalizado)
     const existingGroup = await sql.query(
       `SELECT id, name FROM groups WHERE LOWER(REGEXP_REPLACE(NORMALIZE(name, NFD), '[\\u0300-\\u036f]', '', 'g')) = $1 AND id != $2`,
-      [normalizedName, id]
+      [normalizedName, id],
     );
 
     if (existingGroup.rows.length > 0) {
       throw CustomError.badRequest(
-        `Ya existe otro grupo con el nombre "${existingGroup.rows[0].name}"`
+        `Ya existe otro grupo con el nombre "${existingGroup.rows[0].name}"`,
       );
     }
 
@@ -46,7 +46,7 @@ export const editGroupAction = actionClient
     // Verificar que la mentora existe
     const mentorExists = await sql.query(
       `SELECT id FROM mentors WHERE id = $1`,
-      [mentorId]
+      [mentorId],
     );
 
     if (mentorExists.rows.length === 0) {
@@ -56,7 +56,7 @@ export const editGroupAction = actionClient
     // Actualizar el grupo
     const result = await sql.query(
       `UPDATE groups SET name = $1, club_id = $2, mentor_id = $3 WHERE id = $4 RETURNING id, name, club_id, mentor_id`,
-      [trimmedName, clubId, mentorId, id]
+      [trimmedName, clubId, mentorId, id],
     );
 
     // Revalidar la página para mostrar los cambios

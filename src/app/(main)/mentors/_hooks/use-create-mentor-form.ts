@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { createMentorAction } from "../_lib/create-mentor.action";
 import {
-  CreateMentorFormData,
+  type CreateMentorFormData,
   createMentorSchema,
 } from "../_lib/create-mentor.schema";
 

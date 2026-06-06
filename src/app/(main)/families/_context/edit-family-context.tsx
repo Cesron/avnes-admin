@@ -11,7 +11,7 @@ type EditFamilyContextType = {
 };
 
 const EditFamilyContext = createContext<EditFamilyContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export function EditFamilyProvider({ children }: { children: ReactNode }) {

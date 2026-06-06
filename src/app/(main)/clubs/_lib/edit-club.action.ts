@@ -25,19 +25,19 @@ export const editClubAction = actionClient
     // Verificar si ya existe otro club con el mismo nombre (normalizado)
     const existingClub = await sql.query(
       `SELECT id, name FROM clubs WHERE LOWER(REGEXP_REPLACE(NORMALIZE(name, NFD), '[\\u0300-\\u036f]', '', 'g')) = $1 AND id != $2`,
-      [normalizedName, id]
+      [normalizedName, id],
     );
 
     if (existingClub.rows.length > 0) {
       throw CustomError.badRequest(
-        `Ya existe otro club con el nombre "${existingClub.rows[0].name}"`
+        `Ya existe otro club con el nombre "${existingClub.rows[0].name}"`,
       );
     }
 
     // Actualizar el club
     const result = await sql.query(
       `UPDATE clubs SET name = $1 WHERE id = $2 RETURNING id, name`,
-      [trimmedName, id]
+      [trimmedName, id],
     );
 
     // Revalidar la página de clubes para mostrar los cambios

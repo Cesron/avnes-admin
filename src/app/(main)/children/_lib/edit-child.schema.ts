@@ -23,7 +23,7 @@ export const editChildSchema = z.object({
         const today = new Date();
         return birthDate <= today;
       },
-      { message: "La fecha de nacimiento no puede ser futura" }
+      { message: "La fecha de nacimiento no puede ser futura" },
     ),
   pamphletUrl: z
     .string()

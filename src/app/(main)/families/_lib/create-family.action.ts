@@ -15,12 +15,12 @@ export const createFamilyAction = actionClient
       // Verificar si ya existe una familia con el mismo código penpal
       const existingFamily = await sql.query(
         `SELECT id FROM families WHERE penpal_code = $1`,
-        [penpalCode]
+        [penpalCode],
       );
 
       if (existingFamily.rows.length > 0) {
         throw CustomError.badRequest(
-          `Ya existe una familia con el código penpal "${penpalCode}"`
+          `Ya existe una familia con el código penpal "${penpalCode}"`,
         );
       }
 
@@ -29,10 +29,10 @@ export const createFamilyAction = actionClient
         `INSERT INTO families (penpal_code, family_biography_url, family_photo_url) 
          VALUES ($1, $2, $3) 
          RETURNING id, penpal_code, family_biography_url, family_photo_url`,
-        [penpalCode, familyBiographyUrl || null, familyPhotoUrl || null]
+        [penpalCode, familyBiographyUrl || null, familyPhotoUrl || null],
       );
 
       // Revalidar la página para mostrar los cambios
       revalidatePath("/families");
-    }
+    },
   );

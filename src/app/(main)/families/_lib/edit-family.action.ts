@@ -15,7 +15,7 @@ export const editFamilyAction = actionClient
       // Verificar si la familia existe
       const familyExists = await sql.query(
         `SELECT id FROM families WHERE id = $1`,
-        [id]
+        [id],
       );
 
       if (familyExists.rows.length === 0) {
@@ -25,12 +25,12 @@ export const editFamilyAction = actionClient
       // Verificar si ya existe otra familia con el mismo código penpal
       const existingFamily = await sql.query(
         `SELECT id FROM families WHERE penpal_code = $1 AND id != $2`,
-        [penpalCode, id]
+        [penpalCode, id],
       );
 
       if (existingFamily.rows.length > 0) {
         throw CustomError.badRequest(
-          `Ya existe otra familia con el código penpal "${penpalCode}"`
+          `Ya existe otra familia con el código penpal "${penpalCode}"`,
         );
       }
 
@@ -40,7 +40,7 @@ export const editFamilyAction = actionClient
          SET penpal_code = $1, family_biography_url = $2, family_photo_url = $3, updated_at = NOW() 
          WHERE id = $4 
          RETURNING id, penpal_code, family_biography_url, family_photo_url`,
-        [penpalCode, familyBiographyUrl || null, familyPhotoUrl || null, id]
+        [penpalCode, familyBiographyUrl || null, familyPhotoUrl || null, id],
       );
 
       // Revalidar la página para mostrar los cambios
@@ -49,5 +49,5 @@ export const editFamilyAction = actionClient
       return {
         family: result.rows[0],
       };
-    }
+    },
   );

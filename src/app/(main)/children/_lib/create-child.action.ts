@@ -24,7 +24,7 @@ export const createChildAction = actionClient
       if (familyId) {
         const familyExists = await sql.query(
           `SELECT id FROM families WHERE id = $1`,
-          [familyId]
+          [familyId],
         );
 
         if (familyExists.rows.length === 0) {
@@ -42,7 +42,7 @@ export const createChildAction = actionClient
           familyId || null,
           pamphletUrl || null,
           childPhotoUrl || null,
-        ]
+        ],
       );
-    }
+    },
   );

@@ -21,7 +21,7 @@ export const loginAction = actionClient
           console.error("Unauthorized access attempt with email:", email);
 
           throw CustomError.unauthorized(
-            "Credenciales inválidas, verifica los datos e inténtalo de nuevo."
+            "Credenciales inválidas, verifica los datos e inténtalo de nuevo.",
           );
         }
 

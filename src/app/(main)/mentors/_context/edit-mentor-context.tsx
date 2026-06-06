@@ -1,7 +1,7 @@
 "use client";
 
+import { createContext, type ReactNode, useContext, useState } from "react";
 import type { Mentor } from "@/types/mentor";
-import { createContext, useContext, useState, type ReactNode } from "react";
 
 type EditMentorContextType = {
   isOpen: boolean;
@@ -11,7 +11,7 @@ type EditMentorContextType = {
 };
 
 const EditMentorContext = createContext<EditMentorContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export function EditMentorProvider({ children }: { children: ReactNode }) {

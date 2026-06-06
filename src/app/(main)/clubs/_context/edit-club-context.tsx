@@ -11,7 +11,7 @@ type EditClubContextType = {
 };
 
 const EditClubContext = createContext<EditClubContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export function EditClubProvider({ children }: { children: ReactNode }) {

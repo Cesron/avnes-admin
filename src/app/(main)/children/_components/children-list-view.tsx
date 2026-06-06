@@ -1,11 +1,11 @@
 "use client";
 
+import { useCallback, useRef, useState, useTransition } from "react";
 import type { ChildWithFamily } from "@/services/children/get-children";
 import type { GroupOption } from "@/services/groups/get-groups-options";
-import { useCallback, useRef, useState, useTransition } from "react";
 import { getChildrenAction } from "../_lib/get-children.action";
+import { ChildrenCardsGrid } from "./children-cards-grid";
 import { ChildrenFilters } from "./children-filters";
-import { ChildrenTableContent } from "./children-table-content";
 
 type ClubOption = {
   id: string;
@@ -66,8 +66,13 @@ export function ChildrenListView({
     }, 300);
   };
 
+  const isFiltered =
+    selectedClubId !== "all" ||
+    selectedGroupId !== "all" ||
+    search.trim().length > 0;
+
   return (
-    <div>
+    <div className="space-y-4">
       <ChildrenFilters
         clubs={clubs}
         groups={groups}
@@ -80,12 +85,24 @@ export function ChildrenListView({
         onSearchChange={handleSearchChange}
       />
 
+      <div className="flex items-center justify-between px-1">
+        <p className="text-xs text-muted-foreground">
+          {isPending ? (
+            "Cargando..."
+          ) : (
+            <>
+              {children.length} {children.length === 1 ? "niño" : "niños"}
+            </>
+          )}
+        </p>
+      </div>
+
       {isPending ? (
-        <div className="flex items-center justify-center py-12">
+        <div className="flex items-center justify-center py-16">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
       ) : (
-        <ChildrenTableContent children={children} />
+        <ChildrenCardsGrid childList={children} isFiltered={isFiltered} />
       )}
     </div>
   );

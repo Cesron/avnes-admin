@@ -1,3 +1,4 @@
+import { PlusCircleIcon } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,7 +7,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,8 +17,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { PlusCircleIcon } from "lucide-react";
 import { CreateMentorForm } from "./create-mentor-form";
 
 export function MentorsHeader() {

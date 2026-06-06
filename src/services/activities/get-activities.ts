@@ -1,5 +1,10 @@
 import { sql } from "@/lib/sql";
 
+export type ActivityGroup = {
+  id: string;
+  name: string;
+};
+
 export type ActivityWithDetails = {
   id: string;
   name: string;
@@ -16,15 +21,15 @@ export type ActivityWithDetails = {
   end_date: Date | null;
   start_time: string | null;
   end_time: string | null;
-  // Groups (comma separated)
-  group_names: string | null;
+  // Groups (structured array)
+  groups: ActivityGroup[];
   // Next occurrence
   next_occurrence: Date | null;
 };
 
 export async function getActivities(): Promise<ActivityWithDetails[]> {
   const result = await sql.query<ActivityWithDetails>(`
-    SELECT 
+    SELECT
       a.id,
       a.name,
       a.description,
@@ -39,7 +44,12 @@ export async function getActivities(): Promise<ActivityWithDetails[]> {
       ar.end_date,
       ar.start_time,
       ar.end_time,
-      STRING_AGG(g.name, ', ' ORDER BY g.name) as group_names,
+      COALESCE(
+        JSON_AGG(
+          JSON_BUILD_OBJECT('id', g.id, 'name', g.name) ORDER BY g.name
+        ) FILTER (WHERE g.id IS NOT NULL),
+        '[]'::json
+      ) as groups,
       (
         SELECT MIN(ao.start_datetime)
         FROM activity_occurrences ao

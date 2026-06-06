@@ -25,7 +25,7 @@ export const editChildAction = actionClient
       // Verificar si el niño existe
       const childExists = await sql.query(
         `SELECT id FROM children WHERE id = $1`,
-        [id]
+        [id],
       );
 
       if (childExists.rows.length === 0) {
@@ -36,7 +36,7 @@ export const editChildAction = actionClient
       if (familyId) {
         const familyExists = await sql.query(
           `SELECT id FROM families WHERE id = $1`,
-          [familyId]
+          [familyId],
         );
 
         if (familyExists.rows.length === 0) {
@@ -50,7 +50,7 @@ export const editChildAction = actionClient
 
       if (birthDateObj > today) {
         throw CustomError.badRequest(
-          "La fecha de nacimiento no puede ser futura"
+          "La fecha de nacimiento no puede ser futura",
         );
       }
 
@@ -65,7 +65,7 @@ export const editChildAction = actionClient
           pamphletUrl || null,
           childPhotoUrl || null,
           id,
-        ]
+        ],
       );
 
       // Revalidar la página para mostrar los cambios
@@ -74,5 +74,5 @@ export const editChildAction = actionClient
       return {
         child: result.rows[0],
       };
-    }
+    },
   );

@@ -1,8 +1,8 @@
 import { authorize } from "@/lib/auth-utils";
 import { getAvailableMentorsOptions } from "@/services/mentors/get-available-mentors-options";
 import { EditUserForm } from "./_components/edit-user-form";
+import { UsersCardsGrid } from "./_components/users-cards-grid";
 import { UsersHeader } from "./_components/users-header";
-import { UsersTable } from "./_components/users-table";
 import { EditUserProvider } from "./_context/edit-user-context";
 
 export default async function UsersPage() {
@@ -14,7 +14,9 @@ export default async function UsersPage() {
     <EditUserProvider>
       <UsersHeader mentorsOptions={mentorsOptions} />
 
-      <UsersTable />
+      <div className="py-6">
+        <UsersCardsGrid />
+      </div>
 
       <EditUserForm mentorsOptions={mentorsOptions} />
     </EditUserProvider>

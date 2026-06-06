@@ -11,7 +11,7 @@ type EditGroupContextType = {
 };
 
 const EditGroupContext = createContext<EditGroupContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export function EditGroupProvider({ children }: { children: ReactNode }) {

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useEditMentor } from "../_context/edit-mentor-context";
 import { editMentorAction } from "../_lib/edit-mentor.action";
 import {
-  EditMentorFormData,
+  type EditMentorFormData,
   editMentorSchema,
 } from "../_lib/edit-mentor.schema";
 
