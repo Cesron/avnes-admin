@@ -2,17 +2,19 @@
 
 import type { GroupOption } from "@/services/groups/get-groups-options";
 import type { WeekOccurrence } from "@/types/attendance";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   formatDateLocal,
   getCalendarDays,
   getMonthEnd,
   getMonthStart,
 } from "@/utils/week-helpers";
-import { useCallback, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { getMonthOccurrencesAction } from "../_lib/get-month-occurrences.action";
+import { AttendanceAgendaView } from "./attendance-agenda-view";
 import { AttendanceFilters } from "./attendance-filters";
 import { CalendarDayCell } from "./calendar-day-cell";
-import { MonthNavigator } from "./month-navigator";
+import { MonthNavigator, type MonthViewMode } from "./month-navigator";
 
 type ClubOption = {
   id: string;
@@ -27,6 +29,10 @@ interface AttendanceMonthViewProps {
   clubs: ClubOption[];
   groups: GroupOption[];
   mentorGroupIds?: string[];
+  /** Pre-selected club id (or "all" sentinel). Defaults to "all". */
+  defaultClubId?: string;
+  /** Pre-selected group id (or "all" sentinel). Defaults to "all". */
+  defaultGroupId?: string;
 }
 
 export function AttendanceMonthView({
@@ -35,13 +41,36 @@ export function AttendanceMonthView({
   clubs,
   groups,
   mentorGroupIds,
+  defaultClubId = "all",
+  defaultGroupId = "all",
 }: AttendanceMonthViewProps) {
   const [occurrences, setOccurrences] =
     useState<WeekOccurrence[]>(initialOccurrences);
   const [currentMonthStart, setCurrentMonthStart] = useState(initialMonthStart);
-  const [selectedClubId, setSelectedClubId] = useState("all");
-  const [selectedGroupId, setSelectedGroupId] = useState("all");
+  const [selectedClubId, setSelectedClubId] = useState(defaultClubId);
+  const [selectedGroupId, setSelectedGroupId] = useState(defaultGroupId);
   const [isPending, startTransition] = useTransition();
+  const isMobile = useIsMobile();
+  const [viewMode, setViewMode] = useState<MonthViewMode>("month");
+  const [hasUserToggled, setHasUserToggled] = useState(false);
+
+  // Auto-pick the best view for the current viewport, but only on the first
+  // render after we know the screen size. Never override the user once they
+  // have explicitly picked a view.
+  useEffect(() => {
+    if (hasUserToggled) return;
+    setViewMode(isMobile ? "agenda" : "month");
+  }, [isMobile, hasUserToggled]);
+
+  const handleViewModeChange = (mode: MonthViewMode) => {
+    setHasUserToggled(true);
+    setViewMode(mode);
+  };
+
+  // Filter UI is only useful when there's more than one club AND more than
+  // one group to choose between. With a single option on either side, the
+  // single value is auto-applied to the query and the dropdowns are hidden.
+  const showFilters = !mentorGroupIds && clubs.length > 1 && groups.length > 1;
 
   const [year, month] = currentMonthStart.split("-").map(Number);
   const monthStartDate = new Date(year, month - 1, 1);
@@ -95,8 +124,8 @@ export function AttendanceMonthView({
   const currentMonth = monthStartDate.getMonth();
 
   return (
-    <div className="space-y-6">
-      {!mentorGroupIds && (
+    <div className="space-y-4 sm:space-y-6">
+      {showFilters && (
         <AttendanceFilters
           clubs={clubs}
           groups={groups}
@@ -110,16 +139,24 @@ export function AttendanceMonthView({
       <MonthNavigator
         currentMonthStart={currentMonthStart}
         onMonthChange={handleMonthChange}
+        viewMode={viewMode}
+        onViewModeChange={handleViewModeChange}
       />
 
       {isPending ? (
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
+      ) : viewMode === "agenda" ? (
+        <AttendanceAgendaView
+          calendarDays={calendarDays}
+          occurrencesByDate={occurrencesByDate}
+          todayStr={todayStr}
+        />
       ) : (
         <div>
           {/* Weekday headers */}
-          <div className="grid grid-cols-7 gap-1 mb-1">
+          <div className="hidden sm:grid grid-cols-7 gap-1 mb-1">
             {WEEKDAY_HEADERS.map((day) => (
               <div
                 key={day}
@@ -130,8 +167,20 @@ export function AttendanceMonthView({
             ))}
           </div>
 
+          {/* Mobile day-of-week abbreviated header for narrow screens */}
+          <div className="grid grid-cols-7 gap-0.5 mb-1 sm:hidden">
+            {WEEKDAY_HEADERS.map((day) => (
+              <div
+                key={day}
+                className="py-1 text-center text-[10px] font-semibold text-muted-foreground uppercase tracking-wide"
+              >
+                {day.charAt(0)}
+              </div>
+            ))}
+          </div>
+
           {/* Calendar grid */}
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
             {calendarDays.map((dayDate) => {
               const dateStr = formatDateLocal(dayDate);
               const dayOccurrences = occurrencesByDate.get(dateStr) || [];

@@ -47,9 +47,9 @@ export function AttendanceFilters({
         });
 
   return (
-    <div className="flex flex-wrap gap-4 mb-6">
-      <div className="flex flex-col gap-2 min-w-[200px]">
-        <label className="text-sm font-medium text-muted-foreground">
+    <div className="grid grid-cols-1 gap-3 sm:flex sm:flex-wrap sm:gap-4">
+      <div className="flex flex-col gap-1.5 sm:min-w-[200px]">
+        <label className="text-xs sm:text-sm font-medium text-muted-foreground">
           Club
         </label>
         <Select value={selectedClubId} onValueChange={onClubChange}>
@@ -67,8 +67,8 @@ export function AttendanceFilters({
         </Select>
       </div>
 
-      <div className="flex flex-col gap-2 min-w-[200px]">
-        <label className="text-sm font-medium text-muted-foreground">
+      <div className="flex flex-col gap-1.5 sm:min-w-[200px]">
+        <label className="text-xs sm:text-sm font-medium text-muted-foreground">
           Grupo
         </label>
         <Select value={selectedGroupId} onValueChange={onGroupChange}>

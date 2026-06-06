@@ -48,6 +48,7 @@ export type ChildAttendance = {
   child_birth_date: Date;
   group_id: string;
   group_name: string;
+  club_id: string;
   attendance_id: string | null;
   attendance_status: AttendanceStatus | null;
 };
@@ -60,5 +61,5 @@ export type OccurrenceDetail = {
   start_datetime: Date;
   end_datetime: Date;
   status: string;
-  groups: { id: string; name: string; club_name: string }[];
+  groups: { id: string; name: string; club_id: string; club_name: string }[];
 };

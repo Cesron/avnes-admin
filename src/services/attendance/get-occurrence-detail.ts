@@ -40,12 +40,14 @@ export async function getOccurrenceDetail(
   const groupsResult = await sql.query<{
     id: string;
     name: string;
+    club_id: string;
     club_name: string;
   }>(
     `
-    SELECT 
+    SELECT
       g.id,
       g.name,
+      c.id as club_id,
       c.name as club_name
     FROM activity_groups ag
     INNER JOIN groups g ON g.id = ag.group_id

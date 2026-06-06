@@ -91,12 +91,6 @@ export function ChildCard({ child }: ChildCardProps) {
             <CardTitle className="text-base truncate">{child.name}</CardTitle>
 
             <div className="flex flex-wrap items-center gap-1.5">
-              <Badge
-                variant={child.gender === "M" ? "blue-subtle" : "purple-subtle"}
-              >
-                {getGenderLabel(child.gender)}
-              </Badge>
-
               {child.penpal_code && (
                 <Badge variant="outline" className="font-mono">
                   {child.penpal_code}
@@ -104,6 +98,12 @@ export function ChildCard({ child }: ChildCardProps) {
               )}
 
               {age !== null && <Badge variant="secondary">{age} años</Badge>}
+
+              <Badge
+                variant={child.gender === "M" ? "blue-subtle" : "purple-subtle"}
+              >
+                {getGenderLabel(child.gender)}
+              </Badge>
             </div>
           </div>
         </div>

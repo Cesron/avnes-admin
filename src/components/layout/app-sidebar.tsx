@@ -1,3 +1,5 @@
+"use client";
+
 import {
   BabyIcon,
   BlocksIcon,
@@ -10,6 +12,8 @@ import {
   UsersRoundIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { ModeToggle } from "@/components/layout/mode-toggle";
 import { NavUser } from "@/components/layout/nav-user";
 import {
@@ -22,6 +26,7 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { hasAccess } from "@/lib/permissions";
 import type { UserRole } from "@/types/user";
@@ -124,6 +129,21 @@ type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
 };
 
 export function AppSidebar({ userRole, ...props }: AppSidebarProps) {
+  const pathname = usePathname();
+  const { isMobile, setOpenMobile } = useSidebar();
+  const isFirstRender = useRef(true);
+
+  // Cerrar el sidebar móvil al cambiar de ruta
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  }, [pathname, isMobile, setOpenMobile]);
+
   const filteredNav = data.navMain
     .map((group) => ({
       ...group,

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,9 +14,18 @@ import type { OccurrenceDetail } from "@/types/attendance";
 
 interface OccurrenceHeaderProps {
   occurrence: OccurrenceDetail;
+  /**
+   * When provided (mentor users), only badges for groups inside this list are
+   * shown. Admin / coordinator pass `undefined` and see every group that
+   * belongs to the activity.
+   */
+  mentorGroupIds?: string[];
 }
 
-export function OccurrenceHeader({ occurrence }: OccurrenceHeaderProps) {
+export function OccurrenceHeader({
+  occurrence,
+  mentorGroupIds,
+}: OccurrenceHeaderProps) {
   // Format time for display
   const formatTime = (date: Date) => {
     return new Date(date).toLocaleTimeString("es-ES", {
@@ -39,6 +47,12 @@ export function OccurrenceHeader({ occurrence }: OccurrenceHeaderProps) {
   const formattedDate = formatDate(occurrence.start_datetime);
   const capitalizedDate =
     formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+
+  // For mentors, restrict the visible badges to the groups they own.
+  const visibleGroups =
+    mentorGroupIds === undefined
+      ? occurrence.groups
+      : occurrence.groups.filter((g) => mentorGroupIds.includes(g.id));
 
   return (
     <header className="flex flex-col gap-4 min-h-20 py-4 shrink-0 transition-all ease-linear border-b">
@@ -77,7 +91,7 @@ export function OccurrenceHeader({ occurrence }: OccurrenceHeaderProps) {
           {formatTime(occurrence.end_datetime)}
         </p>
         <div className="flex flex-wrap gap-2 mt-2">
-          {occurrence.groups.map((group) => (
+          {visibleGroups.map((group) => (
             <span
               key={group.id}
               className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary"
