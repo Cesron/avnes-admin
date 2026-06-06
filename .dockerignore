@@ -18,8 +18,9 @@ next-env.d.ts
 !.env.example
 
 # ----- git / VCS -----
+# .git se excluye para no inflar la imagen; .gitignore se mantiene porque
+# Tailwind v4 / oxide-scanner lo usa para detectar archivos fuente.
 .git
-.gitignore
 .gitattributes
 
 # ----- logs y temporales -----
@@ -38,9 +39,8 @@ README.md
 debug-attendance.ts
 
 # ----- configs de herramientas no necesarias en runtime -----
+# postcss.config.mjs y components.json NO se excluyen: el build los necesita.
 biome.json
-postcss.config.mjs
-components.json
 .idea
 .vscode
 
