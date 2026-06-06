@@ -5,6 +5,10 @@ export type ChildWithFamily = Child & {
   penpal_code: string | null;
   family_biography_url: string | null;
   family_photo_url: string | null;
+  /** Active group assigned to the child (null when the child is not in any group). */
+  group_id: string | null;
+  group_name: string | null;
+  group_club_name: string | null;
 };
 
 type GetChildrenParams = {
@@ -26,13 +30,6 @@ export async function getChildren(
   let searchCondition = "";
   const queryParams: (string | string[])[] = [];
   let paramIndex = 1;
-
-  // We need the JOIN when any group/club filter is active
-  const needsGroupJoin = !!(
-    clubId ||
-    groupId ||
-    (mentorGroupIds && mentorGroupIds.length > 0)
-  );
 
   if (clubId) {
     clubCondition = `AND cl.id = $${paramIndex}`;
@@ -63,16 +60,13 @@ export async function getChildren(
     paramIndex++;
   }
 
-  const groupJoin = needsGroupJoin
-    ? `INNER JOIN children_groups cg ON cg.child_id = c.id AND cg.active = true
-       INNER JOIN groups g ON g.id = cg.group_id
-       INNER JOIN clubs cl ON cl.id = g.club_id`
-    : "";
-
+  // Always LEFT JOIN with children_groups so we can surface the assigned group
+  // on every child (including children that don't belong to any group). The
+  // `active = true` filter keeps only currently-active group memberships.
   const result = await sql.query<ChildWithFamily>(
     `
       SELECT DISTINCT
-        c.id, 
+        c.id,
         c.name,
         c.gender,
         c.birth_date,
@@ -84,10 +78,15 @@ export async function getChildren(
         f.penpal_code,
         f.family_biography_url,
         f.family_photo_url,
-        LPAD(f.penpal_code, 4, '0') as penpal_sort
+        g.id AS group_id,
+        g.name AS group_name,
+        cl.name AS group_club_name,
+        LPAD(f.penpal_code, 4, '0') AS penpal_sort
       FROM children c
       LEFT JOIN families f ON c.family_id = f.id
-      ${groupJoin}
+      LEFT JOIN children_groups cg ON cg.child_id = c.id AND cg.active = true
+      LEFT JOIN groups g ON g.id = cg.group_id
+      LEFT JOIN clubs cl ON cl.id = g.club_id
       WHERE 1=1
         ${clubCondition}
         ${groupCondition}

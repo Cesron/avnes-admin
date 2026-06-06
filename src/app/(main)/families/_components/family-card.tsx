@@ -130,7 +130,7 @@ export function FamilyCard({ family }: FamilyCardProps) {
                   href={link.url ?? "#"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline px-2.5 py-1 rounded-md bg-primary/5 hover:bg-primary/10 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:underline px-2.5 py-1 rounded-md bg-muted hover:bg-muted-foreground/10 transition-colors"
                 >
                   <Icon className="size-3.5" />
                   {link.label}

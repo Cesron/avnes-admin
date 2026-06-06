@@ -1,52 +1,40 @@
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { getSessionUserInfo, verifySession } from "@/lib/auth-utils";
+import { AdminDashboard } from "./_components/admin-dashboard";
+import { DashboardHeader } from "./_components/dashboard-header";
+import { MentorDashboard } from "./_components/mentor-dashboard";
 
-import { Button } from "@/components/ui/button";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { verifySession } from "@/lib/auth-utils";
+export default async function DashboardPage() {
+  const [session, userInfo] = await Promise.all([
+    verifySession(),
+    getSessionUserInfo(),
+  ]);
 
-export default async function Home() {
-  const session = await verifySession();
+  const userName = session.user.name ?? "";
+  const firstName = userName.split(" ")[0] || userName;
+
+  const todayLabel = format(new Date(), "EEEE d 'de' MMMM, yyyy", {
+    locale: es,
+  });
+
+  const isMentor = userInfo.role === "mentor";
+  const subtitle = isMentor
+    ? userInfo.groupIds.length === 0
+      ? "No tienes grupos asignados"
+      : `Tus grupos • ${todayLabel}`
+    : `Resumen general • ${todayLabel}`;
 
   return (
     <>
-      <header className="flex flex-wrap gap-3 min-h-20 py-4 shrink-0 items-center transition-all ease-linear border-b">
-        <div className="flex flex-1 items-center gap-2">
-          <SidebarTrigger className="-ms-1" />
-          <div className="max-lg:hidden lg:contents">
-            <Separator
-              orientation="vertical"
-              className="me-2 data-[orientation=vertical]:h-4"
-            />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">Home</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Dashboard</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-        </div>
+      <DashboardHeader userName={firstName} subtitle={subtitle} />
 
-        <Button>Do something</Button>
-      </header>
-      <div className="overflow-hidden">
-        <div className="grid auto-rows-min @2xl:grid-cols-2 *:-ms-px *:-mt-px -m-px">
-          <pre>
-            <code>{JSON.stringify(session, null, 2)}</code>
-          </pre>
-        </div>
+      <div className="py-6">
+        {isMentor ? (
+          <MentorDashboard groupIds={userInfo.groupIds} />
+        ) : (
+          <AdminDashboard />
+        )}
       </div>
     </>
   );

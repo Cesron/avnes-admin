@@ -8,6 +8,7 @@ import {
   ImageIcon,
   MoreVerticalIcon,
   UserIcon,
+  UsersIcon,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -139,6 +140,28 @@ export function ChildCard({ child }: ChildCardProps) {
           </span>
         </div>
 
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <UsersIcon className="size-4 shrink-0" />
+          {child.group_name ? (
+            <span className="truncate">
+              Grupo:{" "}
+              <span className="text-foreground font-medium">
+                {child.group_name}
+              </span>
+              {child.group_club_name && (
+                <>
+                  {" "}
+                  <span className="text-muted-foreground">
+                    ({child.group_club_name})
+                  </span>
+                </>
+              )}
+            </span>
+          ) : (
+            <span className="text-xs italic">Sin grupo asignado</span>
+          )}
+        </div>
+
         {quickLinks.length > 0 && (
           <div className="flex flex-wrap gap-2 pt-1">
             {quickLinks.map((link) => {
@@ -149,7 +172,7 @@ export function ChildCard({ child }: ChildCardProps) {
                   href={link.url ?? "#"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline px-2.5 py-1 rounded-md bg-primary/5 hover:bg-primary/10 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:underline px-2.5 py-1 rounded-md bg-muted hover:bg-muted-foreground/10 transition-colors"
                 >
                   <Icon className="size-3.5" />
                   {link.label}

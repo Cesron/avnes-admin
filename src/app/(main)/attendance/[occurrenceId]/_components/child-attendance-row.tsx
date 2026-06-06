@@ -61,11 +61,11 @@ export function ChildAttendanceRow({
       <div className="flex gap-2">
         <Button
           size="sm"
-          variant={currentStatus === "present" ? "default" : "outline"}
+          variant="outline"
           className={
             currentStatus === "present"
-              ? "bg-green-600 hover:bg-green-700"
-              : "hover:bg-green-100 hover:text-green-700 hover:border-green-300"
+              ? "bg-green-subtle text-green-subtle-foreground border-green-subtle"
+              : undefined
           }
           onClick={() => handleStatusChange("present")}
           disabled={isPending}
@@ -76,11 +76,11 @@ export function ChildAttendanceRow({
 
         <Button
           size="sm"
-          variant={currentStatus === "absent" ? "default" : "outline"}
+          variant="outline"
           className={
             currentStatus === "absent"
-              ? "bg-red-600 hover:bg-red-700"
-              : "hover:bg-red-100 hover:text-red-700 hover:border-red-300"
+              ? "bg-red-subtle text-red-subtle-foreground border-red-subtle"
+              : undefined
           }
           onClick={() => handleStatusChange("absent")}
           disabled={isPending}
@@ -91,11 +91,11 @@ export function ChildAttendanceRow({
 
         <Button
           size="sm"
-          variant={currentStatus === "excused" ? "default" : "outline"}
+          variant="outline"
           className={
             currentStatus === "excused"
-              ? "bg-amber-600 hover:bg-amber-700"
-              : "hover:bg-amber-100 hover:text-amber-700 hover:border-amber-300"
+              ? "bg-amber-subtle text-amber-subtle-foreground border-amber-subtle"
+              : undefined
           }
           onClick={() => handleStatusChange("excused")}
           disabled={isPending}

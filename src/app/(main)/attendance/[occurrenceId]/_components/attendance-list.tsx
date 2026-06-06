@@ -1,8 +1,9 @@
 "use client";
 
-import type { AttendanceStatus, ChildAttendance } from "@/types/attendance";
-import { InboxIcon, UsersIcon } from "lucide-react";
+import { InboxIcon } from "lucide-react";
 import { useState } from "react";
+import type { AttendanceStatus, ChildAttendance } from "@/types/attendance";
+import { AttendanceStatsCards } from "./attendance-stats-cards";
 import { ChildAttendanceRow } from "./child-attendance-row";
 
 interface AttendanceListProps {
@@ -37,9 +38,6 @@ export function AttendanceList({
   const excusedCount = children.filter(
     (c) => c.attendance_status === "excused",
   ).length;
-  const unmarkedCount = children.filter(
-    (c) => c.attendance_status === null,
-  ).length;
 
   if (children.length === 0) {
     return (
@@ -58,22 +56,12 @@ export function AttendanceList({
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <div className="flex flex-wrap gap-4 p-4 bg-muted/50 rounded-lg">
-        <div className="flex items-center gap-2">
-          <UsersIcon className="size-5 text-muted-foreground" />
-          <span className="font-medium">{totalChildren} niños</span>
-        </div>
-        <div className="flex gap-4 text-sm">
-          <span className="text-green-600">✓ {presentCount} presentes</span>
-          <span className="text-red-600">✗ {absentCount} ausentes</span>
-          <span className="text-amber-600">? {excusedCount} permisos</span>
-          {unmarkedCount > 0 && (
-            <span className="text-muted-foreground">
-              • {unmarkedCount} sin marcar
-            </span>
-          )}
-        </div>
-      </div>
+      <AttendanceStatsCards
+        total={totalChildren}
+        present={presentCount}
+        absent={absentCount}
+        excused={excusedCount}
+      />
 
       {/* Children list */}
       <div className="space-y-3">

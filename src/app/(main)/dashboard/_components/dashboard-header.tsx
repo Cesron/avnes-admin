@@ -1,17 +1,18 @@
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
-
-import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
-export function DashboardHeader() {
+type DashboardHeaderProps = {
+  userName: string;
+  subtitle?: string;
+};
+
+export function DashboardHeader({ userName, subtitle }: DashboardHeaderProps) {
   return (
     <header className="flex flex-wrap gap-3 min-h-20 py-4 shrink-0 items-center transition-all ease-linear border-b">
       <div className="flex flex-1 items-center gap-2">
@@ -23,10 +24,6 @@ export function DashboardHeader() {
           />
           <Breadcrumb>
             <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/">Home</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
                 <BreadcrumbPage>Dashboard</BreadcrumbPage>
               </BreadcrumbItem>
@@ -35,7 +32,12 @@ export function DashboardHeader() {
         </div>
       </div>
 
-      <Button>Do something</Button>
+      <div className="text-right">
+        <p className="text-sm font-medium leading-tight">Hola, {userName}</p>
+        {subtitle && (
+          <p className="text-xs text-muted-foreground">{subtitle}</p>
+        )}
+      </div>
     </header>
   );
 }
