@@ -1,26 +1,19 @@
 # syntax=docker/dockerfile:1.7
-# ---------------------------------------------
-# Next.js 16 + React 19 standalone Dockerfile
-# Optimizado para Coolify / cualquier runtime Docker
-# ---------------------------------------------
 
-# ---------- Stage 1: deps ----------
-FROM node:24-alpine AS deps
+# ============================================================
+# Stage 1: dependencias
+# ============================================================
+FROM node:22-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copiamos sólo los manifests para cachear dependencias
-COPY package.json package-lock.json* ./
-# Forzamos la instalación de devDependencies: plugins de Tailwind como
-# tw-animate-css se importan desde el CSS y se necesitan aunque el
-# build sea de producción.
-ENV NODE_ENV=development
-RUN npm ci --include=dev
-# Si usás pnpm, descomentá esto y borrá las dos líneas de npm:
-# RUN corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile
+COPY package.json package-lock.json ./
+RUN npm ci
 
-# ---------- Stage 2: builder ----------
-FROM node:24-alpine AS builder
+# ============================================================
+# Stage 2: build
+# ============================================================
+FROM node:22-alpine AS builder
 WORKDIR /app
 
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -31,8 +24,10 @@ COPY . .
 
 RUN npm run build
 
-# ---------- Stage 3: runner ----------
-FROM node:24-alpine AS runner
+# ============================================================
+# Stage 3: runtime
+# ============================================================
+FROM node:22-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -41,20 +36,17 @@ ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
 RUN addgroup --system --gid 1001 nodejs \
- && adduser  --system --uid 1001 nextjs
+  && adduser --system --uid 1001 nextjs
 
-# Copiamos el output standalone generado por Next
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static   ./.next/static
-
-# Si tenés carpeta public, copiala (es seguro aunque esté vacía)
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
+
 EXPOSE 3000
 
-# Healthcheck opcional: si tenés /api/health
-# HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-#   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1
 
 CMD ["node", "server.js"]
