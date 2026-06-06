@@ -1,5 +1,16 @@
+import {
+  BabyIcon,
+  BlocksIcon,
+  BookMarkedIcon,
+  CalendarDaysIcon,
+  ClipboardCheckIcon,
+  GaugeIcon,
+  HomeIcon,
+  UserRoundCogIcon,
+  UsersRoundIcon,
+} from "lucide-react";
 import Link from "next/link";
-
+import { ModeToggle } from "@/components/layout/mode-toggle";
 import { NavUser } from "@/components/layout/nav-user";
 import {
   Sidebar,
@@ -14,17 +25,6 @@ import {
 } from "@/components/ui/sidebar";
 import { hasAccess } from "@/lib/permissions";
 import type { UserRole } from "@/types/user";
-import {
-  BabyIcon,
-  BlocksIcon,
-  BookMarkedIcon,
-  CalendarDaysIcon,
-  ClipboardCheckIcon,
-  GaugeIcon,
-  HomeIcon,
-  UserRoundCogIcon,
-  UsersRoundIcon,
-} from "lucide-react";
 import { ActiveSidebarMenuItem } from "./active-sidebar-menu-button";
 
 const data = {
@@ -166,7 +166,10 @@ export function AppSidebar({ userRole, ...props }: AppSidebarProps) {
         ))}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser />
+        <div className="flex items-center gap-2">
+          <NavUser />
+          <ModeToggle />
+        </div>
       </SidebarFooter>
     </Sidebar>
   );
