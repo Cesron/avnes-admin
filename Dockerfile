@@ -11,9 +11,12 @@ WORKDIR /app
 
 # Copiamos sólo los manifests para cachear dependencias
 COPY package.json package-lock.json* ./
-# Si usás npm
-RUN npm ci
-# Si usás pnpm, descomentá esto y borrá la línea de npm ci:
+# Forzamos la instalación de devDependencies: plugins de Tailwind como
+# tw-animate-css se importan desde el CSS y se necesitan aunque el
+# build sea de producción.
+ENV NODE_ENV=development
+RUN npm ci --include=dev
+# Si usás pnpm, descomentá esto y borrá las dos líneas de npm:
 # RUN corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile
 
 # ---------- Stage 2: builder ----------
