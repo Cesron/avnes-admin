@@ -2,6 +2,8 @@
 
 Sistema de administración para AVNES construido con Next.js.
 
+La arquitectura, la actualización de Next.js y los pendientes de seguridad se documentan en la [revisión del 31 de octubre de 2026](docs/revision-dependencias-2026-10-31.md).
+
 ## Guía de Desarrollo
 
 ### Estructura de Carpetas para CRUDs
