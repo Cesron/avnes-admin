@@ -1,15 +1,9 @@
 "use client";
 
-import {
-  CalendarIcon,
-  EditIcon,
-  MailIcon,
-  MoreVerticalIcon,
-  UserRoundIcon,
-} from "lucide-react";
+import { CalendarIcon, MailIcon, UserRoundIcon } from "lucide-react";
+import { EditButton } from "@/components/edit-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
@@ -17,15 +11,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import type { UserWithMentor } from "@/services/users/get-users";
 import type { UserRole } from "@/types/user";
 import { formatDate } from "@/utils/format-date";
-import type { UserWithMentor } from "@/services/users/get-users";
 import { useEditUser } from "../_context/edit-user-context";
 
 interface UserCardProps {
@@ -90,23 +78,7 @@ export function UserCard({ user }: UserCardProps) {
         </div>
 
         <CardAction>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Abrir menú de acciones"
-              >
-                <MoreVerticalIcon />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => openEditDialog(user)}>
-                <EditIcon />
-                Editar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <EditButton onClick={() => openEditDialog(user)} />
         </CardAction>
       </CardHeader>
 

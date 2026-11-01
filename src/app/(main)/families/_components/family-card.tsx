@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  EditIcon,
   ExternalLinkIcon,
   FileTextIcon,
   ImageIcon,
   UsersIcon,
 } from "lucide-react";
+import { EditButton } from "@/components/edit-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardTitle } from "@/components/ui/card";
 import {
@@ -169,7 +169,7 @@ export function FamilyCard({ family }: FamilyCardProps) {
             </div>
 
             <CardAction className="-mt-1 -mr-1 shrink-0">
-              <Button
+              <EditButton
                 variant="ghost"
                 size="icon"
                 aria-label={`Editar familia ${family.penpal_code}`}
@@ -184,9 +184,7 @@ export function FamilyCard({ family }: FamilyCardProps) {
                     updated_at: family.updated_at,
                   })
                 }
-              >
-                <EditIcon />
-              </Button>
+              />
             </CardAction>
           </div>
 

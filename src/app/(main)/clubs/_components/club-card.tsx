@@ -1,8 +1,8 @@
 "use client";
 
-import { EditIcon, MoreVerticalIcon, UsersIcon } from "lucide-react";
+import { UsersIcon } from "lucide-react";
+import { EditButton } from "@/components/edit-button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
@@ -10,12 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import type { Club } from "@/types/club";
 import { useEditClub } from "../_context/edit-club-context";
 
@@ -59,23 +53,7 @@ export function ClubCard({ club }: ClubCardProps) {
         </div>
 
         <CardAction>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Abrir menú de acciones"
-              >
-                <MoreVerticalIcon />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => openEditDialog(club)}>
-                <EditIcon />
-                Editar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <EditButton onClick={() => openEditDialog(club)} />
         </CardAction>
       </CardHeader>
 

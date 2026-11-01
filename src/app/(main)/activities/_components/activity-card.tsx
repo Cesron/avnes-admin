@@ -1,14 +1,9 @@
 "use client";
 
-import {
-  CalendarIcon,
-  EditIcon,
-  MoreVerticalIcon,
-  RepeatIcon,
-  UsersIcon,
-} from "lucide-react";
+import { CalendarIcon, RepeatIcon, UsersIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { EditButton } from "@/components/edit-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,12 +13,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import type { ActivityWithDetails } from "@/services/activities/get-activities";
 import { formatDate } from "@/utils/format-date";
 import { useEditActivity } from "../_context/edit-activity-context";
@@ -71,23 +60,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
         </div>
 
         <CardAction>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Abrir menú de acciones"
-              >
-                <MoreVerticalIcon />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleEdit}>
-                <EditIcon />
-                Editar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <EditButton onClick={handleEdit} />
         </CardAction>
       </CardHeader>
 

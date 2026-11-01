@@ -1,9 +1,9 @@
 "use client";
 
-import { EditIcon, MoreVerticalIcon, UserRoundIcon } from "lucide-react";
+import { UserRoundIcon } from "lucide-react";
+import { EditButton } from "@/components/edit-button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
@@ -11,12 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import type { Group } from "@/types/group";
 import { getClubBadgeVariant } from "@/utils/club-colors";
 import { useEditGroup } from "../_context/edit-group-context";
@@ -65,23 +59,7 @@ export function GroupCard({ group }: GroupCardProps) {
         </div>
 
         <CardAction>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Abrir menú de acciones"
-              >
-                <MoreVerticalIcon />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => openEditDialog(group)}>
-                <EditIcon />
-                Editar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <EditButton onClick={() => openEditDialog(group)} />
         </CardAction>
       </CardHeader>
 

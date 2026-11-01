@@ -51,7 +51,6 @@ export default async function ChildrenPage({
       <div className="py-6">
         <Suspense fallback={<ListSkeleton kind="children" />}>
           <ChildResults
-            key={JSON.stringify(query)}
             childrenPromise={childrenPromise}
             clubs={clubs}
             groups={filteredGroups}

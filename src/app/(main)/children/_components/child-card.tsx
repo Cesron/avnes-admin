@@ -2,17 +2,15 @@
 
 import {
   CalendarIcon,
-  EditIcon,
   ExternalLinkIcon,
   FileTextIcon,
   ImageIcon,
-  MoreVerticalIcon,
   UserIcon,
   UsersIcon,
 } from "lucide-react";
+import { EditButton } from "@/components/edit-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
@@ -20,12 +18,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import type { ChildWithFamily } from "@/services/children/get-children";
 import { calculateAge } from "@/utils/calculate-age";
 import { formatDate } from "@/utils/format-date";
@@ -109,23 +101,7 @@ export function ChildCard({ child }: ChildCardProps) {
         </div>
 
         <CardAction>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Abrir menú de acciones"
-              >
-                <MoreVerticalIcon />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => openEditDialog(child)}>
-                <EditIcon />
-                Editar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <EditButton onClick={() => openEditDialog(child)} />
         </CardAction>
       </CardHeader>
 

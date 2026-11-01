@@ -15,7 +15,7 @@ export function FamiliesListView({
   const navigation = useListNavigation();
   return (
     <div className="space-y-4" aria-busy={navigation.busy}>
-      <fieldset disabled={navigation.isPending} className="min-w-0">
+      <fieldset className="min-w-0">
         <FamiliesFilters
           searchValue={navigation.search}
           onSearchChange={navigation.changeSearch}

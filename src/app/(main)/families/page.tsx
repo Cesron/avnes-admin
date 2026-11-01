@@ -44,7 +44,5 @@ async function FamilyResults({
     before: singleParam(query.before),
   });
 
-  return (
-    <FamiliesListView key={JSON.stringify(query)} initialFamilies={families} />
-  );
+  return <FamiliesListView initialFamilies={families} />;
 }
