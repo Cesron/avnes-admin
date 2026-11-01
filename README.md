@@ -4,6 +4,57 @@ Sistema de administración para AVNES construido con Next.js.
 
 La arquitectura, la actualización de Next.js y los pendientes de seguridad se documentan en la [revisión del 31 de octubre de 2026](docs/revision-dependencias-2026-10-31.md).
 
+## Aplicación instalable (PWA)
+
+La app se instala como **AVNES**, con el mismo favicon y logo de
+`avnes-coming-soon`. Usa el manifiesto nativo de App Router
+(`src/app/manifest.ts`), sin plugins ni service worker: el panel siempre necesita
+conexión a internet. No se guardan datos del panel para usarlos sin conexión.
+
+El manifiesto solicita `display: fullscreen`. Si el dispositivo no admite ese
+modo, el navegador usa su alternativa compatible (normalmente `standalone`, sin
+barra de direcciones). En iPhone/iPad, iOS controla la barra de estado; no se puede
+garantizar ocultarla. Se respetan las áreas seguras de la pantalla y se permite
+el zoom.
+
+### Instalación
+
+Publicar el panel en **HTTPS**. Los archivos del manifiesto e iconos deben ser
+públicos, sin redirecciones al login. El botón **Instalar aplicación** aparece en
+el login y en el menú lateral y se oculta al abrir AVNES en modo aplicación.
+
+- **Android (Chrome):** tocar el botón y confirmar el diálogo nativo cuando esté
+  disponible. Como alternativa, menú ⋮ → Instalar aplicación / Agregar a pantalla
+  principal.
+- **iPhone/iPad (Safari):** el botón muestra la guía: Compartir → Agregar a
+  pantalla de inicio → activar Abrir como app, si aparece → Agregar.
+- **Computadora (Chrome/Edge):** usar el botón o la opción Instalar del navegador.
+
+El navegador decide cuándo ofrece el diálogo nativo. Si no está disponible,
+se muestran instrucciones; la instalación no es automática.
+
+### Iconos y verificación
+
+`src/app/favicon.ico` es una copia exacta del favicon original. `public/logo.png`
+conserva el logo original de 400 × 400. Los PNG de `public/icons` se derivan de ese
+mismo diseño: 192 y 512 px para el manifiesto, 180 px para Apple y una variante
+maskable de 512 px con margen para evitar recortes en Android.
+
+1. Ejecutar `npm run build` y `npm start` (localhost permite probar la instalación
+   desde la misma computadora).
+2. Verificar `/manifest.webmanifest`, `/favicon.ico` y los iconos en `/icons/`.
+3. En Chrome DevTools → Application → Manifest, comprobar nombre, iconos y
+   ausencia de errores de instalación.
+4. En un teléfono, abrir el dominio HTTPS, instalar y lanzar desde el icono.
+   Comprobar login, navegación, áreas seguras, orientación vertical/horizontal y
+   que el botón de instalación ya no aparezca dentro de la app.
+5. Sin conexión, las consultas y registros requieren recuperar la red; no hay
+   funcionamiento sin conexión ni sincronización de cambios pendientes.
+
+Referencias: [guía oficial de Next.js](https://nextjs.org/docs/app/guides/progressive-web-apps),
+[modos de visualización](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Manifest/Reference/display)
+y [apps de pantalla de inicio en iOS/iPadOS](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/).
+
 ## Guía de Desarrollo
 
 ### Paginación de familias y niños

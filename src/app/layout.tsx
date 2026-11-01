@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import { PwaProvider } from "@/components/pwa/pwa-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -10,9 +11,28 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Asociación Vida Nueva en El Salvador",
+  applicationName: "AVNES",
+  title: "AVNES",
   description:
     "Panel de administración de Asociación Vida Nueva en El Salvador",
+  appleWebApp: {
+    capable: true,
+    title: "AVNES",
+    statusBarStyle: "black-translucent",
+  },
+  icons: {
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+  ],
 };
 
 export default function RootLayout({
@@ -29,7 +49,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <PwaProvider>{children}</PwaProvider>
           <Toaster />
         </ThemeProvider>
       </body>

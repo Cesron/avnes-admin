@@ -1,4 +1,5 @@
-import { GalleryVerticalEndIcon } from "lucide-react";
+import Image from "next/image";
+import { InstallAppButton } from "@/components/pwa/install-app-button";
 import { LoginForm } from "./_components/login-form";
 
 export default function LoginPage() {
@@ -6,14 +7,14 @@ export default function LoginPage() {
     <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center gap-2 text-center">
-          <div className="flex flex-col items-center gap-2 font-medium">
-            <div className="flex size-8 items-center justify-center rounded-md">
-              <GalleryVerticalEndIcon className="size-6" />
-            </div>
-            <span className="sr-only">
-              Asociación Vida Nueva en El Salvador
-            </span>
-          </div>
+          <Image
+            src="/logo.png"
+            alt="Asociación Vida Nueva en El Salvador"
+            width={88}
+            height={88}
+            priority
+            className="mb-2 rounded-full"
+          />
           <h1 className="text-xl font-bold">
             Asociación Vida Nueva en El Salvador
           </h1>
@@ -23,6 +24,9 @@ export default function LoginPage() {
         </div>
 
         <LoginForm />
+        <div className="mt-6">
+          <InstallAppButton />
+        </div>
       </div>
     </div>
   );
