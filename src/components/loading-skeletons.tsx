@@ -65,7 +65,9 @@ export function CardsSkeleton({
 }) {
   return (
     <LoadingRegion>
-      <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
+      <div
+        className={`grid grid-cols-1 gap-3 sm:gap-4 ${kind === "families" ? "xl:grid-cols-2" : "md:grid-cols-2"}`}
+      >
         {Array.from({ length: Math.max(1, count) }, (_, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: fixed placeholders have no identity or state.
           <Skeleton key={`card-${i}`} className={heights[kind]} />
