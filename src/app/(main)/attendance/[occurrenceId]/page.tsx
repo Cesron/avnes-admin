@@ -1,4 +1,7 @@
 import { notFound, redirect } from "next/navigation";
+import type { ComponentProps } from "react";
+import { Suspense } from "react";
+import { AttendanceListSkeleton } from "@/components/loading-skeletons";
 import { getSessionUserInfo } from "@/lib/auth-utils";
 import { getChildrenForAttendance } from "@/services/attendance/get-children-for-attendance";
 import { getOccurrenceDetail } from "@/services/attendance/get-occurrence-detail";
@@ -37,14 +40,9 @@ export default async function OccurrencePage({ params }: OccurrencePageProps) {
     }
   }
 
-  const [children, visibleGroups] = await Promise.all([
-    getChildrenForAttendance(occurrenceId, mentorGroupIds),
-    Promise.resolve(
-      mentorGroupIds
-        ? occurrence.groups.filter((g) => mentorGroupIds.includes(g.id))
-        : occurrence.groups,
-    ),
-  ]);
+  const visibleGroups = mentorGroupIds
+    ? occurrence.groups.filter((g) => mentorGroupIds.includes(g.id))
+    : occurrence.groups;
 
   // Derive the unique clubs of the activity from its groups. For mentors, we
   // derive from the (already filtered) `visibleGroups` so the dropdowns only
@@ -65,13 +63,28 @@ export default async function OccurrencePage({ params }: OccurrencePageProps) {
       />
 
       <div className="py-6">
-        <AttendanceList
-          initialChildren={children}
-          occurrenceId={occurrenceId}
-          groups={visibleGroups}
-          clubs={visibleClubs}
-        />
+        <Suspense fallback={<AttendanceListSkeleton />}>
+          <AttendanceResults
+            mentorGroupIds={mentorGroupIds}
+            occurrenceId={occurrenceId}
+            groups={visibleGroups}
+            clubs={visibleClubs}
+          />
+        </Suspense>
       </div>
     </>
   );
+}
+
+async function AttendanceResults({
+  mentorGroupIds,
+  ...props
+}: Omit<ComponentProps<typeof AttendanceList>, "initialChildren"> & {
+  mentorGroupIds?: string[];
+}) {
+  const children = await getChildrenForAttendance(
+    props.occurrenceId,
+    mentorGroupIds,
+  );
+  return <AttendanceList {...props} initialChildren={children} />;
 }

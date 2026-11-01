@@ -1,96 +1,293 @@
+import { ArrowUpRightIcon, ClipboardListIcon } from "lucide-react";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
-  BabyIcon,
-  CalendarCheckIcon,
-  CalendarDaysIcon,
-  TrophyIcon,
-} from "lucide-react";
-import { getAdminOverview } from "@/services/dashboard/get-admin-overview";
-import { getClubAttendance } from "@/services/dashboard/get-club-attendance";
-import { getGroupAttendanceRanking } from "@/services/dashboard/get-group-attendance-ranking";
-import { getLowAttendanceChildren } from "@/services/dashboard/get-low-attendance-children";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
-  formatDateLocal,
-  getMonthEnd,
-  getMonthStart,
-} from "@/utils/week-helpers";
-import { ClubAttendanceList } from "./club-attendance-list";
-import { GroupRanking } from "./group-ranking";
-import { KpiCard } from "./kpi-card";
-import { LowAttendanceAlert } from "./low-attendance-alert";
-import { TodayActivitiesCard } from "./today-activities-card";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { dashboardWeek } from "@/lib/dashboard-week";
+import { getClubsOptions } from "@/services/clubs/get-clubs-options";
+import {
+  type AttendanceBreakdown,
+  attendancePercentage,
+  getWeeklyDashboard,
+} from "@/services/dashboard/get-weekly-dashboard";
+import { DashboardFilters } from "./dashboard-filters";
 
-export async function AdminDashboard() {
-  const today = new Date();
-  const monthStart = formatDateLocal(getMonthStart(today));
-  const monthEnd = formatDateLocal(getMonthEnd(today));
+function Breakdown({
+  rows,
+  groups = false,
+}: {
+  rows: AttendanceBreakdown[];
+  groups?: boolean;
+}) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>{groups ? "Grupo" : "Club"}</TableHead>
+          <TableHead className="text-right">Presentes</TableHead>
+          <TableHead className="text-right">Ausentes</TableHead>
+          <TableHead className="text-right">Justificados</TableHead>
+          <TableHead className="text-right">Pendientes</TableHead>
+          <TableHead className="text-right">Asistencia</TableHead>
+          <TableHead className="text-right">Captura</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {rows.map((row) => {
+          const percentage = attendancePercentage(row);
+          return (
+            <TableRow key={row.id}>
+              <TableCell className="font-medium">
+                <span className="block">{row.name}</span>
+                {groups && (
+                  <span className="text-xs font-normal text-muted-foreground">
+                    {row.club_name}
+                  </span>
+                )}
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                {row.present}
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                {row.absent > 0 ? (
+                  <span className="text-destructive">{row.absent}</span>
+                ) : (
+                  0
+                )}
+              </TableCell>
+              <TableCell className="text-right tabular-nums text-muted-foreground">
+                {row.excused}
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                {row.pending > 0 ? (
+                  <Badge
+                    variant="outline"
+                    className="border-amber-500/25 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                  >
+                    {row.pending}
+                  </Badge>
+                ) : (
+                  0
+                )}
+              </TableCell>
+              <TableCell className="text-right font-semibold tabular-nums">
+                {percentage === null ? (
+                  <span className="font-normal text-muted-foreground">
+                    Sin datos
+                  </span>
+                ) : (
+                  `${percentage}%`
+                )}
+              </TableCell>
+              <TableCell className="text-right text-xs tabular-nums text-muted-foreground">
+                {row.expected
+                  ? `${row.recorded} / ${row.expected}`
+                  : "Sin actividad"}
+              </TableCell>
+            </TableRow>
+          );
+        })}
+        {rows.length === 0 && (
+          <TableRow>
+            <TableCell
+              colSpan={7}
+              className="h-24 text-center text-muted-foreground"
+            >
+              No hay grupos para este club.
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
+  );
+}
 
-  const [overview, clubAttendance, topGroups, lowAttendance] =
-    await Promise.all([
-      getAdminOverview({ monthStart, monthEnd }),
-      getClubAttendance({ startDate: monthStart, endDate: monthEnd }),
-      getGroupAttendanceRanking({
-        startDate: monthStart,
-        endDate: monthEnd,
-        limit: 5,
-        order: "top",
-      }),
-      getLowAttendanceChildren({
-        startDate: monthStart,
-        endDate: monthEnd,
-        threshold: 70,
-        limit: 5,
-      }),
-    ]);
-
+export async function AdminDashboard({
+  weekInput,
+  clubInput,
+}: {
+  weekInput?: string;
+  clubInput?: string;
+}) {
+  const current = dashboardWeek();
+  const requested = dashboardWeek(weekInput);
+  const week = requested.start > current.start ? current : requested;
+  const clubs = await getClubsOptions();
+  const clubId = clubs.find((club) => club.id === clubInput)?.id;
+  const data = await getWeeklyDashboard(week.start, week.endExclusive, clubId);
+  const s = data.summary;
+  const attendance = attendancePercentage(s);
+  const capture = s.expected
+    ? Math.round((s.recorded / s.expected) * 100)
+    : null;
   return (
     <div className="space-y-6">
-      {/* KPIs */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <KpiCard
-          title="Niños"
-          value={overview.childrenCount}
-          icon={BabyIcon}
-          iconClassName="bg-blue-500/10 text-blue-600"
-        />
-        <KpiCard
-          title="Actividades"
-          value={overview.activitiesCount}
-          icon={CalendarDaysIcon}
-          iconClassName="bg-violet-500/10 text-violet-600"
-        />
-        <KpiCard
-          title="Asistencia del mes"
-          value={`${overview.attendancePct}%`}
-          description={
-            overview.attendanceTotal > 0
-              ? `${overview.attendanceAttended} de ${overview.attendanceTotal}`
-              : "Sin registros este mes"
-          }
-          icon={CalendarCheckIcon}
-          iconClassName="bg-emerald-500/10 text-emerald-600"
-        />
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Asistencia semanal
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Supervisa los resultados de tus clubes y el avance de la captura.
+        </p>
       </div>
-
-      {/* Today activities + low attendance alert */}
-      <div className="grid gap-4 lg:grid-cols-3">
-        <TodayActivitiesCard
-          groupIds={[]}
-          showClubs
-          className="lg:col-span-2"
-        />
-        <LowAttendanceAlert items={lowAttendance} />
-      </div>
-
-      {/* Club attendance + top groups ranking */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <ClubAttendanceList clubs={clubAttendance} />
-        <GroupRanking
-          groups={topGroups}
-          icon={TrophyIcon}
-          title="Top 5 grupos con mejor asistencia"
-          emptyMessage="Aún no hay datos de asistencia"
-        />
-      </div>
+      <DashboardFilters
+        week={week.start}
+        currentWeek={current.start}
+        clubId={clubId}
+        clubs={clubs}
+      />
+      <section
+        aria-label="Resumen semanal"
+        className="grid gap-4 md:grid-cols-3"
+      >
+        <Card className="border-primary/20 bg-primary/5 shadow-none">
+          <CardHeader>
+            <CardDescription>Asistencia registrada</CardDescription>
+            <CardTitle className="text-4xl font-semibold tracking-tight tabular-nums">
+              {attendance === null ? "Sin datos" : `${attendance}%`}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground">
+            {s.present} presentes · {s.absent} ausentes
+            <p className="mt-1 text-xs">
+              {s.excused} justificados, excluidos del porcentaje
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-none">
+          <CardHeader>
+            <CardDescription>Avance de captura</CardDescription>
+            <CardTitle className="text-4xl font-semibold tracking-tight tabular-nums">
+              {capture === null ? "Sin datos" : `${capture}%`}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground">
+            {s.recorded} de {s.expected} registros completados
+            <p className="mt-1 text-xs">
+              Una asistencia por niño y fecha de actividad
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-none">
+          <CardHeader>
+            <CardDescription>Pendientes de capturar</CardDescription>
+            <CardTitle className="text-4xl font-semibold tracking-tight tabular-nums">
+              {s.pending}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground">
+            En {data.pendingCount} fechas de actividad
+            <p className="mt-1 text-xs">
+              Los pendientes no cuentan como ausencias
+            </p>
+          </CardContent>
+        </Card>
+      </section>
+      {s.expected === 0 && (
+        <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+          No hay asistencias esperadas para actividades finalizadas en esta
+          semana y selección.
+        </div>
+      )}
+      {s.pending > 0 && (
+        <p className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-sm text-amber-800 dark:text-amber-300">
+          La captura está incompleta. El porcentaje refleja únicamente los
+          registros confirmados y puede cambiar al completar los pendientes.
+        </p>
+      )}
+      <Card className="overflow-hidden shadow-none">
+        <CardHeader>
+          <CardTitle>Asistencia por club</CardTitle>
+          <CardDescription>
+            Resultados y registros pendientes, sin clasificación competitiva.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Breakdown rows={data.clubs} />
+        </CardContent>
+      </Card>
+      <Card className="overflow-hidden shadow-none">
+        <CardHeader>
+          <CardTitle>Detalle por grupo</CardTitle>
+          <CardDescription>
+            Identifica dónde faltan registros antes de interpretar los
+            porcentajes.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Breakdown rows={data.groups} groups />
+        </CardContent>
+      </Card>
+      <Card className="shadow-none">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ClipboardListIcon className="size-4" />
+            Por completar
+          </CardTitle>
+          <CardDescription>
+            {data.pendingCount > 8
+              ? `Mostrando las 8 fechas más antiguas de ${data.pendingCount} pendientes en la semana.`
+              : "Actividades finalizadas que aún tienen registros pendientes."}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {data.pending.length ? (
+            <ul className="divide-y">
+              {data.pending.map((item) => (
+                <li
+                  key={item.id}
+                  className="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium">{item.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {item.date.split("-").reverse().join("/")} · {item.groups}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs tabular-nums text-muted-foreground">
+                      {item.pending} pendientes de {item.expected}
+                    </span>
+                    <Button asChild size="sm" variant="outline">
+                      <Link href={`/attendance/${item.id}`}>
+                        Completar
+                        <ArrowUpRightIcon className="size-3.5" />
+                      </Link>
+                    </Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="py-4 text-sm text-muted-foreground">
+              {s.expected
+                ? "La captura de esta selección está completa."
+                : "Sin pendientes para esta selección."}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+      <p className="text-xs leading-relaxed text-muted-foreground">
+        Semana de lunes a domingo · Hora de El Salvador · Solo actividades
+        finalizadas, excluyendo canceladas. La asistencia se calcula como
+        presentes / (presentes + ausentes). Los desgloses usan las asignaciones
+        actuales de grupos; un niño en varios grupos se cuenta una sola vez en
+        el total general.
+      </p>
     </div>
   );
 }

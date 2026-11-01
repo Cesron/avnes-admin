@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { CardsSkeleton } from "@/components/loading-skeletons";
 import { authorize } from "@/lib/auth-utils";
 import { getActivities } from "@/services/activities/get-activities";
 import { getGroupsOptions } from "@/services/groups/get-groups-options";
@@ -9,20 +11,28 @@ import { EditActivityProvider } from "./_context/edit-activity-context";
 export default async function ActivitiesPage() {
   await authorize("/activities");
 
-  const [groupsOptions, activities] = await Promise.all([
-    getGroupsOptions(),
-    getActivities(),
-  ]);
+  const activitiesPromise = getActivities();
+  const groupsOptions = await getGroupsOptions();
 
   return (
     <EditActivityProvider>
       <ActivitiesHeader groupsOptions={groupsOptions} />
 
       <div className="py-6">
-        <ActivitiesCardsGrid activityList={activities} />
+        <Suspense fallback={<CardsSkeleton kind="activities" />}>
+          <ActivityResults activitiesPromise={activitiesPromise} />
+        </Suspense>
       </div>
 
       <EditActivityForm groupsOptions={groupsOptions} />
     </EditActivityProvider>
   );
+}
+
+async function ActivityResults({
+  activitiesPromise,
+}: {
+  activitiesPromise: ReturnType<typeof getActivities>;
+}) {
+  return <ActivitiesCardsGrid activityList={await activitiesPromise} />;
 }

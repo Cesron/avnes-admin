@@ -1,67 +1,40 @@
 "use client";
-
-import { useCallback, useRef, useState, useTransition } from "react";
+import { ListPagination } from "@/components/list-pagination";
+import { CardsSkeleton } from "@/components/loading-skeletons";
+import { useListNavigation } from "@/hooks/use-list-navigation";
+import type { PageResult } from "@/lib/pagination";
 import type { FamilyWithChildren } from "@/services/families/get-families";
-import { getFamiliesAction } from "../_lib/get-families.action";
 import { FamiliesCardsGrid } from "./families-cards-grid";
 import { FamiliesFilters } from "./families-filters";
 
-interface FamiliesListViewProps {
-  initialFamilies: FamilyWithChildren[];
-}
-
-export function FamiliesListView({ initialFamilies }: FamiliesListViewProps) {
-  const [families, setFamilies] =
-    useState<FamilyWithChildren[]>(initialFamilies);
-  const [search, setSearch] = useState("");
-  const [isPending, startTransition] = useTransition();
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const fetchFamilies = useCallback((searchTerm: string) => {
-    startTransition(async () => {
-      const result = await getFamiliesAction({
-        search: searchTerm || undefined,
-      });
-      setFamilies(result);
-    });
-  }, []);
-
-  const handleSearchChange = (value: string) => {
-    setSearch(value);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      fetchFamilies(value);
-    }, 300);
-  };
-
-  const isFiltered = search.trim().length > 0;
-
+export function FamiliesListView({
+  initialFamilies,
+}: {
+  initialFamilies: PageResult<FamilyWithChildren>;
+}) {
+  const navigation = useListNavigation();
   return (
-    <div className="space-y-4">
-      <FamiliesFilters
-        searchValue={search}
-        onSearchChange={handleSearchChange}
-      />
-
-      <div className="flex items-center justify-between px-1">
-        <p className="text-xs text-muted-foreground">
-          {isPending ? (
-            "Cargando..."
-          ) : (
-            <>
-              {families.length} {families.length === 1 ? "familia" : "familias"}
-            </>
-          )}
-        </p>
-      </div>
-
-      {isPending ? (
-        <div className="flex items-center justify-center py-16">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-        </div>
+    <div className="space-y-4" aria-busy={navigation.busy}>
+      <fieldset disabled={navigation.isPending} className="min-w-0">
+        <FamiliesFilters
+          searchValue={navigation.search}
+          onSearchChange={navigation.changeSearch}
+        />
+      </fieldset>
+      {navigation.busy ? (
+        <CardsSkeleton kind="families" count={initialFamilies.items.length} />
       ) : (
-        <FamiliesCardsGrid familyList={families} isFiltered={isFiltered} />
+        <FamiliesCardsGrid
+          familyList={initialFamilies.items}
+          isFiltered={!!navigation.search.trim()}
+        />
       )}
+      <ListPagination
+        {...initialFamilies}
+        count={initialFamilies.items.length}
+        busy={navigation.busy}
+        onNavigate={navigation.navigate}
+      />
     </div>
   );
 }

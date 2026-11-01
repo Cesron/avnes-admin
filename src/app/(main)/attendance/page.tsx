@@ -1,3 +1,6 @@
+import { Suspense } from "react";
+import { AttendanceSkeleton } from "@/components/loading-skeletons";
+import type { SessionUserInfo } from "@/lib/auth-utils";
 import { getSessionUserInfo } from "@/lib/auth-utils";
 import { getWeekOccurrences } from "@/services/attendance/get-week-occurrences";
 import { getClubsOptions } from "@/services/clubs/get-clubs-options";
@@ -13,6 +16,20 @@ import { AttendanceMonthView } from "./_components/attendance-month-view";
 export default async function AttendancePage() {
   const userInfo = await getSessionUserInfo();
 
+  return (
+    <>
+      <AttendanceHeader />
+
+      <div className="py-6">
+        <Suspense fallback={<AttendanceSkeleton />}>
+          <AttendanceContent userInfo={userInfo} />
+        </Suspense>
+      </div>
+    </>
+  );
+}
+
+async function AttendanceContent({ userInfo }: { userInfo: SessionUserInfo }) {
   const today = new Date();
   const monthStart = formatDateLocal(getMonthStart(today));
   const monthEnd = formatDateLocal(getMonthEnd(today));
@@ -54,20 +71,14 @@ export default async function AttendancePage() {
   });
 
   return (
-    <>
-      <AttendanceHeader />
-
-      <div className="py-6">
-        <AttendanceMonthView
-          initialOccurrences={initialOccurrences}
-          initialMonthStart={monthStart}
-          clubs={clubs}
-          groups={filteredGroups}
-          mentorGroupIds={mentorGroupIds}
-          defaultClubId={defaultClubId}
-          defaultGroupId={defaultGroupId}
-        />
-      </div>
-    </>
+    <AttendanceMonthView
+      initialOccurrences={initialOccurrences}
+      initialMonthStart={monthStart}
+      clubs={clubs}
+      groups={filteredGroups}
+      mentorGroupIds={mentorGroupIds}
+      defaultClubId={defaultClubId}
+      defaultGroupId={defaultGroupId}
+    />
   );
 }

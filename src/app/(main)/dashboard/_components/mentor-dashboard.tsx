@@ -4,6 +4,9 @@ import {
   CalendarClockIcon,
   CircleAlertIcon,
 } from "lucide-react";
+import { Suspense } from "react";
+import { LoadingRegion } from "@/components/loading-skeletons";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getMentorChildrenWithAttendance } from "@/services/dashboard/get-mentor-children-with-attendance";
 import { getMentorOverview } from "@/services/dashboard/get-mentor-overview";
 import { getMentorWeeklyTrend } from "@/services/dashboard/get-mentor-weekly-trend";
@@ -73,7 +76,15 @@ export async function MentorDashboard({ groupIds }: MentorDashboardProps) {
 
       {/* Two-column section: today + weekly */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <TodayActivitiesCard groupIds={groupIds} showClubs={false} />
+        <Suspense
+          fallback={
+            <LoadingRegion>
+              <Skeleton className="h-72" />
+            </LoadingRegion>
+          }
+        >
+          <TodayActivitiesCard groupIds={groupIds} showClubs={false} />
+        </Suspense>
 
         <div className="rounded-xl border bg-card p-5 shadow-sm">
           <div className="mb-4">

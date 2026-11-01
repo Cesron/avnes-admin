@@ -8,19 +8,9 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { PlusCircleIcon } from "lucide-react";
-import { CreateFamilyForm } from "./create-family-form";
 import { getNextPenpalCode } from "@/services/families/get-next-penpal-code";
+import { CreateFamilyDialog } from "./create-family-dialog";
 
 export async function FamiliesHeader() {
   const suggestedPenpalCode = await getNextPenpalCode();
@@ -48,24 +38,7 @@ export async function FamiliesHeader() {
         </div>
       </div>
 
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button>
-            <PlusCircleIcon />
-            Agregar Familia
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Crear Nueva Familia</DialogTitle>
-            <DialogDescription>
-              Ingresa los datos de la nueva familia.
-            </DialogDescription>
-          </DialogHeader>
-
-          <CreateFamilyForm suggestedPenpalCode={suggestedPenpalCode} />
-        </DialogContent>
-      </Dialog>
+      <CreateFamilyDialog suggestedPenpalCode={suggestedPenpalCode} />
     </header>
   );
 }

@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { CardsSkeleton } from "@/components/loading-skeletons";
 import { authorize, getSessionUserInfo } from "@/lib/auth-utils";
 import { getMentors } from "@/services/mentors/get-mentors";
 import { EditMentorForm } from "./_components/edit-mentor-form";
@@ -10,17 +12,22 @@ export default async function MentorsPage() {
   const userInfo = await getSessionUserInfo();
 
   // Las mentoras no ven la lista de otras mentoras.
-  const mentors = userInfo.role === "mentor" ? [] : await getMentors();
 
   return (
     <EditMentorProvider>
       <MentorsHeader />
 
       <div className="py-6">
-        <MentorsCardsGrid mentors={mentors} />
+        <Suspense fallback={<CardsSkeleton kind="mentors" />}>
+          <MentorResults isMentor={userInfo.role === "mentor"} />
+        </Suspense>
       </div>
 
       <EditMentorForm />
     </EditMentorProvider>
   );
+}
+
+async function MentorResults({ isMentor }: { isMentor: boolean }) {
+  return <MentorsCardsGrid mentors={isMentor ? [] : await getMentors()} />;
 }

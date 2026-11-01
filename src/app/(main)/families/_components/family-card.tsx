@@ -33,6 +33,7 @@ import {
   getSurnameInitials,
 } from "@/utils/family-helpers";
 import { useEditFamily } from "../_context/edit-family-context";
+import { FamilyPhoto } from "./family-photo";
 
 interface FamilyCardProps {
   family: FamilyWithChildren;
@@ -86,18 +87,18 @@ export function FamilyCard({ family }: FamilyCardProps) {
                   aria-label={`Ver foto de la familia ${family.penpal_code} en grande`}
                   className="absolute inset-0 cursor-pointer"
                 >
-                  {/* biome-ignore lint/performance/noImgElement: las URLs de Google Drive no admiten next/image sin proxy. */}
-                  <img
+                  <FamilyPhoto
                     src={photoUrl ?? ""}
                     alt={
                       hasSurnames ? surnames : `Familia ${family.penpal_code}`
                     }
                     className="absolute inset-0 h-full w-full object-cover"
-                    loading="lazy"
+                    sizes="(max-width: 639px) 168px, 224px"
                   />
                 </button>
               </DialogTrigger>
               <DialogContent
+                aria-describedby={undefined}
                 className={cn(
                   "bg-black/90 border-0 p-2 sm:max-w-3xl md:max-w-5xl",
                   "[&_[data-slot=dialog-close]]:bg-white/20",
@@ -114,12 +115,16 @@ export function FamilyCard({ family }: FamilyCardProps) {
                     ? `Foto de la familia ${surnames}`
                     : `Foto de la familia ${family.penpal_code}`}
                 </DialogTitle>
-                {/* biome-ignore lint/performance/noImgElement: misma razón que la foto principal. */}
-                <img
-                  src={photoUrl ?? ""}
-                  alt={hasSurnames ? surnames : `Familia ${family.penpal_code}`}
-                  className="max-h-[88vh] w-full object-contain"
-                />
+                <div className="relative h-[80vh] w-full">
+                  <FamilyPhoto
+                    src={photoUrl ?? ""}
+                    alt={
+                      hasSurnames ? surnames : `Familia ${family.penpal_code}`
+                    }
+                    sizes="(max-width: 767px) 100vw, 1024px"
+                    className="object-contain"
+                  />
+                </div>
               </DialogContent>
             </Dialog>
           ) : (
@@ -270,14 +275,14 @@ function ChildChip({ child }: ChildChipProps) {
       )}
       title={child.name}
     >
-      <div className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary/45 to-primary/15">
+      <div className="relative flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary/45 to-primary/15">
         {hasChildPhoto ? (
-          // biome-ignore lint/performance/noImgElement: misma razón que la foto principal (URLs de Google Drive).
-          <img
+          <FamilyPhoto
             src={childPhotoUrl ?? ""}
             alt={firstName}
             className="size-full object-cover"
-            loading="lazy"
+            sizes="24px"
+            compact
           />
         ) : (
           <span className="text-[10px] font-bold text-primary/90">

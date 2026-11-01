@@ -1,9 +1,11 @@
+import { Suspense } from "react";
+import { AppLoadingSkeleton } from "@/components/app-loading-skeleton";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { verifySession } from "@/lib/auth-utils";
 import type { UserRole } from "@/types/user";
 
-export default async function RootLayout({
+async function AuthenticatedLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -20,5 +22,17 @@ export default async function RootLayout({
         </div>
       </SidebarInset>
     </SidebarProvider>
+  );
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <Suspense fallback={<AppLoadingSkeleton />}>
+      <AuthenticatedLayout>{children}</AuthenticatedLayout>
+    </Suspense>
   );
 }

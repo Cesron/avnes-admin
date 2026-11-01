@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { HeaderSkeleton, ListSkeleton } from "@/components/loading-skeletons";
 import { authorize } from "@/lib/auth-utils";
 import { getAvailableMentorsOptions } from "@/services/mentors/get-available-mentors-options";
 import { EditUserForm } from "./_components/edit-user-form";
@@ -8,17 +10,27 @@ import { EditUserProvider } from "./_context/edit-user-context";
 export default async function UsersPage() {
   await authorize("/users");
 
-  const mentorsOptions = await getAvailableMentorsOptions();
-
   return (
     <EditUserProvider>
-      <UsersHeader mentorsOptions={mentorsOptions} />
+      <Suspense fallback={<HeaderSkeleton />}>
+        <UserActions />
+      </Suspense>
 
       <div className="py-6">
-        <UsersCardsGrid />
+        <Suspense fallback={<ListSkeleton kind="users" />}>
+          <UsersCardsGrid />
+        </Suspense>
       </div>
-
-      <EditUserForm mentorsOptions={mentorsOptions} />
     </EditUserProvider>
+  );
+}
+
+async function UserActions() {
+  const mentorsOptions = await getAvailableMentorsOptions();
+  return (
+    <>
+      <UsersHeader mentorsOptions={mentorsOptions} />
+      <EditUserForm mentorsOptions={mentorsOptions} />
+    </>
   );
 }

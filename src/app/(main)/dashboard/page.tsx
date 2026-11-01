@@ -1,11 +1,19 @@
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { Suspense } from "react";
+import { DashboardSkeleton } from "@/components/loading-skeletons";
 import { getSessionUserInfo, verifySession } from "@/lib/auth-utils";
+import { type SearchParams, singleParam } from "@/lib/pagination";
 import { AdminDashboard } from "./_components/admin-dashboard";
 import { DashboardHeader } from "./_components/dashboard-header";
 import { MentorDashboard } from "./_components/mentor-dashboard";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const query = await searchParams;
   const [session, userInfo] = await Promise.all([
     verifySession(),
     getSessionUserInfo(),
@@ -23,7 +31,7 @@ export default async function DashboardPage() {
     ? userInfo.groupIds.length === 0
       ? "No tienes grupos asignados"
       : `Tus grupos • ${todayLabel}`
-    : `Resumen general • ${todayLabel}`;
+    : "Supervisión de clubes y grupos";
 
   return (
     <>
@@ -31,9 +39,23 @@ export default async function DashboardPage() {
 
       <div className="py-6">
         {isMentor ? (
-          <MentorDashboard groupIds={userInfo.groupIds} />
+          <Suspense fallback={<DashboardSkeleton mentor />}>
+            <MentorDashboard groupIds={userInfo.groupIds} />
+          </Suspense>
+        ) : userInfo.role === "admin" || userInfo.role === "coordinator" ? (
+          <Suspense
+            key={JSON.stringify(query)}
+            fallback={<DashboardSkeleton />}
+          >
+            <AdminDashboard
+              weekInput={singleParam(query.week)}
+              clubInput={singleParam(query.club)}
+            />
+          </Suspense>
         ) : (
-          <AdminDashboard />
+          <p className="text-sm text-muted-foreground">
+            Tu cuenta no tiene un rol habilitado para consultar este dashboard.
+          </p>
         )}
       </div>
     </>

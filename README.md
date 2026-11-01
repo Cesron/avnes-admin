@@ -6,6 +6,29 @@ La arquitectura, la actualización de Next.js y los pendientes de seguridad se d
 
 ## Guía de Desarrollo
 
+### Paginación de familias y niños
+
+Ambas listas muestran 24 registros por página. Usan cursores por código penpal
+e ID, con navegación anterior/siguiente y filtros en la URL. PostgreSQL devuelve
+como máximo 25 registros: el adicional determina si hay otra página. No se usa
+`OFFSET` ni se cuenta toda la lista en cada navegación. Los detalles de las
+familias se agregan después de limitar la página. El tamaño se configura en
+`src/lib/pagination.ts`.
+
+Los niños se muestran una vez por ID; cuando pertenecen a varios grupos, se
+muestra el primer grupo por nombre entre los que coinciden con el filtro. El
+alcance de las mentoras se obtiene de la sesión en el servidor.
+
+Pruebas de recorrido completo, navegación inversa, filtros y alcance vacío:
+
+```powershell
+$env:PGOPTIONS='-c default_transaction_read_only=on'
+node --env-file=.env --import tsx --test tests/pagination.test.ts
+```
+
+Las pruebas usan consultas de lectura. Sin `DB_HOST` se omite la prueba de
+integración; la validación de cursores se ejecuta igualmente.
+
 ### Estructura de Carpetas para CRUDs
 
 Cada módulo de CRUD sigue la siguiente estructura de carpetas:

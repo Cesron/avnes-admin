@@ -1,15 +1,15 @@
 "use client";
-
+import { useCallback, useEffect, useState, useTransition } from "react";
+import { CalendarSkeleton } from "@/components/loading-skeletons";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { GroupOption } from "@/services/groups/get-groups-options";
 import type { WeekOccurrence } from "@/types/attendance";
-import { useIsMobile } from "@/hooks/use-mobile";
 import {
   formatDateLocal,
   getCalendarDays,
   getMonthEnd,
   getMonthStart,
 } from "@/utils/week-helpers";
-import { useCallback, useEffect, useState, useTransition } from "react";
 import { getMonthOccurrencesAction } from "../_lib/get-month-occurrences.action";
 import { AttendanceAgendaView } from "./attendance-agenda-view";
 import { AttendanceFilters } from "./attendance-filters";
@@ -144,9 +144,10 @@ export function AttendanceMonthView({
       />
 
       {isPending ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-        </div>
+        <CalendarSkeleton
+          agenda={viewMode === "agenda"}
+          weeks={calendarDays.length / 7}
+        />
       ) : viewMode === "agenda" ? (
         <AttendanceAgendaView
           calendarDays={calendarDays}

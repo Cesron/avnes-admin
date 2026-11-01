@@ -92,24 +92,20 @@ export function getSurnameInitials(
 export function convertGoogleDriveImageUrl(
   url: string | null | undefined,
 ): string | null {
-  if (!url) return null;
-
-  // /file/d/{fileId}/...
-  const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-  if (fileMatch?.[1]) {
-    return `https://lh3.googleusercontent.com/d/${fileMatch[1]}`;
+  if (!url?.trim()) return null;
+  try {
+    const parsed = new URL(url.trim());
+    if (!["https:", "http:"].includes(parsed.protocol)) return null;
+    if (parsed.hostname === "drive.google.com") {
+      const fileId =
+        parsed.pathname.match(/^\/file\/d\/([\w-]+)(?:\/|$)/)?.[1] ??
+        parsed.searchParams.get("id");
+      return fileId && /^[\w-]+$/.test(fileId)
+        ? `https://lh3.googleusercontent.com/d/${fileId}`
+        : null;
+    }
+    return parsed.href;
+  } catch {
+    return null;
   }
-
-  // ?id={fileId} o &id={fileId}
-  const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  if (idMatch?.[1]) {
-    return `https://lh3.googleusercontent.com/d/${idMatch[1]}`;
-  }
-
-  // Si ya es una URL de lh3.googleusercontent.com, la dejamos como está
-  if (url.includes("lh3.googleusercontent.com")) {
-    return url;
-  }
-
-  return url;
 }

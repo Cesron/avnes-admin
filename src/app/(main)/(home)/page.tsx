@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { KpisSkeleton } from "@/components/loading-skeletons";
 import { verifySession } from "@/lib/auth-utils";
 import { HomeHeader } from "./_components/home-header";
 import { HomeKpiCards } from "./_components/home-kpi-cards";
@@ -20,7 +22,9 @@ export default async function Home() {
           </p>
         </div>
 
-        <HomeKpiCards />
+        <Suspense fallback={<KpisSkeleton />}>
+          <HomeKpiCards />
+        </Suspense>
       </div>
     </>
   );

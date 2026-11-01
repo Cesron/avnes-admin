@@ -1,3 +1,10 @@
+import {
+  makePage,
+  PAGE_SIZE,
+  type PageRequest,
+  type PageResult,
+  readCursor,
+} from "@/lib/pagination";
 import { sql } from "@/lib/sql";
 
 /**
@@ -33,86 +40,51 @@ export type FamilyWithChildren = {
   children: ChildSummary[];
 };
 
-type GetFamiliesParams = {
-  search?: string;
-};
-
-type FamilyRow = Omit<FamilyWithChildren, "children"> & {
-  // PostgreSQL devuelve el `json_agg` como string por defecto.
-  children: string | ChildSummary[];
-};
-
-/**
- * Parsea el valor de la columna `children` que viene del SQL.
- * El driver `pg` devuelve los `json` como string, pero lo dejamos
- * tolerante por si en algún momento se configura el auto-parseo.
- */
-function parseChildren(value: string | ChildSummary[]): ChildSummary[] {
-  if (Array.isArray(value)) return value;
-  if (typeof value !== "string" || value.length === 0) return [];
-  try {
-    const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? (parsed as ChildSummary[]) : [];
-  } catch {
-    return [];
-  }
-}
+type GetFamiliesParams = PageRequest & { search?: string };
 
 export async function getFamilies(
-  params?: GetFamiliesParams,
-): Promise<FamilyWithChildren[]> {
-  const { search } = params ?? {};
-
-  const searchCondition = search
-    ? `WHERE LOWER(penpal_code) LIKE $1
-       OR LOWER(COALESCE(children_names, '')) LIKE $1`
-    : "";
-
-  const queryParams: string[] = search ? [`%${search.toLowerCase()}%`] : [];
-
-  const result = await sql.query<FamilyRow>(
+  params: GetFamiliesParams = {},
+): Promise<PageResult<FamilyWithChildren>> {
+  const cursor = readCursor(params);
+  const backwards = cursor?.backwards ?? false;
+  const values: (string | number)[] = [];
+  const conditions: string[] = [];
+  if (params.search?.trim()) {
+    values.push(`%${params.search.trim().toLowerCase()}%`);
+    conditions.push(`(LOWER(f.penpal_code) LIKE $${values.length} OR EXISTS (
+      SELECT 1 FROM children child WHERE child.family_id = f.id
+      AND LOWER(child.name) LIKE $${values.length}
+    ))`);
+  }
+  if (cursor) {
+    values.push(cursor.key, cursor.id);
+    conditions.push(`(LPAD(f.penpal_code, 4, '0'), f.id) ${backwards ? "<" : ">"}
+      ($${values.length - 1}::text, $${values.length}::uuid)`);
+  }
+  values.push(PAGE_SIZE + 1);
+  const direction = backwards ? "DESC" : "ASC";
+  const result = await sql.query<FamilyWithChildren & { penpal_sort: string }>(
     `
-    WITH families_aggregated AS (
-      SELECT
-        f.id,
-        f.penpal_code,
-        f.family_biography_url,
-        f.family_photo_url,
-        f.created_at,
-        f.updated_at,
-        COUNT(c.id)::int as children_count,
-        STRING_AGG(c.name, ', ' ORDER BY c.name) as children_names,
-        MIN(c.name) as first_child_name
+    WITH page AS MATERIALIZED (
+      SELECT f.*, LPAD(f.penpal_code, 4, '0') AS penpal_sort
       FROM families f
-      LEFT JOIN children c ON f.id = c.family_id
-      GROUP BY f.id, f.penpal_code, f.family_biography_url, f.family_photo_url, f.created_at, f.updated_at
+      ${conditions.length ? `WHERE ${conditions.join(" AND ")}` : ""}
+      ORDER BY LPAD(f.penpal_code, 4, '0') ${direction}, f.id ${direction}
+      LIMIT $${values.length}
     )
-    SELECT
-      fa.*,
-      COALESCE(
-        (
-          SELECT json_agg(
-            json_build_object(
-              'id', c.id,
-              'name', c.name,
-              'photo_url', c.child_photo_url,
-              'gender', c.gender
-            ) ORDER BY c.name
-          )
-          FROM children c
-          WHERE c.family_id = fa.id
-        ),
-        '[]'::json
-      ) as children
-    FROM families_aggregated fa
-    ${searchCondition}
-    ORDER BY LPAD(penpal_code, 4, '0') ASC
+    SELECT page.*, details.* FROM page
+    CROSS JOIN LATERAL (
+      SELECT COUNT(c.id)::int AS children_count,
+        STRING_AGG(c.name, ', ' ORDER BY c.name, c.id) AS children_names,
+        MIN(c.name) AS first_child_name,
+        COALESCE(json_agg(json_build_object(
+          'id', c.id, 'name', c.name, 'photo_url', c.child_photo_url, 'gender', c.gender
+        ) ORDER BY c.name, c.id), '[]'::json) AS children
+      FROM children c WHERE c.family_id = page.id
+    ) details
+    ORDER BY page.penpal_sort ${direction}, page.id ${direction}
   `,
-    queryParams,
+    values,
   );
-
-  return result.rows.map((row) => ({
-    ...row,
-    children: parseChildren(row.children),
-  }));
+  return makePage(result.rows, cursor);
 }

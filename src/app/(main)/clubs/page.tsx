@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { ListSkeleton } from "@/components/loading-skeletons";
 import { authorize } from "@/lib/auth-utils";
 import { ClubsHeader } from "./_components/clubs-header";
 import { ClubsList } from "./_components/clubs-list";
@@ -12,7 +14,9 @@ export default async function ClubsPage() {
       <ClubsHeader />
 
       <div className="py-6">
-        <ClubsList />
+        <Suspense fallback={<ListSkeleton kind="clubs" />}>
+          <ClubsList />
+        </Suspense>
       </div>
 
       <EditClubForm />
