@@ -154,9 +154,14 @@
   }
   body {
     @apply bg-background text-foreground;
-    padding: env(safe-area-inset-top) env(safe-area-inset-right)
-      env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
+}
+
+/* Radix scroll locking rewrites body padding. Keep safe areas on a stable
+   content wrapper so opening a modal or mobile sidebar cannot resize the page. */
+.app-safe-area {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 /* Keep fixed navigation clear of the notch and home indicator in installed apps. */

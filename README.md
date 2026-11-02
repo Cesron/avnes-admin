@@ -11,11 +11,13 @@ La app se instala como **AVNES**, con el mismo favicon y logo de
 (`src/app/manifest.ts`), sin plugins ni service worker: el panel siempre necesita
 conexión a internet. No se guardan datos del panel para usarlos sin conexión.
 
-El manifiesto solicita `display: fullscreen`. Si el dispositivo no admite ese
-modo, el navegador usa su alternativa compatible (normalmente `standalone`, sin
-barra de direcciones). En iPhone/iPad, iOS controla la barra de estado; no se puede
-garantizar ocultarla. Se respetan las áreas seguras de la pantalla y se permite
-el zoom.
+El manifiesto solicita `display: standalone`: abre la app sin barra de
+direcciones y permite conservar la barra de estado (hora, batería y conexión).
+En iPhone/iPad se usa el estilo de barra de estado `default`. El sistema operativo
+controla su presentación final. Se respetan las áreas seguras de la pantalla y
+se permite el zoom. Sus márgenes se aplican al contenedor `.app-safe-area`, no al
+`body`, para evitar que el bloqueo de scroll del sidebar o de los diálogos los
+sobrescriba al abrirse.
 
 ### Instalación
 

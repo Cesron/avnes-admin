@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "AVNES",
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
   },
   icons: {
     apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
@@ -49,7 +49,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <PwaProvider>{children}</PwaProvider>
+          <div className="app-safe-area">
+            <PwaProvider>{children}</PwaProvider>
+          </div>
           <Toaster />
         </ThemeProvider>
       </body>
