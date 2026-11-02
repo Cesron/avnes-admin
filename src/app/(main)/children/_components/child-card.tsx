@@ -8,9 +8,11 @@ import {
   UserIcon,
   UsersIcon,
 } from "lucide-react";
+import Link from "next/link";
 import { EditButton } from "@/components/edit-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
@@ -106,6 +108,12 @@ export function ChildCard({ child }: ChildCardProps) {
       </CardHeader>
 
       <CardContent className="space-y-3">
+        <Button variant="outline" size="sm" asChild>
+          <Link href={`/children/${child.id}/attendance`}>
+            <CalendarIcon aria-hidden="true" />
+            Historial de asistencia
+          </Link>
+        </Button>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <CalendarIcon className="size-4 shrink-0" />
           <span>

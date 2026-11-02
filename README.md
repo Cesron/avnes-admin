@@ -59,6 +59,26 @@ y [apps de pantalla de inicio en iOS/iPadOS](https://webkit.org/blog/13878/web-p
 
 ## Guía de Desarrollo
 
+### Historial de asistencia por niño
+
+Desde Niños → Historial de asistencia se accede a
+`/children/[childId]/attendance`. Incluye fechas inclusivas, presentes, ausentes,
+justificados, notas y páginas de 25 registros. El resumen abarca todo el filtro;
+las actividades sin registro no se interpretan como ausencias.
+
+Administradores y coordinadores pueden consultar cualquier niño. Para las
+mentoras, el servidor verifica la pertenencia activa del niño a un grupo de la
+mentora vinculada a la sesión; también protege el acceso por URL directa. Una
+mentora sin vinculación o grupos no obtiene acceso. Una vez autorizado el niño,
+se muestra su historial registrado completo, incluido el de grupos anteriores.
+
+Pruebas de filtros, resumen y permisos (solo lectura):
+
+```powershell
+$env:PGOPTIONS='-c default_transaction_read_only=on'
+node --env-file=.env --import tsx --test tests/child-attendance-history.test.ts
+```
+
 ### Paginación de familias y niños
 
 Ambas listas muestran 24 registros por página. Usan cursores por código penpal
