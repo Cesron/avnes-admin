@@ -2,7 +2,10 @@
 
 import { InboxIcon } from "lucide-react";
 import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import type { AttendanceStatus, ChildAttendance } from "@/types/attendance";
+import { normalizeString } from "@/utils/normalize-string";
 import { AttendanceFilters } from "../../_components/attendance-filters";
 import { AttendanceStatsCards } from "./attendance-stats-cards";
 import { ChildAttendanceRow } from "./child-attendance-row";
@@ -34,6 +37,8 @@ export function AttendanceList({
   clubs,
 }: AttendanceListProps) {
   const [children, setChildren] = useState(initialChildren);
+  const [search, setSearch] = useState("");
+  const [onlyPending, setOnlyPending] = useState(false);
   const [selectedClubId, setSelectedClubId] = useState<string>(
     clubs.length === 1 ? clubs[0].id : "all",
   );
@@ -60,14 +65,10 @@ export function AttendanceList({
     setSelectedGroupId(groupId);
   };
 
-  // Filter UI is only useful when there is more than one club AND more than
-  // one group to choose between. With a single option on either side the
-  // value is auto-applied (already in the default state) and the dropdowns
-  // are hidden.
-  const showFilters = clubs.length > 1 && groups.length > 1;
+  const showFilters = clubs.length > 1 || groups.length > 1;
 
   const visibleChildren = useMemo(() => {
-    return children.filter((child) => {
+    const scoped = children.filter((child) => {
       if (selectedClubId !== "all" && child.club_id !== selectedClubId) {
         return false;
       }
@@ -76,6 +77,9 @@ export function AttendanceList({
       }
       return true;
     });
+    return Array.from(
+      new Map(scoped.map((child) => [child.child_id, child])).values(),
+    );
   }, [children, selectedClubId, selectedGroupId]);
 
   // Calculate stats from the visible (filtered) children
@@ -89,6 +93,14 @@ export function AttendanceList({
   const excusedCount = visibleChildren.filter(
     (c) => c.attendance_status === "excused",
   ).length;
+
+  const matchingChildren = visibleChildren.filter(
+    (child) =>
+      normalizeString(child.child_name).includes(
+        normalizeString(search.trim()),
+      ) &&
+      (!onlyPending || child.attendance_status === null),
+  );
 
   if (children.length === 0) {
     return (
@@ -125,16 +137,43 @@ export function AttendanceList({
         excused={excusedCount}
       />
 
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="flex-1 space-y-2">
+          <label htmlFor="attendance-search" className="text-sm font-medium">
+            Buscar niño
+          </label>
+          <Input
+            id="attendance-search"
+            type="search"
+            placeholder="Escribe un nombre…"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          aria-pressed={onlyPending}
+          onClick={() => setOnlyPending(!onlyPending)}
+        >
+          {onlyPending ? "Mostrar todos" : "Solo pendientes"}
+        </Button>
+      </div>
+      <output className="block text-sm text-muted-foreground tabular-nums">
+        {matchingChildren.length} de {totalChildren} niños en la lista
+      </output>
       {/* Children list */}
-      {visibleChildren.length === 0 ? (
+      {matchingChildren.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8 text-center border rounded-lg">
           <p className="text-sm text-muted-foreground">
-            No hay niños que coincidan con los filtros seleccionados.
+            {onlyPending && !search
+              ? "No quedan registros pendientes en esta selección."
+              : "No hay niños que coincidan con la búsqueda y los filtros."}
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {visibleChildren.map((child) => (
+        <div className="rounded-xl border bg-card">
+          {matchingChildren.map((child) => (
             <ChildAttendanceRow
               key={child.child_id}
               child={child}

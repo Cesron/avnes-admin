@@ -86,5 +86,11 @@ async function AttendanceResults({
     props.occurrenceId,
     mentorGroupIds,
   );
-  return <AttendanceList {...props} initialChildren={children} />;
+  return (
+    <AttendanceList
+      key={props.occurrenceId}
+      {...props}
+      initialChildren={children}
+    />
+  );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import {
   Select,
   SelectContent,
@@ -36,6 +37,8 @@ export function AttendanceFilters({
   onClubChange,
   onGroupChange,
 }: AttendanceFiltersProps) {
+  const clubId = useId();
+  const groupId = useId();
   // Filter groups based on selected club
   const filteredGroups =
     selectedClubId === "all"
@@ -49,11 +52,14 @@ export function AttendanceFilters({
   return (
     <div className="grid grid-cols-1 gap-3 sm:flex sm:flex-wrap sm:gap-4">
       <div className="flex flex-col gap-1.5 sm:min-w-[200px]">
-        <label className="text-xs sm:text-sm font-medium text-muted-foreground">
+        <label
+          htmlFor={clubId}
+          className="text-xs sm:text-sm font-medium text-muted-foreground"
+        >
           Club
         </label>
         <Select value={selectedClubId} onValueChange={onClubChange}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger id={clubId} className="w-full">
             <SelectValue placeholder="Seleccionar club" />
           </SelectTrigger>
           <SelectContent>
@@ -68,11 +74,14 @@ export function AttendanceFilters({
       </div>
 
       <div className="flex flex-col gap-1.5 sm:min-w-[200px]">
-        <label className="text-xs sm:text-sm font-medium text-muted-foreground">
+        <label
+          htmlFor={groupId}
+          className="text-xs sm:text-sm font-medium text-muted-foreground"
+        >
           Grupo
         </label>
         <Select value={selectedGroupId} onValueChange={onGroupChange}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger id={groupId} className="w-full">
             <SelectValue placeholder="Seleccionar grupo" />
           </SelectTrigger>
           <SelectContent>

@@ -1,9 +1,14 @@
 "use client";
 
+import {
+  CalendarIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  LayoutListIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { formatDateLocal, getMonthStart } from "@/utils/week-helpers";
-import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon, LayoutListIcon } from "lucide-react";
 
 export type MonthViewMode = "month" | "agenda";
 
@@ -75,23 +80,22 @@ export function MonthNavigator({
           </Button>
         </div>
 
-        <span className="text-base sm:text-lg font-semibold capitalize tabular-nums">
+        <span className="text-base sm:text-lg font-semibold tabular-nums">
           {formatMonthLabel(currentMonthStart)}
         </span>
       </div>
 
       {/* Right side: view mode toggle */}
       {onViewModeChange && (
-        <div
-          className="inline-flex h-9 items-center justify-center rounded-md border bg-muted/40 p-0.5 self-start sm:self-auto"
-          role="group"
+        <fieldset
+          className="inline-flex items-center justify-center rounded-md border bg-muted/40 p-0.5 self-start sm:self-auto"
           aria-label="Modo de vista"
         >
           <button
             type="button"
             onClick={() => onViewModeChange("month")}
             className={cn(
-              "inline-flex h-8 items-center gap-1.5 rounded-sm px-2.5 text-xs font-medium transition-all",
+              "inline-flex min-h-11 items-center gap-1.5 rounded-sm px-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2",
               viewMode === "month"
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",
@@ -100,13 +104,13 @@ export function MonthNavigator({
             aria-label="Vista calendario"
           >
             <CalendarIcon className="size-3.5" />
-            <span className="hidden sm:inline">Calendario</span>
+            <span>Calendario</span>
           </button>
           <button
             type="button"
             onClick={() => onViewModeChange("agenda")}
             className={cn(
-              "inline-flex h-8 items-center gap-1.5 rounded-sm px-2.5 text-xs font-medium transition-all",
+              "inline-flex min-h-11 items-center gap-1.5 rounded-sm px-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2",
               viewMode === "agenda"
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",
@@ -115,9 +119,9 @@ export function MonthNavigator({
             aria-label="Vista lista"
           >
             <LayoutListIcon className="size-3.5" />
-            <span className="hidden sm:inline">Lista</span>
+            <span>Lista</span>
           </button>
-        </div>
+        </fieldset>
       )}
     </div>
   );

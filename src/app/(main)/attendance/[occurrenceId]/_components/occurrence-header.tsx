@@ -1,5 +1,7 @@
 "use client";
 
+import { ArrowLeftIcon } from "lucide-react";
+import Link from "next/link";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,6 +10,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import type { OccurrenceDetail } from "@/types/attendance";
@@ -55,9 +58,15 @@ export function OccurrenceHeader({
       : occurrence.groups.filter((g) => mentorGroupIds.includes(g.id));
 
   return (
-    <header className="flex flex-col gap-4 min-h-20 py-4 shrink-0 transition-all ease-linear border-b">
+    <header className="flex flex-col gap-4 min-h-20 py-4 shrink-0 border-b">
       <div className="flex flex-wrap gap-3 items-center">
         <SidebarTrigger className="-ms-1" />
+        <Button asChild variant="ghost" className="lg:hidden">
+          <Link href="/attendance">
+            <ArrowLeftIcon aria-hidden="true" />
+            Actividades
+          </Link>
+        </Button>
         <div className="max-lg:hidden lg:contents">
           <Separator
             orientation="vertical"
@@ -66,7 +75,7 @@ export function OccurrenceHeader({
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem className="hidden md:block">

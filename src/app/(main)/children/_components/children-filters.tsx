@@ -1,5 +1,7 @@
 "use client";
 
+import { SearchIcon } from "lucide-react";
+import { useId } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -8,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SearchIcon } from "lucide-react";
 
 type ClubOption = {
   id: string;
@@ -44,6 +45,9 @@ export function ChildrenFilters({
   onGroupChange,
   onSearchChange,
 }: ChildrenFiltersProps) {
+  const searchId = useId();
+  const clubId = useId();
+  const groupId = useId();
   const filteredGroups =
     selectedClubId === "all"
       ? groups
@@ -54,13 +58,17 @@ export function ChildrenFilters({
 
   return (
     <div className="flex flex-wrap gap-4">
-      <div className="flex flex-col gap-2 min-w-[250px]">
-        <label className="text-sm font-medium text-muted-foreground">
+      <div className="flex flex-col gap-2 w-full sm:w-auto sm:min-w-[250px]">
+        <label
+          htmlFor={searchId}
+          className="text-sm font-medium text-muted-foreground"
+        >
           Buscar
         </label>
         <div className="relative">
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
+            id={searchId}
             placeholder="Buscar por nombre..."
             value={searchValue}
             onChange={(e) => onSearchChange(e.target.value)}
@@ -70,12 +78,15 @@ export function ChildrenFilters({
       </div>
 
       {showGroupFilters && (
-        <div className="flex flex-col gap-2 min-w-[200px]">
-          <label className="text-sm font-medium text-muted-foreground">
+        <div className="flex flex-col gap-2 w-full sm:w-auto sm:min-w-[200px]">
+          <label
+            htmlFor={clubId}
+            className="text-sm font-medium text-muted-foreground"
+          >
             Club
           </label>
           <Select value={selectedClubId} onValueChange={onClubChange}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger id={clubId} className="w-full">
               <SelectValue placeholder="Seleccionar club" />
             </SelectTrigger>
             <SelectContent>
@@ -91,12 +102,15 @@ export function ChildrenFilters({
       )}
 
       {showGroupFilters && (
-        <div className="flex flex-col gap-2 min-w-[200px]">
-          <label className="text-sm font-medium text-muted-foreground">
+        <div className="flex flex-col gap-2 w-full sm:w-auto sm:min-w-[200px]">
+          <label
+            htmlFor={groupId}
+            className="text-sm font-medium text-muted-foreground"
+          >
             Grupo
           </label>
           <Select value={selectedGroupId} onValueChange={onGroupChange}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger id={groupId} className="w-full">
               <SelectValue placeholder="Seleccionar grupo" />
             </SelectTrigger>
             <SelectContent>

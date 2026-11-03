@@ -1,6 +1,7 @@
 "use client";
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { CalendarSkeleton } from "@/components/loading-skeletons";
+import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { GroupOption } from "@/services/groups/get-groups-options";
 import type { WeekOccurrence } from "@/types/attendance";
@@ -50,6 +51,8 @@ export function AttendanceMonthView({
   const [selectedClubId, setSelectedClubId] = useState(defaultClubId);
   const [selectedGroupId, setSelectedGroupId] = useState(defaultGroupId);
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const requestId = useRef(0);
   const isMobile = useIsMobile();
   const [viewMode, setViewMode] = useState<MonthViewMode>("month");
   const [hasUserToggled, setHasUserToggled] = useState(false);
@@ -67,10 +70,7 @@ export function AttendanceMonthView({
     setViewMode(mode);
   };
 
-  // Filter UI is only useful when there's more than one club AND more than
-  // one group to choose between. With a single option on either side, the
-  // single value is auto-applied to the query and the dropdowns are hidden.
-  const showFilters = !mentorGroupIds && clubs.length > 1 && groups.length > 1;
+  const showFilters = clubs.length > 1 || groups.length > 1;
 
   const [year, month] = currentMonthStart.split("-").map(Number);
   const monthStartDate = new Date(year, month - 1, 1);
@@ -82,15 +82,24 @@ export function AttendanceMonthView({
       const start = getMonthStart(new Date(y, m - 1, 1));
       const end = getMonthEnd(new Date(y, m - 1, 1));
 
+      const id = ++requestId.current;
+      setError(null);
       startTransition(async () => {
-        const result = await getMonthOccurrencesAction({
-          startDate: formatDateLocal(start),
-          endDate: formatDateLocal(end),
-          clubId: clubId === "all" ? undefined : clubId,
-          groupId: groupId === "all" ? undefined : groupId,
-          mentorGroupIds,
-        });
-        setOccurrences(result);
+        try {
+          const result = await getMonthOccurrencesAction({
+            startDate: formatDateLocal(start),
+            endDate: formatDateLocal(end),
+            clubId: clubId === "all" ? undefined : clubId,
+            groupId: groupId === "all" ? undefined : groupId,
+            mentorGroupIds,
+          });
+          if (id === requestId.current) setOccurrences(result);
+        } catch {
+          if (id === requestId.current)
+            setError(
+              "No se pudieron cargar las actividades. Revisa tu conexión e inténtalo de nuevo.",
+            );
+        }
       });
     },
     [mentorGroupIds],
@@ -143,7 +152,23 @@ export function AttendanceMonthView({
         onViewModeChange={handleViewModeChange}
       />
 
-      {isPending ? (
+      {error ? (
+        <div role="alert" className="space-y-3 rounded-xl border p-6">
+          <p className="text-sm">{error}</p>
+          <Button
+            variant="outline"
+            onClick={() =>
+              fetchOccurrences(
+                currentMonthStart,
+                selectedClubId,
+                selectedGroupId,
+              )
+            }
+          >
+            Reintentar
+          </Button>
+        </div>
+      ) : isPending ? (
         <CalendarSkeleton
           agenda={viewMode === "agenda"}
           weeks={calendarDays.length / 7}

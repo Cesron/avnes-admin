@@ -73,7 +73,7 @@ export type KpiCardProps = {
   progress?: number;
   /** Optional trend pill rendered next to the value. */
   trend?: KpiTrend;
-  /** 0-based index used to stagger the entrance animation. */
+  /** Legacy ordering prop; metrics render immediately without entrance motion. */
   index?: number;
 };
 
@@ -85,8 +85,6 @@ export type KpiCardProps = {
  * - Tabular-nums on the headline value to prevent layout shift.
  * - Thin progress bar pinned to the bottom edge via absolute positioning
  *   so the card's rounded corners clip it (concentric radius).
- * - Hover: shadow lift + icon scale 1.05 (no `transition: all`).
- * - Entrance: fade + slide-up, staggered by `index * 80ms`.
  */
 export function KpiCard({
   label,
@@ -96,29 +94,20 @@ export function KpiCard({
   tone = "blue",
   progress,
   trend,
-  index = 0,
 }: KpiCardProps) {
   const t = TONE_STYLES[tone];
   const safeProgress =
     progress === undefined ? undefined : Math.min(100, Math.max(0, progress));
 
   return (
-    <Card
-      className={cn(
-        "group relative gap-3 overflow-hidden p-5",
-        "animate-in fade-in slide-in-from-bottom-2 duration-500 fill-mode-both",
-        "transition-shadow duration-200 hover:shadow-md",
-      )}
-      style={{ animationDelay: `${index * 80}ms` }}
-    >
+    <Card className={cn("group relative gap-3 overflow-hidden p-5")}>
       <div className="flex items-start justify-between gap-3">
-        <CardDescription className="font-medium text-[0.6875rem] uppercase tracking-wider text-pretty">
+        <CardDescription className="font-medium text-sm text-pretty">
           {label}
         </CardDescription>
         <div
           className={cn(
             "flex size-10 shrink-0 items-center justify-center rounded-full",
-            "transition-transform duration-300 group-hover:scale-105",
             t.iconBg,
           )}
           aria-hidden="true"

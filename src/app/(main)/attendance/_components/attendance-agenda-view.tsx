@@ -40,9 +40,21 @@ export function AttendanceAgendaView({
   occurrencesByDate,
   todayStr,
 }: AttendanceAgendaViewProps) {
+  const activeDays = calendarDays.filter(
+    (day) =>
+      (occurrencesByDate.get(formatDateLocal(day))?.length ?? 0) > 0 ||
+      formatDateLocal(day) === todayStr,
+  );
+  if (activeDays.length === 0)
+    return (
+      <p className="rounded-xl border p-6 text-sm text-muted-foreground">
+        No hay actividades en este mes para los filtros seleccionados. Prueba
+        otro mes o cambia los filtros.
+      </p>
+    );
   return (
     <div className="space-y-3">
-      {calendarDays.map((dayDate) => {
+      {activeDays.map((dayDate) => {
         const dateStr = formatDateLocal(dayDate);
         const dayOccurrences = occurrencesByDate.get(dateStr) || [];
         const dayNumber = dayDate.getDate();
@@ -104,7 +116,7 @@ export function AttendanceAgendaView({
             {/* Occurrences */}
             {dayOccurrences.length === 0 ? (
               <p className="py-4 text-center text-xs text-muted-foreground">
-                Sin actividades
+                No hay actividades programadas para hoy
               </p>
             ) : (
               <div className="p-2 space-y-2">

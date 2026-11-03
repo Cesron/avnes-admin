@@ -1,5 +1,7 @@
 "use client";
 
+import { PlusCircleIcon } from "lucide-react";
+import { useState } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,6 +10,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -17,11 +20,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { PlusCircleIcon } from "lucide-react";
 import { CreateUserForm } from "./create-user-form";
-import { useState } from "react";
 
 type MentorOption = { id: string; name: string };
 
@@ -33,9 +33,10 @@ export function UsersHeader({ mentorsOptions }: UsersHeaderProps) {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="flex flex-wrap gap-3 min-h-20 py-4 shrink-0 items-center transition-all ease-linear border-b">
+    <header className="flex flex-wrap gap-3 min-h-20 py-4 shrink-0 items-center border-b">
       <div className="flex flex-1 items-center gap-2">
         <SidebarTrigger className="-ms-1" />
+        <h1 className="text-xl font-semibold lg:sr-only">Usuarios</h1>
         <div className="max-lg:hidden lg:contents">
           <Separator
             orientation="vertical"
@@ -44,7 +45,7 @@ export function UsersHeader({ mentorsOptions }: UsersHeaderProps) {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>

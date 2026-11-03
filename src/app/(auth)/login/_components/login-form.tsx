@@ -1,5 +1,7 @@
 "use client";
 
+import { EyeIcon } from "lucide-react";
+import { Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -15,8 +17,6 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { EyeIcon } from "lucide-react";
-import { Controller } from "react-hook-form";
 import { useLoginForm } from "../_hooks/use-login-form";
 
 export function LoginForm() {
@@ -37,7 +37,8 @@ export function LoginForm() {
                 id="form-login-email"
                 aria-invalid={fieldState.invalid}
                 placeholder="nombre@ejemplo.com"
-                autoComplete="off"
+                type="email"
+                autoComplete="username"
               />
 
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -52,21 +53,25 @@ export function LoginForm() {
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="form-login-password">Contraseña</FieldLabel>
 
-              <InputGroup>
+              <InputGroup className="h-11 md:h-9">
                 <InputGroupInput
                   {...field}
                   type={showPassword ? "text" : "password"}
                   id="form-login-password"
                   aria-invalid={fieldState.invalid}
                   placeholder="••••••••"
-                  autoComplete="off"
+                  autoComplete="current-password"
                 />
 
                 <InputGroupAddon align="inline-end">
                   <InputGroupButton
                     variant="ghost"
-                    aria-label="Mostrar contraseña"
+                    aria-label={
+                      showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                    }
+                    aria-pressed={showPassword}
                     size="icon-xs"
+                    className="size-11 md:size-6"
                     onClick={() => setShowPassword((prev) => !prev)}
                   >
                     <EyeIcon />
@@ -104,7 +109,7 @@ export function LoginForm() {
 
         <Field>
           <Button type="submit" disabled={loading}>
-            {loading ? "Iniciando sesión..." : "Login"}
+            {loading ? "Iniciando sesión..." : "Iniciar sesión"}
           </Button>
         </Field>
       </FieldGroup>

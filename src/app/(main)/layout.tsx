@@ -15,8 +15,14 @@ async function AuthenticatedLayout({
 
   return (
     <SidebarProvider>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-background focus:p-3 focus:text-foreground focus:ring-2"
+      >
+        Saltar al contenido
+      </a>
       <AppSidebar userRole={userRole} />
-      <SidebarInset>
+      <SidebarInset id="main-content" tabIndex={-1}>
         <div className="px-4 md:px-6 lg:px-8 @container">
           <div className="w-full max-w-6xl mx-auto">{children}</div>
         </div>
