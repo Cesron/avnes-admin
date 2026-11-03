@@ -5,6 +5,7 @@ import {
   type PageResult,
   readCursor,
 } from "@/lib/pagination";
+import { searchColumn, searchPattern } from "@/lib/search";
 import { sql } from "@/lib/sql";
 
 /**
@@ -50,10 +51,10 @@ export async function getFamilies(
   const values: (string | number)[] = [];
   const conditions: string[] = [];
   if (params.search?.trim()) {
-    values.push(`%${params.search.trim().toLowerCase()}%`);
-    conditions.push(`(LOWER(f.penpal_code) LIKE $${values.length} OR EXISTS (
+    values.push(searchPattern(params.search));
+    conditions.push(`(${searchColumn("f.penpal_code")} LIKE $${values.length} OR EXISTS (
       SELECT 1 FROM children child WHERE child.family_id = f.id
-      AND LOWER(child.name) LIKE $${values.length}
+      AND ${searchColumn("child.name")} LIKE $${values.length}
     ))`);
   }
   if (cursor) {

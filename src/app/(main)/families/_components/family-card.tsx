@@ -7,9 +7,10 @@ import {
   UsersIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { useId } from "react";
+import { useId, useState } from "react";
 import { EditButton } from "@/components/edit-button";
 import { ResourceLinks } from "@/components/resource-links";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
   Dialog,
@@ -29,6 +30,8 @@ import { FamilyPhoto } from "./family-photo";
 export function FamilyCard({ family }: { family: FamilyWithChildren }) {
   const { openEditDialog } = useEditFamily();
   const headingId = useId();
+  const childrenId = useId();
+  const [childrenOpen, setChildrenOpen] = useState(false);
   const photoUrl = convertGoogleDriveImageUrl(family.family_photo_url);
   const surnames = extractSurnames(family.first_child_name);
   const familyName = surnames
@@ -92,7 +95,7 @@ export function FamilyCard({ family }: { family: FamilyWithChildren }) {
             </div>
           )}
         </div>
-        <div className="flex flex-1 flex-col gap-4 p-5">
+        <div className="flex min-w-0 flex-1 flex-col gap-4 p-5">
           <div className="flex items-start gap-3">
             <div className="min-w-0 flex-1 space-y-2">
               <h2
@@ -124,8 +127,15 @@ export function FamilyCard({ family }: { family: FamilyWithChildren }) {
             />
           </div>
           {family.children.length ? (
-            <details className="group/children">
-              <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-md px-3 text-sm font-medium hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden">
+            <div>
+              <Button
+                variant="ghost"
+                className="min-h-11 w-full justify-start gap-2 px-3"
+                aria-label={`Ver niños de la familia ${family.penpal_code}`}
+                aria-expanded={childrenOpen}
+                aria-controls={childrenId}
+                onClick={() => setChildrenOpen((open) => !open)}
+              >
                 <UsersIcon
                   aria-hidden="true"
                   className="size-4 text-muted-foreground"
@@ -138,23 +148,36 @@ export function FamilyCard({ family }: { family: FamilyWithChildren }) {
                 </span>
                 <ChevronDownIcon
                   aria-hidden="true"
-                  className="ml-auto size-4 text-muted-foreground group-open/children:rotate-180"
+                  className="ml-auto size-4 text-muted-foreground transition-transform duration-300 ease-out motion-reduce:transition-none"
+                  style={{
+                    transform: childrenOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  }}
                 />
-              </summary>
-              <ul className="mt-1 space-y-1 border-l ml-5 pl-3">
-                {family.children.map((child) => (
-                  <li key={child.id}>
-                    <Link
-                      href={`/children/${child.id}/attendance`}
-                      className="flex min-h-11 items-center rounded-md px-2 py-2 text-sm break-words hover:bg-accent hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-ring"
-                      aria-label={`Historial de asistencia de ${child.name}`}
-                    >
-                      {child.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </details>
+              </Button>
+              <div
+                id={childrenId}
+                inert={!childrenOpen}
+                aria-hidden={!childrenOpen}
+                className="grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none"
+                style={{ gridTemplateRows: childrenOpen ? "1fr" : "0fr" }}
+              >
+                <div className="min-h-0 overflow-hidden">
+                  <ul className="ml-5 space-y-1 border-l pl-3 pt-1">
+                    {family.children.map((child) => (
+                      <li key={child.id}>
+                        <Link
+                          href={`/children/${child.id}/attendance`}
+                          className="flex min-h-11 items-center rounded-md px-2 py-2 text-sm break-words hover:bg-accent hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-ring"
+                          aria-label={`Historial de asistencia de ${child.name}`}
+                        >
+                          {child.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
           ) : (
             <p className="py-3 text-sm text-muted-foreground">
               Sin niños registrados

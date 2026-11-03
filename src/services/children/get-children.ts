@@ -5,6 +5,7 @@ import {
   type PageResult,
   readCursor,
 } from "@/lib/pagination";
+import { searchColumn, searchPattern } from "@/lib/search";
 import { sql } from "@/lib/sql";
 import type { Child } from "@/types/child";
 
@@ -55,8 +56,8 @@ export async function getChildren(
   if (groupConditions.length)
     conditions.push("membership.group_id IS NOT NULL");
   if (params.search?.trim()) {
-    values.push(`%${params.search.trim().toLowerCase()}%`);
-    conditions.push(`LOWER(c.name) LIKE $${values.length}`);
+    values.push(searchPattern(params.search));
+    conditions.push(`${searchColumn("c.name")} LIKE $${values.length}`);
   }
   if (cursor) {
     values.push(cursor.key, cursor.id);

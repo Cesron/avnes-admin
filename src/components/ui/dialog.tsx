@@ -50,6 +50,7 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  onOpenAutoFocus,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
@@ -64,6 +65,27 @@ function DialogContent({
           className,
         )}
         {...props}
+        onOpenAutoFocus={(event) => {
+          onOpenAutoFocus?.(event);
+          if (event.defaultPrevented) return;
+
+          const content = event.currentTarget;
+          if (
+            !(content instanceof HTMLElement) ||
+            !content.querySelector("form")
+          ) {
+            return;
+          }
+
+          const title = content.querySelector<HTMLElement>(
+            '[data-slot="dialog-title"]',
+          );
+          if (!title) return;
+
+          // Start at the form's heading without selecting an input's value.
+          event.preventDefault();
+          title.focus();
+        }}
       >
         {children}
         {showCloseButton && (
@@ -110,6 +132,7 @@ function DialogTitle({
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
+      tabIndex={-1}
       className={cn("text-lg leading-none font-semibold", className)}
       {...props}
     />

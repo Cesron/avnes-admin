@@ -15,13 +15,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { cn } from "@/lib/cn";
 import type { ChildWithFamily } from "@/services/children/get-children";
 import { calculateAge } from "@/utils/calculate-age";
+import { convertGoogleDriveImageUrl } from "@/utils/family-helpers";
 import { formatDate } from "@/utils/format-date";
 import { getGenderLabel } from "@/utils/get-gender-label";
 import { useEditChild } from "../_context/edit-child-context";
@@ -37,6 +38,7 @@ export function ChildCard({ child }: { child: ChildWithFamily }) {
   const { openEditDialog } = useEditChild();
   const headingId = useId();
   const age = calculateAge(child.birth_date);
+  const photoUrl = convertGoogleDriveImageUrl(child.child_photo_url);
   const quickLinks = [
     {
       key: "pamphlet",
@@ -60,54 +62,54 @@ export function ChildCard({ child }: { child: ChildWithFamily }) {
 
   return (
     <article aria-labelledby={headingId} className="h-full min-w-0">
-      <Card className="h-full gap-5 shadow-none">
-        <CardHeader className="gap-3">
-          <div className="flex min-w-0 items-start gap-3">
-            <Avatar className="size-14 shrink-0 rounded-xl">
-              {child.child_photo_url ? (
-                <AvatarImage
-                  src={child.child_photo_url}
-                  alt=""
-                  className="object-cover"
-                />
-              ) : null}
-              <AvatarFallback className="rounded-xl bg-blue-subtle text-base font-semibold text-blue-subtle-foreground">
-                {getInitials(child.name)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex-1 space-y-2">
-              <h2
-                id={headingId}
-                className="text-lg font-semibold leading-snug break-words"
-              >
-                {child.name}
-              </h2>
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-                {age !== null && (
-                  <span className="tabular-nums">
-                    {age} {age === 1 ? "año" : "años"}
-                  </span>
-                )}
-                <Badge
-                  variant={
-                    child.gender === "M" ? "blue-subtle" : "purple-subtle"
-                  }
-                >
-                  {getGenderLabel(child.gender)}
-                </Badge>
-              </div>
-            </div>
+      <Card className="h-full gap-0 overflow-hidden p-0 shadow-none">
+        <div
+          className={cn(
+            "relative shrink-0 bg-muted",
+            photoUrl ? "h-56 sm:h-64" : "h-40 sm:h-44",
+          )}
+        >
+          <Avatar className="h-full w-full rounded-none">
+            {photoUrl ? (
+              <AvatarImage
+                src={photoUrl}
+                alt={`Foto de ${child.name}`}
+                className="aspect-auto object-contain"
+                referrerPolicy="no-referrer"
+              />
+            ) : null}
+            <AvatarFallback className="rounded-none bg-muted text-4xl font-semibold text-muted-foreground">
+              {getInitials(child.name)}
+            </AvatarFallback>
+          </Avatar>
+          <EditButton
+            className="absolute right-3 top-3 size-11 border bg-card hover:bg-accent"
+            aria-label={`Editar a ${child.name}`}
+            onClick={() => openEditDialog(child)}
+          />
+        </div>
+        <CardHeader className="gap-3 p-5 pb-0 sm:px-6 sm:pt-6">
+          <h2
+            id={headingId}
+            className="text-xl font-semibold leading-snug break-words"
+          >
+            {child.name}
+          </h2>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted-foreground">
+            {age !== null && (
+              <span className="tabular-nums">
+                {age} {age === 1 ? "año" : "años"}
+              </span>
+            )}
+            <Badge
+              variant={child.gender === "M" ? "blue-subtle" : "purple-subtle"}
+            >
+              {getGenderLabel(child.gender)}
+            </Badge>
           </div>
-          <CardAction>
-            <EditButton
-              className="size-11"
-              aria-label={`Editar a ${child.name}`}
-              onClick={() => openEditDialog(child)}
-            />
-          </CardAction>
         </CardHeader>
-        <CardContent className="flex flex-1 flex-col gap-4">
-          <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">
+        <CardContent className="flex flex-1 flex-col gap-5 px-5 pt-6 sm:px-6">
+          <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-3 text-sm">
             <dt className="text-muted-foreground">Grupo</dt>
             <dd className="font-medium break-words">
               {child.group_name || "Sin grupo asignado"}
@@ -131,11 +133,11 @@ export function ChildCard({ child }: { child: ChildWithFamily }) {
               </>
             )}
           </dl>
-          <div className="mt-auto border-t pt-3">
+          <div className="mt-auto border-t pt-4">
             <ResourceLinks links={quickLinks} owner={child.name} />
           </div>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="p-5 pt-4 sm:px-6 sm:pb-6">
           <Button
             variant="outline"
             asChild

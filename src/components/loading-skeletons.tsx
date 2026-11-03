@@ -49,7 +49,7 @@ export type ListKind =
   | "activities";
 const heights: Record<ListKind, string> = {
   families: "h-56",
-  children: "h-52",
+  children: "h-[600px] sm:h-[580px]",
   clubs: "h-44",
   groups: "h-52",
   mentors: "h-44",
@@ -66,7 +66,7 @@ export function CardsSkeleton({
   return (
     <LoadingRegion>
       <div
-        className={`grid grid-cols-1 gap-3 sm:gap-4 ${kind === "families" ? "xl:grid-cols-2" : "md:grid-cols-2"}`}
+        className={`grid grid-cols-1 gap-3 sm:gap-4 ${kind === "families" ? "xl:grid-cols-2" : kind === "children" ? "lg:grid-cols-2" : "md:grid-cols-2"}`}
       >
         {Array.from({ length: Math.max(1, count) }, (_, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: fixed placeholders have no identity or state.
