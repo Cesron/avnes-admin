@@ -1,15 +1,15 @@
 "use client";
 
 import {
+  ArrowRightIcon,
   CalendarIcon,
-  ExternalLinkIcon,
   FileTextIcon,
   ImageIcon,
-  UserIcon,
-  UsersIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { useId } from "react";
 import { EditButton } from "@/components/edit-button";
+import { ResourceLinks } from "@/components/resource-links";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,8 +17,8 @@ import {
   Card,
   CardAction,
   CardContent,
+  CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import type { ChildWithFamily } from "@/services/children/get-children";
 import { calculateAge } from "@/utils/calculate-age";
@@ -26,27 +26,17 @@ import { formatDate } from "@/utils/format-date";
 import { getGenderLabel } from "@/utils/get-gender-label";
 import { useEditChild } from "../_context/edit-child-context";
 
-interface ChildCardProps {
-  child: ChildWithFamily;
-}
-
-/**
- * Returns the initials (max 2 letters) for an avatar fallback.
- */
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/);
-  if (parts.length === 0) return "?";
-
   const first = parts[0]?.[0] ?? "";
   const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? "") : "";
-
   return `${first}${last}`.toUpperCase() || "?";
 }
 
-export function ChildCard({ child }: ChildCardProps) {
+export function ChildCard({ child }: { child: ChildWithFamily }) {
   const { openEditDialog } = useEditChild();
+  const headingId = useId();
   const age = calculateAge(child.birth_date);
-
   const quickLinks = [
     {
       key: "pamphlet",
@@ -57,7 +47,7 @@ export function ChildCard({ child }: ChildCardProps) {
     {
       key: "biography",
       label: "Biografía",
-      icon: UserIcon,
+      icon: FileTextIcon,
       url: child.family_biography_url,
     },
     {
@@ -69,110 +59,101 @@ export function ChildCard({ child }: ChildCardProps) {
   ].filter((link) => Boolean(link.url));
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader>
-        <div className="flex items-start gap-3 min-w-0">
-          <Avatar className="size-12 shrink-0">
-            {child.child_photo_url ? (
-              <AvatarImage src={child.child_photo_url} alt={child.name} />
-            ) : null}
-            <AvatarFallback className="text-sm font-semibold">
-              {getInitials(child.name)}
-            </AvatarFallback>
-          </Avatar>
-
-          <div className="flex flex-col min-w-0 flex-1 gap-1.5">
-            <CardTitle className="text-base truncate">{child.name}</CardTitle>
-
-            <div className="flex flex-wrap items-center gap-1.5">
-              {child.penpal_code && (
-                <Badge variant="outline" className="font-mono">
-                  {child.penpal_code}
-                </Badge>
-              )}
-
-              {age !== null && <Badge variant="secondary">{age} años</Badge>}
-
-              <Badge
-                variant={child.gender === "M" ? "blue-subtle" : "purple-subtle"}
+    <article aria-labelledby={headingId} className="h-full min-w-0">
+      <Card className="h-full gap-5 shadow-none">
+        <CardHeader className="gap-3">
+          <div className="flex min-w-0 items-start gap-3">
+            <Avatar className="size-14 shrink-0 rounded-xl">
+              {child.child_photo_url ? (
+                <AvatarImage
+                  src={child.child_photo_url}
+                  alt=""
+                  className="object-cover"
+                />
+              ) : null}
+              <AvatarFallback className="rounded-xl bg-blue-subtle text-base font-semibold text-blue-subtle-foreground">
+                {getInitials(child.name)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0 flex-1 space-y-2">
+              <h2
+                id={headingId}
+                className="text-lg font-semibold leading-snug break-words"
               >
-                {getGenderLabel(child.gender)}
-              </Badge>
+                {child.name}
+              </h2>
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+                {age !== null && (
+                  <span className="tabular-nums">
+                    {age} {age === 1 ? "año" : "años"}
+                  </span>
+                )}
+                <Badge
+                  variant={
+                    child.gender === "M" ? "blue-subtle" : "purple-subtle"
+                  }
+                >
+                  {getGenderLabel(child.gender)}
+                </Badge>
+              </div>
             </div>
           </div>
-        </div>
-
-        <CardAction>
-          <EditButton onClick={() => openEditDialog(child)} />
-        </CardAction>
-      </CardHeader>
-
-      <CardContent className="space-y-3">
-        <Button variant="outline" size="sm" asChild>
-          <Link href={`/children/${child.id}/attendance`}>
-            <CalendarIcon aria-hidden="true" />
-            Historial de asistencia
-          </Link>
-        </Button>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <CalendarIcon className="size-4 shrink-0" />
-          <span>
-            Nacido el{" "}
-            <span className="text-foreground font-medium">
-              {formatDate(child.birth_date)}
-            </span>
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <UsersIcon className="size-4 shrink-0" />
-          {child.group_name ? (
-            <span className="truncate">
-              Grupo:{" "}
-              <span className="text-foreground font-medium">
-                {child.group_name}
-              </span>
-              {child.group_club_name && (
-                <>
-                  {" "}
-                  <span className="text-muted-foreground">
-                    ({child.group_club_name})
-                  </span>
-                </>
-              )}
-            </span>
-          ) : (
-            <span className="text-xs italic">Sin grupo asignado</span>
-          )}
-        </div>
-
-        {quickLinks.length > 0 && (
-          <div className="flex flex-wrap gap-2 pt-1">
-            {quickLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <a
-                  key={link.key}
-                  href={link.url ?? "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:underline px-2.5 py-1 rounded-md bg-muted hover:bg-muted-foreground/10 transition-colors"
-                >
-                  <Icon className="size-3.5" />
-                  {link.label}
-                  <ExternalLinkIcon className="size-3" />
-                </a>
-              );
-            })}
+          <CardAction>
+            <EditButton
+              className="size-11"
+              aria-label={`Editar a ${child.name}`}
+              onClick={() => openEditDialog(child)}
+            />
+          </CardAction>
+        </CardHeader>
+        <CardContent className="flex flex-1 flex-col gap-4">
+          <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">
+            <dt className="text-muted-foreground">Grupo</dt>
+            <dd className="font-medium break-words">
+              {child.group_name || "Sin grupo asignado"}
+            </dd>
+            <dt className="text-muted-foreground">Club</dt>
+            <dd className="break-words">
+              {child.group_club_name || "Sin club asignado"}
+            </dd>
+            <dt className="text-muted-foreground">Nacimiento</dt>
+            <dd className="tabular-nums">
+              {child.birth_date
+                ? formatDate(child.birth_date)
+                : "Sin fecha registrada"}
+            </dd>
+            {child.penpal_code && (
+              <>
+                <dt className="text-muted-foreground">Código familiar</dt>
+                <dd className="font-medium tabular-nums break-all">
+                  {child.penpal_code}
+                </dd>
+              </>
+            )}
+          </dl>
+          <div className="mt-auto border-t pt-3">
+            <ResourceLinks links={quickLinks} owner={child.name} />
           </div>
-        )}
-
-        {quickLinks.length === 0 && (
-          <p className="text-xs text-muted-foreground italic">
-            Sin recursos vinculados
-          </p>
-        )}
-      </CardContent>
-    </Card>
+        </CardContent>
+        <CardFooter>
+          <Button
+            variant="outline"
+            asChild
+            className="min-h-11 w-full justify-between gap-2"
+          >
+            <Link
+              href={`/children/${child.id}/attendance`}
+              aria-label={`Historial de asistencia de ${child.name}`}
+            >
+              <span className="flex items-center gap-2">
+                <CalendarIcon aria-hidden="true" className="size-4" />
+                Historial de asistencia
+              </span>
+              <ArrowRightIcon aria-hidden="true" className="size-4 shrink-0" />
+            </Link>
+          </Button>
+        </CardFooter>
+      </Card>
+    </article>
   );
 }

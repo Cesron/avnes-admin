@@ -2,7 +2,7 @@
 
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useId, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -11,78 +11,128 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { shiftDate, weekLabel } from "@/lib/dashboard-week";
+import {
+  type DashboardView,
+  periodLabel,
+  periodQuery,
+  shiftPeriod,
+} from "@/lib/dashboard-period";
+import { dashboardWeek } from "@/lib/dashboard-week";
 
 export function DashboardFilters({
-  week,
-  currentWeek,
+  view,
+  start,
+  currentStart,
+  today,
   clubId,
   clubs,
 }: {
-  week: string;
-  currentWeek: string;
+  view: DashboardView;
+  start: string;
+  currentStart: string;
+  today: string;
   clubId?: string;
   clubs: { id: string; name: string }[];
 }) {
   const router = useRouter();
+  const clubSelectId = useId();
   const [pending, startTransition] = useTransition();
-  function navigate(nextWeek: string, club: string | null = clubId ?? null) {
-    const params = new URLSearchParams({ week: nextWeek });
-    if (club) params.set("club", club);
+  function navigate(
+    nextStart: string,
+    club: string | null = clubId ?? null,
+    nextView = view,
+  ) {
+    const params = periodQuery(nextView, nextStart, club);
     startTransition(() =>
       router.push(`/dashboard?${params}`, { scroll: false }),
     );
   }
   return (
     <div
-      className="flex flex-wrap items-center justify-between gap-4"
+      className="flex flex-col justify-between gap-4 rounded-xl border bg-card p-4 sm:flex-row sm:flex-wrap sm:items-end"
       aria-busy={pending}
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center rounded-lg border bg-card">
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium">Vista</legend>
+        <div className="flex rounded-lg border bg-background p-1">
+          {(["week", "month"] as const).map((option) => (
+            <Button
+              key={option}
+              variant={view === option ? "secondary" : "ghost"}
+              size="sm"
+              aria-pressed={view === option}
+              disabled={pending}
+              onClick={() => {
+                const anchor = start === currentStart ? today : start;
+                navigate(
+                  option === "month"
+                    ? `${anchor.slice(0, 7)}-01`
+                    : dashboardWeek(anchor).start,
+                  clubId,
+                  option,
+                );
+              }}
+            >
+              {option === "week" ? "Semanas" : "Meses"}
+            </Button>
+          ))}
+        </div>
+      </fieldset>
+      <div className="min-w-0 space-y-2 sm:flex-1">
+        <p className="text-sm font-medium">Período del informe</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex min-w-0 max-w-full items-center rounded-lg border bg-background">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={view === "month" ? "Mes anterior" : "Semana anterior"}
+              disabled={pending}
+              onClick={() => navigate(shiftPeriod(view, start, -1))}
+            >
+              <ChevronLeftIcon className="size-4" />
+            </Button>
+            <span className="min-w-0 px-1 text-center text-xs font-medium tabular-nums sm:px-2 sm:text-sm">
+              {periodLabel(view, start)}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={
+                view === "month" ? "Mes siguiente" : "Semana siguiente"
+              }
+              disabled={pending || start >= currentStart}
+              onClick={() => navigate(shiftPeriod(view, start, 1))}
+            >
+              <ChevronRightIcon className="size-4" />
+            </Button>
+          </div>
           <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Semana anterior"
-            disabled={pending}
-            onClick={() => navigate(shiftDate(week, -7))}
+            variant="outline"
+            size="sm"
+            disabled={pending || start === currentStart}
+            onClick={() => navigate(currentStart)}
           >
-            <ChevronLeftIcon className="size-4" />
-          </Button>
-          <span className="px-2 text-sm font-medium tabular-nums">
-            {weekLabel(week)}
-          </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Semana siguiente"
-            disabled={pending || week >= currentWeek}
-            onClick={() => navigate(shiftDate(week, 7))}
-          >
-            <ChevronRightIcon className="size-4" />
+            {view === "month" ? "Este mes" : "Esta semana"}
           </Button>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={pending || week === currentWeek}
-          onClick={() => navigate(currentWeek)}
-        >
-          Esta semana
-        </Button>
       </div>
-      <div className="flex items-center gap-3">
-        <output className="text-xs text-muted-foreground">
-          {pending ? "Actualizando…" : ""}
-        </output>
+      <div className="min-w-0 space-y-2 sm:w-52">
+        <label htmlFor={clubSelectId} className="text-sm font-medium">
+          Club
+        </label>
+        <output className="sr-only">{pending ? "Actualizando…" : ""}</output>
         <Select
           value={clubId ?? "all"}
           disabled={pending}
           onValueChange={(value) =>
-            navigate(week, value === "all" ? null : value)
+            navigate(start, value === "all" ? null : value)
           }
         >
-          <SelectTrigger className="w-52" aria-label="Filtrar por club">
+          <SelectTrigger
+            id={clubSelectId}
+            className="w-full"
+            aria-label="Filtrar por club"
+          >
             <SelectValue placeholder="Todos los clubes" />
           </SelectTrigger>
           <SelectContent>

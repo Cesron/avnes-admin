@@ -1,64 +1,39 @@
 "use client";
 
 import {
-  ExternalLinkIcon,
+  ChevronDownIcon,
   FileTextIcon,
   ImageIcon,
   UsersIcon,
 } from "lucide-react";
+import Link from "next/link";
+import { useId } from "react";
 import { EditButton } from "@/components/edit-button";
-import { Button } from "@/components/ui/button";
-import { Card, CardAction, CardTitle } from "@/components/ui/card";
+import { ResourceLinks } from "@/components/resource-links";
+import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
-import { cn } from "@/lib/cn";
-import type {
-  ChildSummary,
-  FamilyWithChildren,
-} from "@/services/families/get-families";
+import type { FamilyWithChildren } from "@/services/families/get-families";
 import {
   convertGoogleDriveImageUrl,
   extractSurnames,
-  getFirstInitial,
-  getFirstName,
   getSurnameInitials,
 } from "@/utils/family-helpers";
 import { useEditFamily } from "../_context/edit-family-context";
 import { FamilyPhoto } from "./family-photo";
 
-interface FamilyCardProps {
-  family: FamilyWithChildren;
-}
-
-export function FamilyCard({ family }: FamilyCardProps) {
+export function FamilyCard({ family }: { family: FamilyWithChildren }) {
   const { openEditDialog } = useEditFamily();
-
-  // Foto: convertimos la URL de Google Drive a un src directo de imagen.
+  const headingId = useId();
   const photoUrl = convertGoogleDriveImageUrl(family.family_photo_url);
-  const hasPhoto = Boolean(photoUrl);
-
-  // Apellidos: los extraemos del nombre completo del primer niño.
   const surnames = extractSurnames(family.first_child_name);
-  const hasSurnames = Boolean(surnames);
-
-  // Iniciales: primera letra de cada apellido (p. ej. "Abrego Ramirez" → "AR").
-  const initials = getSurnameInitials(surnames);
-
-  // Hijos: al hacer hover sobre el botón se muestran todos dentro del tooltip.
-  const hasChildren = family.children.length > 0;
-  const childrenCountLabel = hasChildren
-    ? `${family.children_count} ${family.children_count === 1 ? "niño" : "niños"}`
-    : "Sin niños";
-
+  const familyName = surnames
+    ? `Familia ${surnames}`
+    : `Familia ${family.penpal_code}`;
   const quickLinks = [
     {
       key: "biography",
@@ -72,55 +47,39 @@ export function FamilyCard({ family }: FamilyCardProps) {
       icon: ImageIcon,
       url: family.family_photo_url,
     },
-  ].filter((link) => Boolean(link.url));
+  ];
 
   return (
-    <Card className="group overflow-hidden p-0 hover:shadow-md transition-all duration-300">
-      <div className="flex">
-        {/* Foto familiar: cuadrada, ocupa todo el alto de la card. */}
-        <div className="relative w-42 sm:w-56 shrink-0 overflow-hidden bg-linear-to-br from-primary/25 via-primary/8 to-amber-200/50 dark:from-primary/30 dark:via-primary/10 dark:to-amber-900/30">
-          {hasPhoto ? (
+    <article aria-labelledby={headingId} className="h-full min-w-0">
+      <Card className="h-full gap-0 overflow-hidden p-0 shadow-none">
+        <div className="relative aspect-square w-full shrink-0 overflow-hidden bg-muted sm:aspect-[4/3]">
+          {photoUrl ? (
             <Dialog>
               <DialogTrigger asChild>
                 <button
                   type="button"
                   aria-label={`Ver foto de la familia ${family.penpal_code} en grande`}
-                  className="absolute inset-0 cursor-pointer"
+                  className="absolute inset-0 cursor-zoom-in focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
                 >
                   <FamilyPhoto
-                    src={photoUrl ?? ""}
-                    alt={
-                      hasSurnames ? surnames : `Familia ${family.penpal_code}`
-                    }
-                    className="absolute inset-0 h-full w-full object-cover"
-                    sizes="(max-width: 639px) 168px, 224px"
+                    src={photoUrl}
+                    alt={familyName}
+                    className="object-contain"
+                    sizes="(min-width: 1280px) calc((100vw - 352px) / 2), (min-width: 768px) calc(100vw - 320px), calc(100vw - 32px)"
                   />
                 </button>
               </DialogTrigger>
               <DialogContent
                 aria-describedby={undefined}
-                className={cn(
-                  "bg-black/90 border-0 p-2 sm:max-w-3xl md:max-w-5xl",
-                  "[&_[data-slot=dialog-close]]:bg-white/20",
-                  "[&_[data-slot=dialog-close]]:text-white",
-                  "[&_[data-slot=dialog-close]]:rounded-full",
-                  "[&_[data-slot=dialog-close]]:size-8",
-                  "[&_[data-slot=dialog-close]]:p-2",
-                  "[&_[data-slot=dialog-close]]:opacity-100",
-                  "[&_[data-slot=dialog-close]]:hover:bg-white/30",
-                )}
+                className="border-0 bg-background p-2 sm:max-w-3xl md:max-w-5xl [&_[data-slot=dialog-close]]:size-11 [&_[data-slot=dialog-close]]:bg-background [&_[data-slot=dialog-close]]:opacity-100"
               >
                 <DialogTitle className="sr-only">
-                  {hasSurnames
-                    ? `Foto de la familia ${surnames}`
-                    : `Foto de la familia ${family.penpal_code}`}
+                  Foto de {familyName}
                 </DialogTitle>
                 <div className="relative h-[80vh] w-full">
                   <FamilyPhoto
-                    src={photoUrl ?? ""}
-                    alt={
-                      hasSurnames ? surnames : `Familia ${family.penpal_code}`
-                    }
+                    src={photoUrl}
+                    alt={familyName}
                     sizes="(max-width: 767px) 100vw, 1024px"
                     className="object-contain"
                   />
@@ -128,169 +87,84 @@ export function FamilyCard({ family }: FamilyCardProps) {
               </DialogContent>
             </Dialog>
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="select-none text-3xl sm:text-4xl font-bold tracking-tight text-primary/45 dark:text-primary/40">
-                {initials || "?"}
-              </span>
+            <div className="flex h-full items-center justify-center text-5xl font-semibold text-muted-foreground">
+              {getSurnameInitials(surnames) || "?"}
             </div>
           )}
-          <div className="pointer-events-none absolute inset-0 bg-linear-to-tr from-black/10 via-transparent to-white/5" />
         </div>
-
-        {/* Contenido */}
-        <div className="flex min-w-0 flex-1 flex-col gap-3 p-4 sm:p-5">
-          {/* Header: etiqueta + título + acciones */}
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex min-w-0 flex-1 flex-col gap-1">
-              {/* Etiqueta "Familia · 0001" */}
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-sm font-mono font-semibold uppercase tracking-wider text-muted-foreground">
-                  Familia
-                </span>
-                <span className="text-sm text-muted-foreground/40">·</span>
-                <span className="text-sm font-mono font-bold tracking-wider text-primary">
+        <div className="flex flex-1 flex-col gap-4 p-5">
+          <div className="flex items-start gap-3">
+            <div className="min-w-0 flex-1 space-y-2">
+              <h2
+                id={headingId}
+                className="text-lg font-semibold leading-snug break-words"
+              >
+                {familyName}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Código familiar{" "}
+                <span className="font-medium tabular-nums text-foreground break-all">
                   {family.penpal_code}
                 </span>
-              </div>
-
-              {/* Título principal: apellidos del primer niño */}
-              <CardTitle
-                className="truncate text-xl font-bold tracking-tight leading-tight sm:text-2xl"
-                title={hasSurnames ? surnames : `Familia ${family.penpal_code}`}
-              >
-                {hasSurnames ? (
-                  surnames
-                ) : (
-                  <span className="font-normal italic text-muted-foreground">
-                    Sin nombre
-                  </span>
-                )}
-              </CardTitle>
+              </p>
             </div>
-
-            <CardAction className="-mt-1 -mr-1 shrink-0">
-              <EditButton
-                variant="ghost"
-                size="icon"
-                aria-label={`Editar familia ${family.penpal_code}`}
-                className="size-8"
-                onClick={() =>
-                  openEditDialog({
-                    id: family.id,
-                    penpal_code: family.penpal_code,
-                    family_biography_url: family.family_biography_url,
-                    family_photo_url: family.family_photo_url,
-                    created_at: family.created_at,
-                    updated_at: family.updated_at,
-                  })
-                }
-              />
-            </CardAction>
+            <EditButton
+              className="-mr-2 shrink-0 size-11"
+              aria-label={`Editar familia ${family.penpal_code}`}
+              onClick={() =>
+                openEditDialog({
+                  id: family.id,
+                  penpal_code: family.penpal_code,
+                  family_biography_url: family.family_biography_url,
+                  family_photo_url: family.family_photo_url,
+                  created_at: family.created_at,
+                  updated_at: family.updated_at,
+                })
+              }
+            />
           </div>
-
-          {/* Botón "X niños": al hacer hover (desktop) o tap (mobile) muestra los niños. */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <HoverCard openDelay={150} closeDelay={120}>
-              <HoverCardTrigger asChild>
-                <Button
-                  variant={hasChildren ? "secondary" : "outline"}
-                  disabled={!hasChildren}
-                  className="h-7 gap-1.5 px-2.5 text-sm font-medium tabular-nums"
-                  aria-label={
-                    hasChildren
-                      ? `Ver ${family.children.length} ${family.children.length === 1 ? "niño" : "niños"} de la familia`
-                      : "Esta familia no tiene niños registrados"
-                  }
-                >
-                  <UsersIcon className="size-3.5" />
-                  {childrenCountLabel}
-                </Button>
-              </HoverCardTrigger>
-              {hasChildren && (
-                <HoverCardContent
-                  side="bottom"
-                  align="start"
-                  sideOffset={8}
-                  className="max-w-xs p-2"
-                >
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    {family.children.map((child) => (
-                      <ChildChip key={child.id} child={child} />
-                    ))}
-                  </div>
-                </HoverCardContent>
-              )}
-            </HoverCard>
-          </div>
-
-          {/* Acciones / recursos: botones grandes y clickeables */}
-          {quickLinks.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-1">
-              {quickLinks.map((link) => {
-                const Icon = link.icon;
-                return (
-                  <a
-                    key={link.key}
-                    href={link.url ?? "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex h-9 items-center gap-1.5 rounded-md bg-secondary px-3 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
-                  >
-                    <Icon className="size-3.5" />
-                    {link.label}
-                    <ExternalLinkIcon className="size-3 opacity-60" />
-                  </a>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Estado vacío: sin niños y sin recursos */}
-          {quickLinks.length === 0 && family.children.length === 0 && (
-            <p className="text-xs italic text-muted-foreground">
-              Sin recursos vinculados
+          {family.children.length ? (
+            <details className="group/children">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-md px-3 text-sm font-medium hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden">
+                <UsersIcon
+                  aria-hidden="true"
+                  className="size-4 text-muted-foreground"
+                />
+                <span className="tabular-nums">
+                  {family.children.length}{" "}
+                  {family.children.length === 1
+                    ? "niño registrado"
+                    : "niños registrados"}
+                </span>
+                <ChevronDownIcon
+                  aria-hidden="true"
+                  className="ml-auto size-4 text-muted-foreground group-open/children:rotate-180"
+                />
+              </summary>
+              <ul className="mt-1 space-y-1 border-l ml-5 pl-3">
+                {family.children.map((child) => (
+                  <li key={child.id}>
+                    <Link
+                      href={`/children/${child.id}/attendance`}
+                      className="flex min-h-11 items-center rounded-md px-2 py-2 text-sm break-words hover:bg-accent hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-ring"
+                      aria-label={`Historial de asistencia de ${child.name}`}
+                    >
+                      {child.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ) : (
+            <p className="py-3 text-sm text-muted-foreground">
+              Sin niños registrados
             </p>
           )}
+          <div className="mt-auto border-t pt-4">
+            <ResourceLinks links={quickLinks} owner={familyName} />
+          </div>
         </div>
-      </div>
-    </Card>
-  );
-}
-
-interface ChildChipProps {
-  child: ChildSummary;
-}
-
-function ChildChip({ child }: ChildChipProps) {
-  const firstName = getFirstName(child.name);
-  const childPhotoUrl = convertGoogleDriveImageUrl(child.photo_url);
-  const hasChildPhoto = Boolean(childPhotoUrl);
-
-  return (
-    <div
-      className={cn(
-        "inline-flex h-7 items-center gap-1.5 rounded-full border border-foreground/20 bg-foreground/5 pl-0.5 pr-2.5 transition-colors hover:bg-foreground/10",
-      )}
-      title={child.name}
-    >
-      <div className="relative flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary/45 to-primary/15">
-        {hasChildPhoto ? (
-          <FamilyPhoto
-            src={childPhotoUrl ?? ""}
-            alt={firstName}
-            className="size-full object-cover"
-            sizes="24px"
-            compact
-          />
-        ) : (
-          <span className="text-[10px] font-bold text-primary/90">
-            {getFirstInitial(child.name) || "?"}
-          </span>
-        )}
-      </div>
-      <span className="max-w-[90px] truncate text-sm font-medium text-popover-foreground">
-        {firstName || "—"}
-      </span>
-    </div>
+      </Card>
+    </article>
   );
 }

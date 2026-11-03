@@ -48,10 +48,15 @@ export function ChildrenCardsGrid({
   }
 
   return (
-    <div className="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2">
+    <ul
+      aria-label="Niños registrados"
+      className="grid grid-cols-1 gap-4 lg:grid-cols-2"
+    >
       {childList.map((child) => (
-        <ChildCard key={child.id} child={child} />
+        <li key={child.id} className="min-w-0">
+          <ChildCard child={child} />
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

@@ -48,10 +48,15 @@ export function FamiliesCardsGrid({
   }
 
   return (
-    <div className="grid gap-3 sm:gap-4 grid-cols-1 xl:grid-cols-2">
+    <ul
+      aria-label="Familias registradas"
+      className="grid grid-cols-1 gap-4 xl:grid-cols-2"
+    >
       {familyList.map((family) => (
-        <FamilyCard key={family.id} family={family} />
+        <li key={family.id} className="min-w-0">
+          <FamilyCard family={family} />
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

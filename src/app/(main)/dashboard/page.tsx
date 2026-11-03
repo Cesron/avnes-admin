@@ -5,6 +5,7 @@ import { DashboardSkeleton } from "@/components/loading-skeletons";
 import { getSessionUserInfo, verifySession } from "@/lib/auth-utils";
 import { type SearchParams, singleParam } from "@/lib/pagination";
 import { AdminDashboard } from "./_components/admin-dashboard";
+import { AdminDashboardSkeleton } from "./_components/admin-dashboard-skeleton";
 import { DashboardHeader } from "./_components/dashboard-header";
 import { MentorDashboard } from "./_components/mentor-dashboard";
 
@@ -45,10 +46,12 @@ export default async function DashboardPage({
         ) : userInfo.role === "admin" || userInfo.role === "coordinator" ? (
           <Suspense
             key={JSON.stringify(query)}
-            fallback={<DashboardSkeleton />}
+            fallback={<AdminDashboardSkeleton />}
           >
             <AdminDashboard
               weekInput={singleParam(query.week)}
+              monthInput={singleParam(query.month)}
+              viewInput={singleParam(query.view)}
               clubInput={singleParam(query.club)}
             />
           </Suspense>
