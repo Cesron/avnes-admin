@@ -169,7 +169,8 @@ export default async function ChildAttendanceHistoryPage({
               className="flex flex-wrap items-center justify-between gap-3"
             >
               <p className="text-sm text-muted-foreground">
-                Página {data.page} de {data.pages}
+                Página <span className="tabular-nums">{data.page}</span> de{" "}
+                <span className="tabular-nums">{data.pages}</span>
               </p>
               <div className="flex gap-2">
                 {data.page > 1 && (

@@ -38,7 +38,7 @@ export function GroupsListDialog({
             <UsersIcon className="size-5" />
             Grupos de la actividad
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="tabular-nums">
             {count} {count === 1 ? "grupo participa" : "grupos participan"} en
             &ldquo;{activityName}&rdquo;
           </DialogDescription>

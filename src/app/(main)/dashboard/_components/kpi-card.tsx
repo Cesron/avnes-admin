@@ -40,9 +40,13 @@ export function KpiCard({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="text-3xl font-semibold tracking-tight">{value}</div>
+        <div className="text-3xl font-semibold tracking-tight tabular-nums">
+          {value}
+        </div>
         {description && (
-          <CardDescription className="mt-1">{description}</CardDescription>
+          <CardDescription className="mt-1 tabular-nums">
+            {description}
+          </CardDescription>
         )}
       </CardContent>
     </Card>

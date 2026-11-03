@@ -195,7 +195,7 @@ export function FamilyCard({ family }: FamilyCardProps) {
                 <Button
                   variant={hasChildren ? "secondary" : "outline"}
                   disabled={!hasChildren}
-                  className="h-7 gap-1.5 px-2.5 text-sm font-medium"
+                  className="h-7 gap-1.5 px-2.5 text-sm font-medium tabular-nums"
                   aria-label={
                     hasChildren
                       ? `Ver ${family.children.length} ${family.children.length === 1 ? "niño" : "niños"} de la familia`

@@ -86,7 +86,7 @@ export function OccurrenceHeader({
       <div className="space-y-1">
         <h1 className="text-2xl font-bold">{occurrence.activity_name}</h1>
         <p className="text-muted-foreground">{capitalizedDate}</p>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground tabular-nums">
           {formatTime(occurrence.start_datetime)} -{" "}
           {formatTime(occurrence.end_datetime)}
         </p>

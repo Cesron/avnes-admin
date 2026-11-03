@@ -32,7 +32,7 @@ export function AttendanceBars({ data }: AttendanceBarsProps) {
             key={bar.dayLabel}
             className="flex flex-1 flex-col items-center gap-1.5"
           >
-            <div className="text-xs font-medium text-muted-foreground">
+            <div className="text-xs font-medium text-muted-foreground tabular-nums">
               {bar.hasData ? `${bar.percentage}%` : "—"}
             </div>
             <div className="relative flex h-full w-full items-end">

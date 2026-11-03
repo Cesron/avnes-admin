@@ -103,7 +103,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
         <Button
           variant="outline"
           size="sm"
-          className="w-full justify-between"
+          className="w-full justify-between tabular-nums"
           onClick={() => setGroupsDialogOpen(true)}
           disabled={groupCount === 0}
         >

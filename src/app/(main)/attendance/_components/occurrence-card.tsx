@@ -50,7 +50,7 @@ function GroupNamesDisplay({ groupNames }: { groupNames: string }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span className="cursor-default truncate">
+        <span className="cursor-default truncate tabular-nums">
           Varios grupos ({groups.length})
         </span>
       </TooltipTrigger>
@@ -120,7 +120,9 @@ export function OccurrenceCard({
             {hasAttendance && (
               <div className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
                 <ClipboardCheckIcon className="size-3" />
-                <span>Asistencia ({occurrence.attendance_count})</span>
+                <span className="tabular-nums">
+                  Asistencia ({occurrence.attendance_count})
+                </span>
               </div>
             )}
           </div>
@@ -167,7 +169,9 @@ export function OccurrenceCard({
         {hasAttendance && (
           <div className="flex items-center gap-1 text-[10px] sm:text-xs text-emerald-600 dark:text-emerald-400">
             <ClipboardCheckIcon className="size-3" />
-            <span>Asist. ({occurrence.attendance_count})</span>
+            <span className="tabular-nums">
+              Asist. ({occurrence.attendance_count})
+            </span>
           </div>
         )}
       </div>

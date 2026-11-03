@@ -23,7 +23,7 @@ export async function ClubsList() {
   return (
     <>
       <div className="flex items-center justify-between px-1 py-3">
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground tabular-nums">
           {clubs.length} {clubs.length === 1 ? "club" : "clubes"}
         </p>
       </div>

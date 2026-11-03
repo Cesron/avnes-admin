@@ -135,7 +135,7 @@ export function KpiCard({
           {trend && <KpiTrendBadge trend={trend} />}
         </div>
         {description ? (
-          <p className="text-xs text-muted-foreground text-pretty">
+          <p className="text-xs text-muted-foreground text-pretty tabular-nums">
             {description}
           </p>
         ) : null}

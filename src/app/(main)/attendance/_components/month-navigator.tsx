@@ -75,7 +75,7 @@ export function MonthNavigator({
           </Button>
         </div>
 
-        <span className="text-base sm:text-lg font-semibold capitalize">
+        <span className="text-base sm:text-lg font-semibold capitalize tabular-nums">
           {formatMonthLabel(currentMonthStart)}
         </span>
       </div>

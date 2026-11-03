@@ -65,7 +65,7 @@ export function AttendanceAgendaView({
             >
               <div className="flex items-center gap-2">
                 <span
-                  className={`inline-flex size-9 items-center justify-center rounded-full text-sm font-semibold ${
+                  className={`inline-flex size-9 items-center justify-center rounded-full text-sm font-semibold tabular-nums ${
                     isToday
                       ? "bg-primary text-primary-foreground"
                       : "bg-background text-foreground border"
@@ -88,7 +88,7 @@ export function AttendanceAgendaView({
               </div>
 
               {dayOccurrences.length > 0 && (
-                <span className="ml-auto text-xs font-medium text-muted-foreground">
+                <span className="ml-auto text-xs font-medium text-muted-foreground tabular-nums">
                   {dayOccurrences.length}{" "}
                   {dayOccurrences.length === 1 ? "actividad" : "actividades"}
                 </span>

@@ -79,7 +79,7 @@ export function WeekNavigator({
         </Button>
       </div>
 
-      <span className="text-lg font-medium">
+      <span className="text-lg font-medium tabular-nums">
         {formatWeekRange(currentWeekStart)}
       </span>
     </div>

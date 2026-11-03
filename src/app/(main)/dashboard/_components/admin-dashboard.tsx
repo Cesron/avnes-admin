@@ -161,7 +161,7 @@ export async function AdminDashboard({
               {attendance === null ? "Sin datos" : `${attendance}%`}
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
+          <CardContent className="text-sm text-muted-foreground tabular-nums">
             {s.present} presentes · {s.absent} ausentes
             <p className="mt-1 text-xs">
               {s.excused} justificados, excluidos del porcentaje
@@ -175,7 +175,7 @@ export async function AdminDashboard({
               {capture === null ? "Sin datos" : `${capture}%`}
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
+          <CardContent className="text-sm text-muted-foreground tabular-nums">
             {s.recorded} de {s.expected} registros completados
             <p className="mt-1 text-xs">
               Una asistencia por niño y fecha de actividad
@@ -189,7 +189,7 @@ export async function AdminDashboard({
               {s.pending}
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
+          <CardContent className="text-sm text-muted-foreground tabular-nums">
             En {data.pendingCount} fechas de actividad
             <p className="mt-1 text-xs">
               Los pendientes no cuentan como ausencias

@@ -34,7 +34,7 @@ export function WeekDayColumn({
     >
       <div className="mb-3 flex items-baseline gap-2">
         <span
-          className={`text-2xl font-bold ${isToday ? "text-primary" : "text-foreground"}`}
+          className={`text-2xl font-bold tabular-nums ${isToday ? "text-primary" : "text-foreground"}`}
         >
           {dayNumber}
         </span>

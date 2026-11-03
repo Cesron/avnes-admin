@@ -33,7 +33,7 @@ export function CalendarDayCell({
       <div className="mb-0.5 sm:mb-1 flex items-center gap-1">
         <span
           className={cn(
-            "inline-flex size-5 sm:size-7 items-center justify-center rounded-full text-[10px] sm:text-sm font-medium",
+            "inline-flex size-5 sm:size-7 items-center justify-center rounded-full text-[10px] sm:text-sm font-medium tabular-nums",
             isToday
               ? "bg-primary text-primary-foreground"
               : isCurrentMonth
@@ -67,7 +67,7 @@ export function CalendarDayCell({
             />
           ))}
           {occurrences.length > 2 && (
-            <p className="text-[10px] sm:text-xs font-medium text-center text-muted-foreground bg-muted/60 rounded-sm py-0.5 sm:py-1">
+            <p className="text-[10px] sm:text-xs font-medium text-center text-muted-foreground bg-muted/60 rounded-sm py-0.5 sm:py-1 tabular-nums">
               +{occurrences.length - 2} más
             </p>
           )}

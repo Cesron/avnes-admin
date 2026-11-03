@@ -23,7 +23,7 @@ export async function GroupsList() {
   return (
     <>
       <div className="flex items-center justify-between px-1 py-3">
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground tabular-nums">
           {groups.length} {groups.length === 1 ? "grupo" : "grupos"}
         </p>
       </div>

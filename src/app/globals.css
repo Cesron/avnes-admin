@@ -155,6 +155,44 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Base-layer defaults let truncate, line-clamp and explicit wrapping utilities
+     keep control of compact UI and user-authored, preformatted content. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  [data-slot="card-title"],
+  [data-slot="dialog-title"],
+  [data-slot="sheet-title"] {
+    @apply text-balance;
+  }
+
+  p:not(.whitespace-pre-wrap),
+  li,
+  figcaption,
+  blockquote,
+  [data-slot="card-description"],
+  [data-slot="dialog-description"],
+  [data-slot="sheet-description"],
+  [data-slot="field-error"] {
+    @apply text-pretty;
+  }
+
+  /* Free-form notes can be long and should retain their authored line breaks. */
+  p.whitespace-pre-wrap {
+    text-wrap: wrap;
+  }
+
+  input[type="number"],
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  time {
+    @apply tabular-nums;
+  }
 }
 
 /* Radix scroll locking rewrites body padding. Keep safe areas on a stable

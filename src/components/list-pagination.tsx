@@ -20,7 +20,10 @@ export function ListPagination({
       aria-label="Paginación"
       className="flex flex-wrap items-center justify-between gap-3 border-t pt-4"
     >
-      <output className="text-xs text-muted-foreground" aria-live="polite">
+      <output
+        className="text-xs text-muted-foreground tabular-nums text-pretty"
+        aria-live="polite"
+      >
         {busy ? "Cargando..." : `${count} registros en esta página`}
       </output>
       <div className="flex gap-2">
