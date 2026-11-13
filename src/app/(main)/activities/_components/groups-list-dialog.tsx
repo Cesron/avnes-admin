@@ -49,7 +49,7 @@ export function GroupsListDialog({
             No hay grupos asignados a esta actividad.
           </p>
         ) : (
-          <div className="max-h-[60vh] overflow-y-auto pr-1">
+          <div className="scrollbar-subtle scrollbar-stable max-h-[60vh] overflow-y-auto overscroll-y-contain pr-1">
             <ul className="flex flex-wrap gap-2">
               {groups.map((group) => (
                 <li key={group.id}>
