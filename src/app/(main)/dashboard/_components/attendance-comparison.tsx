@@ -173,7 +173,16 @@ export function AttendanceComparison({
                       />
                     </Link>
                   ) : (
-                    row.name
+                    <Link
+                      className="inline-flex max-w-full items-center gap-2 rounded-sm underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+                      href={`/groups/${row.id}?${periodQuery(periodView, periodStart)}`}
+                    >
+                      {row.name}
+                      <ArrowUpRightIcon
+                        aria-hidden="true"
+                        className="size-3.5 shrink-0 text-muted-foreground"
+                      />
+                    </Link>
                   )}
                 </h3>
                 <p className="text-sm text-muted-foreground">

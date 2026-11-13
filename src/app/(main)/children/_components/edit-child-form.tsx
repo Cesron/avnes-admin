@@ -1,5 +1,7 @@
 "use client";
 
+import { Controller } from "react-hook-form";
+import { SearchableSelect } from "@/components/searchable-select";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -23,15 +26,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { FamilyOption } from "@/services/families/get-families-options";
-import { Controller } from "react-hook-form";
+import type { GroupOption } from "@/services/groups/get-groups-options";
 import { useEditChild } from "../_context/edit-child-context";
 import { useEditChildForm } from "../_hooks/use-edit-child-form";
 
 interface EditChildFormProps {
   familiesOptions: FamilyOption[];
+  groups: GroupOption[];
 }
 
-export function EditChildForm({ familiesOptions }: EditChildFormProps) {
+export function EditChildForm({ familiesOptions, groups }: EditChildFormProps) {
   const { isOpen, closeEditDialog } = useEditChild();
   const { form, onSubmit, loading } = useEditChildForm();
 
@@ -48,6 +52,40 @@ export function EditChildForm({ familiesOptions }: EditChildFormProps) {
         <form id="form-edit-child" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <Controller
+              name="groupId"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-edit-child-group">Grupo</FieldLabel>
+                  <SearchableSelect
+                    id="form-edit-child-group"
+                    ref={field.ref}
+                    onBlur={field.onBlur}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={loading || groups.length === 0}
+                    aria-invalid={fieldState.invalid}
+                    aria-describedby="form-edit-child-group-description"
+                    placeholder="Sin grupo asignado"
+                    searchPlaceholder="Buscar grupo o club..."
+                    options={groups.map((group) => ({
+                      value: group.id,
+                      label: `${group.name} (${group.club_name})`,
+                    }))}
+                  />
+                  <FieldDescription id="form-edit-child-group-description">
+                    {groups.length === 0
+                      ? "No hay grupos disponibles."
+                      : "El cambio de grupo se aplicará al guardar la ficha."}
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
               name="familyId"
               control={form.control}
               render={({ field, fieldState }) => (
@@ -55,21 +93,20 @@ export function EditChildForm({ familiesOptions }: EditChildFormProps) {
                   <FieldLabel htmlFor="form-edit-child-family">
                     Familia (opcional)
                   </FieldLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger
-                      id="form-edit-child-family"
-                      aria-invalid={fieldState.invalid}
-                    >
-                      <SelectValue placeholder="Selecciona una familia" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {familiesOptions.map((family) => (
-                        <SelectItem key={family.id} value={family.id}>
-                          {family.penpal_code}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <SearchableSelect
+                    id="form-edit-child-family"
+                    ref={field.ref}
+                    onBlur={field.onBlur}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Selecciona una familia"
+                    searchPlaceholder="Buscar familia por código..."
+                    options={familiesOptions.map((family) => ({
+                      value: family.id,
+                      label: family.penpal_code,
+                    }))}
+                  />
 
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />

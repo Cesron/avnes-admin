@@ -4,7 +4,10 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useEditChild } from "../_context/edit-child-context";
 import { editChildAction } from "../_lib/edit-child.action";
-import { EditChildFormData, editChildSchema } from "../_lib/edit-child.schema";
+import {
+  type EditChildFormData,
+  editChildSchema,
+} from "../_lib/edit-child.schema";
 
 export function useEditChildForm() {
   const [loading, setLoading] = useState(false);
@@ -15,6 +18,8 @@ export function useEditChildForm() {
     defaultValues: {
       id: "",
       familyId: "",
+      groupId: undefined,
+      previousGroupId: null,
       name: "",
       gender: "",
       birthDate: "",
@@ -35,6 +40,8 @@ export function useEditChildForm() {
       form.reset({
         id: childToEdit.id,
         familyId: childToEdit.family_id || "",
+        groupId: childToEdit.group_id ?? undefined,
+        previousGroupId: childToEdit.group_id,
         name: childToEdit.name,
         gender: childToEdit.gender,
         birthDate: birthDateStr,
@@ -48,17 +55,28 @@ export function useEditChildForm() {
     const toastId = toast.loading("Actualizando niño/niña...");
     setLoading(true);
 
-    const { serverError } = await editChildAction(data);
+    try {
+      const result = await editChildAction(data);
 
-    if (serverError) {
-      toast.error(serverError, { id: toastId });
+      if (result?.serverError) {
+        toast.error(result.serverError, { id: toastId });
+        return;
+      }
+
+      if (!result?.data) {
+        toast.error("Revisa los datos e inténtalo de nuevo.", { id: toastId });
+        return;
+      }
+
+      toast.success("Niño/Niña actualizado exitosamente", { id: toastId });
+      closeEditDialog();
+    } catch {
+      toast.error("No se pudieron guardar los cambios. Inténtalo de nuevo.", {
+        id: toastId,
+      });
+    } finally {
       setLoading(false);
-      return;
     }
-
-    toast.success("Niño/Niña actualizado exitosamente", { id: toastId });
-    setLoading(false);
-    closeEditDialog();
   }
 
   return { form, onSubmit, loading };

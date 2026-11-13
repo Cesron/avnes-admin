@@ -1,6 +1,8 @@
 "use client";
 
 import { Controller } from "react-hook-form";
+import { SearchableSelect } from "@/components/searchable-select";
+import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldError,
@@ -15,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { useCreateUserForm } from "../_hooks/use-create-user-form";
 
 type MentorOption = { id: string; name: string };
@@ -131,21 +132,20 @@ export function CreateUserForm({
                 <FieldLabel htmlFor="form-create-user-mentor">
                   Mentora vinculada
                 </FieldLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger
-                    id="form-create-user-mentor"
-                    aria-invalid={fieldState.invalid}
-                  >
-                    <SelectValue placeholder="Selecciona una mentora" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {mentorsOptions.map((mentor) => (
-                      <SelectItem key={mentor.id} value={mentor.id}>
-                        {mentor.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <SearchableSelect
+                  id="form-create-user-mentor"
+                  ref={field.ref}
+                  onBlur={field.onBlur}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  aria-invalid={fieldState.invalid}
+                  placeholder="Selecciona una mentora"
+                  searchPlaceholder="Buscar mentora..."
+                  options={mentorsOptions.map((mentor) => ({
+                    value: mentor.id,
+                    label: mentor.name,
+                  }))}
+                />
                 {mentorsOptions.length === 0 && (
                   <p className="text-xs text-muted-foreground">
                     No hay mentoras disponibles sin usuario vinculado

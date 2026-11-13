@@ -1,10 +1,10 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { actionClient } from "@/lib/safe-action";
 import { sql } from "@/lib/sql";
 import { CustomError } from "@/utils/custom-error";
 import { normalizeString } from "@/utils/normalize-string";
-import { revalidatePath } from "next/cache";
 import { editGroupSchema } from "./edit-group.schema";
 
 export const editGroupAction = actionClient
@@ -61,6 +61,7 @@ export const editGroupAction = actionClient
 
     // Revalidar la página para mostrar los cambios
     revalidatePath("/groups");
+    revalidatePath(`/groups/${id}`);
 
     return {
       group: result.rows[0],

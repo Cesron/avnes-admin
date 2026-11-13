@@ -1,5 +1,7 @@
 "use client";
 
+import { Controller } from "react-hook-form";
+import { SearchableSelect } from "@/components/searchable-select";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -16,7 +18,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { FamilyOption } from "@/services/families/get-families-options";
-import { Controller } from "react-hook-form";
 import { useCreateChildForm } from "../_hooks/use-create-child-form";
 
 interface CreateChildFormProps {
@@ -37,21 +38,20 @@ export function CreateChildForm({ familiesOptions }: CreateChildFormProps) {
               <FieldLabel htmlFor="form-create-child-family">
                 Familia (opcional)
               </FieldLabel>
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger
-                  id="form-create-child-family"
-                  aria-invalid={fieldState.invalid}
-                >
-                  <SelectValue placeholder="Selecciona una familia" />
-                </SelectTrigger>
-                <SelectContent>
-                  {familiesOptions.map((family) => (
-                    <SelectItem key={family.id} value={family.id}>
-                      {family.penpal_code}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                id="form-create-child-family"
+                ref={field.ref}
+                onBlur={field.onBlur}
+                value={field.value}
+                onValueChange={field.onChange}
+                aria-invalid={fieldState.invalid}
+                placeholder="Selecciona una familia"
+                searchPlaceholder="Buscar familia por código..."
+                options={familiesOptions.map((family) => ({
+                  value: family.id,
+                  label: family.penpal_code,
+                }))}
+              />
 
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>

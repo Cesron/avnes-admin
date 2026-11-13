@@ -1,5 +1,7 @@
 "use client";
 
+import { Controller } from "react-hook-form";
+import { SearchableSelect } from "@/components/searchable-select";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Controller } from "react-hook-form";
 import { useEditGroup } from "../_context/edit-group-context";
 import { useEditGroupForm } from "../_hooks/use-edit-group-form";
 
@@ -105,24 +106,20 @@ export function EditGroupForm({ clubs, mentors }: EditGroupFormProps) {
                   <FieldLabel htmlFor="form-edit-group-mentor">
                     Mentora
                   </FieldLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger
-                      id="form-edit-group-mentor"
-                      aria-invalid={fieldState.invalid}
-                    >
-                      <SelectValue placeholder="Selecciona una mentora" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mentors.map((mentor) => (
-                        <SelectItem
-                          key={mentor.id}
-                          value={mentor.id.toString()}
-                        >
-                          {mentor.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <SearchableSelect
+                    id="form-edit-group-mentor"
+                    ref={field.ref}
+                    onBlur={field.onBlur}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Selecciona una mentora"
+                    searchPlaceholder="Buscar mentora..."
+                    options={mentors.map((mentor) => ({
+                      value: mentor.id.toString(),
+                      label: mentor.name,
+                    }))}
+                  />
 
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />

@@ -26,13 +26,15 @@ export function DashboardFilters({
   today,
   clubId,
   clubs,
+  pathname = "/dashboard",
 }: {
   view: DashboardView;
   start: string;
   currentStart: string;
   today: string;
   clubId?: string;
-  clubs: { id: string; name: string }[];
+  clubs?: { id: string; name: string }[];
+  pathname?: string;
 }) {
   const router = useRouter();
   const clubSelectId = useId();
@@ -44,7 +46,7 @@ export function DashboardFilters({
   ) {
     const params = periodQuery(nextView, nextStart, club);
     startTransition(() =>
-      router.push(`/dashboard?${params}`, { scroll: false }),
+      router.push(`${pathname}?${params}`, { scroll: false }),
     );
   }
   return (
@@ -52,6 +54,7 @@ export function DashboardFilters({
       className="flex flex-col justify-between gap-4 rounded-xl border bg-card p-4 sm:flex-row sm:flex-wrap sm:items-end"
       aria-busy={pending}
     >
+      <output className="sr-only">{pending ? "Actualizando…" : ""}</output>
       <fieldset className="space-y-2">
         <legend className="text-sm font-medium">Vista</legend>
         <div className="flex rounded-lg border bg-background p-1">
@@ -116,35 +119,36 @@ export function DashboardFilters({
           </Button>
         </div>
       </div>
-      <div className="min-w-0 space-y-2 sm:w-52">
-        <label htmlFor={clubSelectId} className="text-sm font-medium">
-          Club
-        </label>
-        <output className="sr-only">{pending ? "Actualizando…" : ""}</output>
-        <Select
-          value={clubId ?? "all"}
-          disabled={pending}
-          onValueChange={(value) =>
-            navigate(start, value === "all" ? null : value)
-          }
-        >
-          <SelectTrigger
-            id={clubSelectId}
-            className="w-full"
-            aria-label="Filtrar por club"
+      {clubs ? (
+        <div className="min-w-0 space-y-2 sm:w-52">
+          <label htmlFor={clubSelectId} className="text-sm font-medium">
+            Club
+          </label>
+          <Select
+            value={clubId ?? "all"}
+            disabled={pending}
+            onValueChange={(value) =>
+              navigate(start, value === "all" ? null : value)
+            }
           >
-            <SelectValue placeholder="Todos los clubes" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos los clubes</SelectItem>
-            {clubs.map((club) => (
-              <SelectItem key={club.id} value={club.id}>
-                {club.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+            <SelectTrigger
+              id={clubSelectId}
+              className="w-full"
+              aria-label="Filtrar por club"
+            >
+              <SelectValue placeholder="Todos los clubes" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los clubes</SelectItem>
+              {clubs.map((club) => (
+                <SelectItem key={club.id} value={club.id}>
+                  {club.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      ) : null}
     </div>
   );
 }

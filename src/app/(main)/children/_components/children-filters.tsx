@@ -2,6 +2,7 @@
 
 import { SearchIcon } from "lucide-react";
 import { useId } from "react";
+import { SearchableSelect } from "@/components/searchable-select";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -109,22 +110,20 @@ export function ChildrenFilters({
           >
             Grupo
           </label>
-          <Select value={selectedGroupId} onValueChange={onGroupChange}>
-            <SelectTrigger id={groupId} className="w-full">
-              <SelectValue placeholder="Seleccionar grupo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos los grupos</SelectItem>
-              {filteredGroups.map((group) => (
-                <SelectItem key={group.id} value={group.id}>
-                  {group.name}{" "}
-                  <span className="text-muted-foreground">
-                    ({group.club_name})
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SearchableSelect
+            id={groupId}
+            value={selectedGroupId}
+            onValueChange={onGroupChange}
+            placeholder="Seleccionar grupo"
+            searchPlaceholder="Buscar grupo o club..."
+            options={[
+              { value: "all", label: "Todos los grupos" },
+              ...filteredGroups.map((group) => ({
+                value: group.id,
+                label: `${group.name} (${group.club_name})`,
+              })),
+            ]}
+          />
         </div>
       )}
     </div>

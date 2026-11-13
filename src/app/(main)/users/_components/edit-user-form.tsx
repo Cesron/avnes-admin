@@ -1,5 +1,8 @@
 "use client";
 
+import { useMemo } from "react";
+import { Controller } from "react-hook-form";
+import { SearchableSelect } from "@/components/searchable-select";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,8 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useMemo } from "react";
-import { Controller } from "react-hook-form";
 import { useEditUser } from "../_context/edit-user-context";
 import { useEditUserForm } from "../_hooks/use-edit-user-form";
 
@@ -127,21 +128,20 @@ export function EditUserForm({ mentorsOptions }: EditUserFormProps) {
                     <FieldLabel htmlFor="form-edit-user-mentor">
                       Mentora vinculada
                     </FieldLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger
-                        id="form-edit-user-mentor"
-                        aria-invalid={fieldState.invalid}
-                      >
-                        <SelectValue placeholder="Selecciona una mentora" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {mentorOptionsForEdit.map((mentor) => (
-                          <SelectItem key={mentor.id} value={mentor.id}>
-                            {mentor.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <SearchableSelect
+                      id="form-edit-user-mentor"
+                      ref={field.ref}
+                      onBlur={field.onBlur}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Selecciona una mentora"
+                      searchPlaceholder="Buscar mentora..."
+                      options={mentorOptionsForEdit.map((mentor) => ({
+                        value: mentor.id,
+                        label: mentor.name,
+                      }))}
+                    />
                     {mentorOptionsForEdit.length === 0 && (
                       <p className="text-xs text-muted-foreground">
                         No hay mentoras disponibles sin usuario vinculado

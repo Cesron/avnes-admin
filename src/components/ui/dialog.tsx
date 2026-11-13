@@ -51,6 +51,7 @@ function DialogContent({
   children,
   showCloseButton = true,
   onOpenAutoFocus,
+  onEscapeKeyDown,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
@@ -65,6 +66,16 @@ function DialogContent({
           className,
         )}
         {...props}
+        onEscapeKeyDown={(event) => {
+          onEscapeKeyDown?.(event);
+          // A searchable popup handles Escape before the surrounding form closes.
+          if (
+            event.target instanceof Element &&
+            event.target.closest('[data-slot="combobox-content"]')
+          ) {
+            event.preventDefault();
+          }
+        }}
         onOpenAutoFocus={(event) => {
           onOpenAutoFocus?.(event);
           if (event.defaultPrevented) return;

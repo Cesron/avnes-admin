@@ -1,13 +1,16 @@
 "use client";
 
-import { UserRoundIcon } from "lucide-react";
+import { ArrowRightIcon, UserRoundIcon } from "lucide-react";
+import Link from "next/link";
 import { EditButton } from "@/components/edit-button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -47,7 +50,14 @@ export function GroupCard({ group }: GroupCardProps) {
           </Avatar>
 
           <div className="flex flex-col min-w-0 flex-1 gap-1.5">
-            <CardTitle className="text-base truncate">{group.name}</CardTitle>
+            <CardTitle className="text-base truncate">
+              <Link
+                href={`/groups/${group.id}`}
+                className="rounded-sm hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+              >
+                {group.name}
+              </Link>
+            </CardTitle>
 
             <Badge
               variant={getClubBadgeVariant(group.club_name)}
@@ -74,6 +84,17 @@ export function GroupCard({ group }: GroupCardProps) {
           </span>
         </div>
       </CardContent>
+      <CardFooter>
+        <Button asChild variant="outline" className="w-full justify-between">
+          <Link
+            href={`/groups/${group.id}`}
+            aria-label={`Ver grupo ${group.name}`}
+          >
+            Ver grupo
+            <ArrowRightIcon aria-hidden="true" className="size-4" />
+          </Link>
+        </Button>
+      </CardFooter>
     </Card>
   );
 }

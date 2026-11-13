@@ -59,7 +59,7 @@ export default async function ChildrenPage({
         </Suspense>
       </div>
 
-      <EditChildForm familiesOptions={familiesOptions} />
+      <EditChildForm familiesOptions={familiesOptions} groups={groups} />
     </EditChildProvider>
   );
 }

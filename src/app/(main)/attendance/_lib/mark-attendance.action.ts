@@ -50,6 +50,7 @@ export const markAttendanceAction = actionClient
     const result = await markAttendance({ childId, occurrenceId, status });
 
     revalidatePath(`/attendance/${occurrenceId}`);
+    revalidatePath("/groups/[groupId]", "page");
 
     return result;
   });
