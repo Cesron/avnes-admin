@@ -9,8 +9,10 @@ import { FamiliesFilters } from "./families-filters";
 
 export function FamiliesListView({
   initialFamilies,
+  canCreate,
 }: {
   initialFamilies: PageResult<FamilyWithChildren>;
+  canCreate: boolean;
 }) {
   const navigation = useListNavigation();
   return (
@@ -26,6 +28,7 @@ export function FamiliesListView({
       ) : (
         <FamiliesCardsGrid
           familyList={initialFamilies.items}
+          canCreate={canCreate}
           isFiltered={!!navigation.search.trim()}
         />
       )}

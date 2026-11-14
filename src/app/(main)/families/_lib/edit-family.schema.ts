@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const editFamilySchema = z.object({
-  id: z.string().min(1, "ID inválido"),
+  id: z.string().uuid("ID inválido"),
   penpalCode: z
     .string()
     .length(4, "El código penpal debe tener exactamente 4 caracteres")

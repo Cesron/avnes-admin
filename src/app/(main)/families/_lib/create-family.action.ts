@@ -1,9 +1,10 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+import { authorize } from "@/lib/auth-utils";
 import { actionClient } from "@/lib/safe-action";
 import { sql } from "@/lib/sql";
 import { CustomError } from "@/utils/custom-error";
-import { revalidatePath } from "next/cache";
 import { createFamilySchema } from "./create-family.schema";
 
 export const createFamilyAction = actionClient
@@ -12,6 +13,11 @@ export const createFamilyAction = actionClient
     async ({
       parsedInput: { penpalCode, familyBiographyUrl, familyPhotoUrl },
     }) => {
+      const { user } = await authorize("/families");
+      if (user.role !== "admin" && user.role !== "coordinator") {
+        throw CustomError.forbidden("No tienes permisos para crear familias.");
+      }
+
       // Verificar si ya existe una familia con el mismo código penpal
       const existingFamily = await sql.query(
         `SELECT id FROM families WHERE penpal_code = $1`,

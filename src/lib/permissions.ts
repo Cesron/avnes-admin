@@ -14,7 +14,7 @@ const roleRoutes: Record<Exclude<UserRole, "admin">, string[]> = {
     "/attendance",
     "/mentors",
   ],
-  mentor: ["/dashboard", "/children", "/attendance"],
+  mentor: ["/dashboard", "/families", "/children", "/attendance"],
 };
 
 /**

@@ -12,8 +12,8 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { getNextPenpalCode } from "@/services/families/get-next-penpal-code";
 import { CreateFamilyDialog } from "./create-family-dialog";
 
-export async function FamiliesHeader() {
-  const suggestedPenpalCode = await getNextPenpalCode();
+export async function FamiliesHeader({ canCreate }: { canCreate: boolean }) {
+  const suggestedPenpalCode = canCreate ? await getNextPenpalCode() : null;
 
   return (
     <header className="flex flex-wrap gap-3 min-h-20 py-4 shrink-0 items-center border-b">
@@ -39,7 +39,9 @@ export async function FamiliesHeader() {
         </div>
       </div>
 
-      <CreateFamilyDialog suggestedPenpalCode={suggestedPenpalCode} />
+      {suggestedPenpalCode !== null ? (
+        <CreateFamilyDialog suggestedPenpalCode={suggestedPenpalCode} />
+      ) : null}
     </header>
   );
 }

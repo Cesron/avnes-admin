@@ -7,6 +7,7 @@ import {
 } from "@/lib/pagination";
 import { searchColumn, searchPattern } from "@/lib/search";
 import { sql } from "@/lib/sql";
+import { mentorChildAccess, mentorFamilyAccess } from "./family-access";
 
 /**
  * Resumen de un niño pensado para mostrar en listas (cards de familia, etc).
@@ -41,7 +42,11 @@ export type FamilyWithChildren = {
   children: ChildSummary[];
 };
 
-type GetFamiliesParams = PageRequest & { search?: string };
+type GetFamiliesParams = PageRequest & {
+  search?: string;
+  /** Authenticated user ID, supplied by the server for mentors. */
+  mentorUserId?: string;
+};
 
 export async function getFamilies(
   params: GetFamiliesParams = {},
@@ -50,11 +55,19 @@ export async function getFamilies(
   const backwards = cursor?.backwards ?? false;
   const values: (string | number)[] = [];
   const conditions: string[] = [];
+  let childAccess: string | undefined;
+  if (params.mentorUserId !== undefined) {
+    values.push(params.mentorUserId);
+    const userIdParameter = `$${values.length}`;
+    conditions.push(mentorFamilyAccess("f", userIdParameter));
+    childAccess = mentorChildAccess("c", userIdParameter);
+  }
   if (params.search?.trim()) {
     values.push(searchPattern(params.search));
     conditions.push(`(${searchColumn("f.penpal_code")} LIKE $${values.length} OR EXISTS (
-      SELECT 1 FROM children child WHERE child.family_id = f.id
-      AND ${searchColumn("child.name")} LIKE $${values.length}
+      SELECT 1 FROM children c WHERE c.family_id = f.id
+      AND ${searchColumn("c.name")} LIKE $${values.length}
+      ${childAccess ? `AND ${childAccess}` : ""}
     ))`);
   }
   if (cursor) {
@@ -82,6 +95,7 @@ export async function getFamilies(
           'id', c.id, 'name', c.name, 'photo_url', c.child_photo_url, 'gender', c.gender
         ) ORDER BY c.name, c.id), '[]'::json) AS children
       FROM children c WHERE c.family_id = page.id
+        ${childAccess ? `AND ${childAccess}` : ""}
     ) details
     ORDER BY page.penpal_sort ${direction}, page.id ${direction}
   `,

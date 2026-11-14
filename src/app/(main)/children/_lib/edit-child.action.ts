@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { authorize } from "@/lib/auth-utils";
 import { actionClient } from "@/lib/safe-action";
 import { sql } from "@/lib/sql";
+import { mentorFamilyAccess } from "@/services/families/family-access";
 import { CustomError } from "@/utils/custom-error";
 import { editChildSchema } from "./edit-child.schema";
 
@@ -29,12 +30,17 @@ export const editChildAction = actionClient
       // Verificar que la familia existe (solo si se proporciona)
       if (familyId) {
         const familyExists = await sql.query(
-          `SELECT id FROM families WHERE id = $1`,
-          [familyId],
+          `SELECT f.id FROM families f WHERE f.id = $1 AND (
+            $2::text IN ('admin', 'coordinator') OR
+            ($2::text = 'mentor' AND ${mentorFamilyAccess("f", "$3")})
+          )`,
+          [familyId, user.role, user.id],
         );
 
         if (familyExists.rows.length === 0) {
-          throw CustomError.badRequest("La familia seleccionada no existe");
+          throw CustomError.badRequest(
+            "La familia seleccionada no existe o no tienes acceso a ella",
+          );
         }
       }
 

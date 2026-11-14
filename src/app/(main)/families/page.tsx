@@ -13,36 +13,47 @@ export default async function FamiliesPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  await authorize("/families");
+  const { user } = await authorize("/families");
+  const canCreate = user.role === "admin" || user.role === "coordinator";
+  const mentorUserId = user.role === "mentor" ? user.id : undefined;
 
   return (
     <EditFamilyProvider>
       <Suspense fallback={<HeaderSkeleton />}>
-        <FamiliesHeader />
+        <FamiliesHeader canCreate={canCreate} />
       </Suspense>
 
       <div className="py-6">
         <Suspense fallback={<ListSkeleton kind="families" />}>
-          <FamilyResults searchParams={searchParams} />
+          <FamilyResults
+            searchParams={searchParams}
+            mentorUserId={mentorUserId}
+            canCreate={canCreate}
+          />
         </Suspense>
       </div>
 
-      <EditFamilyForm />
+      <EditFamilyForm canEditPenpalCode={canCreate} />
     </EditFamilyProvider>
   );
 }
 
 async function FamilyResults({
   searchParams,
+  mentorUserId,
+  canCreate,
 }: {
   searchParams: Promise<SearchParams>;
+  mentorUserId?: string;
+  canCreate: boolean;
 }) {
   const query = await searchParams;
   const families = await getFamilies({
+    mentorUserId,
     search: singleParam(query.search),
     after: singleParam(query.after),
     before: singleParam(query.before),
   });
 
-  return <FamiliesListView initialFamilies={families} />;
+  return <FamiliesListView initialFamilies={families} canCreate={canCreate} />;
 }

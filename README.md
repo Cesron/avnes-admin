@@ -79,6 +79,28 @@ $env:PGOPTIONS='-c default_transaction_read_only=on'
 node --env-file=.env --import tsx --test tests/child-attendance-history.test.ts
 ```
 
+### Acceso de mentoras a familias
+
+Las mentoras tienen acceso a **Familias** desde el menú. Solo ven las familias
+de niños con membresía activa en sus grupos, y pueden editar sus enlaces de
+foto y biografía. El código penpal es de solo lectura y no pueden crear familias.
+La búsqueda, la paginación y las opciones de familia en Niños respetan el mismo
+alcance; las tarjetas muestran solo los niños a los que la mentora tiene acceso.
+Una mentora sin vinculación o sin niños activos no obtiene familias.
+
+El servidor obtiene el alcance de la sesión y vuelve a verificarlo al guardar.
+También rechaza cambios de código penpal enviados directamente por una mentora.
+Administradores y coordinadores conservan la consulta, creación y edición
+completas. Una familia compartida puede ser editada por las mentoras de cualquiera
+de sus niños activos.
+
+Pruebas de lectura, edición y permisos con tablas temporales y reversión al
+terminar, sin modificar registros reales:
+
+```powershell
+node --env-file=.env --import tsx --test tests/family-permissions.test.ts
+```
+
 ### Paginación de familias y niños
 
 Ambas listas muestran 24 registros por página. Usan cursores por código penpal

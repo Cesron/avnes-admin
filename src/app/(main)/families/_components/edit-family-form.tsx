@@ -1,5 +1,6 @@
 "use client";
 
+import { Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,11 +16,14 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Controller } from "react-hook-form";
 import { useEditFamily } from "../_context/edit-family-context";
 import { useEditFamilyForm } from "../_hooks/use-edit-family-form";
 
-export function EditFamilyForm() {
+export function EditFamilyForm({
+  canEditPenpalCode,
+}: {
+  canEditPenpalCode: boolean;
+}) {
   const { isOpen, closeEditDialog } = useEditFamily();
   const { form, onSubmit, loading } = useEditFamilyForm();
 
@@ -50,7 +54,21 @@ export function EditFamilyForm() {
                     placeholder="Ej: 0001"
                     autoComplete="off"
                     maxLength={4}
+                    readOnly={!canEditPenpalCode}
+                    aria-describedby={
+                      canEditPenpalCode ? undefined : "family-penpal-readonly"
+                    }
                   />
+
+                  {!canEditPenpalCode ? (
+                    <p
+                      id="family-penpal-readonly"
+                      className="text-sm text-muted-foreground"
+                    >
+                      Solo administradores y coordinadores pueden cambiar el
+                      código penpal.
+                    </p>
+                  ) : null}
 
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />

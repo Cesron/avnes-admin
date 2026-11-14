@@ -34,7 +34,9 @@ export default async function ChildrenPage({
     before: singleParam(query.before),
   });
   const [familiesOptions, clubs, groups] = await Promise.all([
-    getFamiliesOptions(),
+    getFamiliesOptions(
+      userInfo.role === "mentor" ? userInfo.userId : undefined,
+    ),
     getClubsOptions(),
     getGroupsOptions(),
   ]);

@@ -6,6 +6,7 @@ import { FamilyCard } from "./family-card";
 
 interface FamiliesCardsGridProps {
   familyList: FamilyWithChildren[];
+  canCreate: boolean;
   /**
    * When true, the empty state is shown as "no matches for your filters"
    * instead of "no families registered yet".
@@ -15,6 +16,7 @@ interface FamiliesCardsGridProps {
 
 export function FamiliesCardsGrid({
   familyList,
+  canCreate,
   isFiltered = false,
 }: FamiliesCardsGridProps) {
   if (familyList.length === 0) {
@@ -35,11 +37,14 @@ export function FamiliesCardsGrid({
           <>
             <UsersIcon className="size-12 text-muted-foreground/50 mb-3" />
             <h3 className="text-base font-medium text-muted-foreground">
-              No hay familias registradas
+              {canCreate
+                ? "No hay familias registradas"
+                : "No hay familias asociadas a tus niños"}
             </h3>
             <p className="text-sm text-muted-foreground/80 mt-1 max-w-sm">
-              Comienza agregando una nueva familia usando el botón
-              &ldquo;Agregar Familia&rdquo; en la parte superior.
+              {canCreate
+                ? "Comienza agregando una nueva familia usando el botón “Agregar Familia” en la parte superior."
+                : "Aquí aparecerán las familias de los niños con membresía activa en tus grupos."}
             </p>
           </>
         )}

@@ -8,6 +8,9 @@ type GetFamiliesActionParams = {
 };
 
 export async function getFamiliesAction(params: GetFamiliesActionParams) {
-  await authorize("/families");
-  return await getFamilies(params);
+  const { user } = await authorize("/families");
+  return await getFamilies({
+    ...params,
+    mentorUserId: user.role === "mentor" ? user.id : undefined,
+  });
 }
