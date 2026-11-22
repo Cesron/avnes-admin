@@ -21,7 +21,12 @@ function createTestAccount() {
     telemetry: { enabled: false },
   });
 
-  function post(path: string, body: object, cookie?: string) {
+  function post(
+    path: string,
+    body: object,
+    cookie?: string,
+    requestHeaders: Record<string, string> = {},
+  ) {
     return authForTest.handler(
       new Request(`${origin}/api/auth${path}`, {
         method: "POST",
@@ -29,6 +34,7 @@ function createTestAccount() {
           "content-type": "application/json",
           origin,
           ...(cookie ? { cookie } : {}),
+          ...requestHeaders,
         },
         body: JSON.stringify(body),
       }),
@@ -53,6 +59,71 @@ function createTestAccount() {
 
   return { authForTest, post, signIn };
 }
+
+test("account updates accept the panel origin behind a proxy", async () => {
+  const { authForTest, post, signIn } = createTestAccount();
+  const cookie = await signIn();
+  const panelOrigin = "https://panel.example.test";
+  const panelHeaders = {
+    origin: panelOrigin,
+    host: "internal.example.test:3000",
+    "x-forwarded-host": new URL(panelOrigin).host,
+    "sec-fetch-site": "same-origin",
+  };
+
+  const updated = await post(
+    "/update-user",
+    { name: "Nombre actualizado" },
+    cookie,
+    panelHeaders,
+  );
+  assert.equal(updated.status, 200, await updated.text());
+  assert.equal(
+    (await authForTest.api.getSession({ headers: new Headers({ cookie }) }))
+      ?.user.name,
+    "Nombre actualizado",
+  );
+
+  const changed = await post(
+    "/change-password",
+    {
+      currentPassword: password,
+      newPassword: "nueva-contraseña-del-panel",
+      revokeOtherSessions: true,
+    },
+    cookie,
+    panelHeaders,
+  );
+  assert.equal(changed.status, 200, await changed.text());
+});
+
+test("account updates still reject cross-site requests and unknown origins", async () => {
+  const { post, signIn } = createTestAccount();
+  const cookie = await signIn();
+  const requestHeaders = {
+    origin: "https://other.example.test",
+    host: "panel.example.test",
+  };
+
+  for (const headers of [
+    { ...requestHeaders, "sec-fetch-site": "same-origin" },
+    { ...requestHeaders, "x-forwarded-host": "other.example.test" },
+    {
+      ...requestHeaders,
+      "x-forwarded-host": "other.example.test",
+      "sec-fetch-site": "cross-site",
+    },
+  ]) {
+    const response = await post(
+      "/update-user",
+      { name: "Nombre que no debe guardarse" },
+      cookie,
+      headers,
+    );
+    assert.equal(response.status, 403);
+    assert.equal((await response.json()).code, "INVALID_ORIGIN");
+  }
+});
 
 test("profile fields are editable on the authenticated account", async () => {
   const { authForTest, post, signIn } = createTestAccount();

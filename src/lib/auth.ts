@@ -7,8 +7,44 @@ import { profileName, profilePhone, profilePhoto } from "@/lib/profile-fields";
 import { sendPasswordResetEmail } from "@/lib/resend";
 import { sql } from "@/lib/sql";
 
+function trustedAccountOrigins(request?: Request): string[] {
+  if (
+    request?.method !== "POST" ||
+    request.headers.get("sec-fetch-site") !== "same-origin"
+  ) {
+    return [];
+  }
+
+  const { pathname, host } = new URL(request.url);
+  if (
+    pathname !== "/api/auth/update-user" &&
+    pathname !== "/api/auth/change-password"
+  ) {
+    return [];
+  }
+
+  const origin = URL.parse(request.headers.get("origin") ?? "");
+  if (
+    !origin ||
+    (origin.protocol !== "https:" && origin.protocol !== "http:")
+  ) {
+    return [];
+  }
+
+  // The URL seen by Next may use the container host behind a reverse proxy.
+  const forwardedHost = request.headers
+    .get("x-forwarded-host")
+    ?.split(",", 1)[0]
+    ?.trim();
+  const requestHost = request.headers.get("host") ?? host;
+  return origin.host === requestHost || origin.host === forwardedHost
+    ? [origin.origin]
+    : [];
+}
+
 export const auth = betterAuth({
   database: sql,
+  trustedOrigins: trustedAccountOrigins,
   emailAndPassword: {
     enabled: true,
     resetPasswordTokenExpiresIn: 30 * 60,
