@@ -1,6 +1,7 @@
 "use client";
 
-import { LogOutIcon, MoreHorizontalIcon } from "lucide-react";
+import { LogOutIcon, MoreHorizontalIcon, UserRoundIcon } from "lucide-react";
+import Link from "next/link";
 
 import { logoutAction } from "@/actions/logout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,13 +17,13 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useSession } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
 
 export function NavUser() {
-  const session = useSession();
+  const session = authClient.useSession();
   const user = session.data?.user;
 
-  const { isMobile } = useSidebar();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   const fallbackName =
     user?.name
@@ -45,7 +46,12 @@ export function NavUser() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="in-data-[state=expanded]:size-6 transition-[width,height] duration-200 ease-in-out">
-                <AvatarImage src={user?.image ?? undefined} alt={user?.name} />
+                <AvatarImage
+                  src={user?.image ?? undefined}
+                  alt=""
+                  referrerPolicy="no-referrer"
+                  className="object-cover"
+                />
                 <AvatarFallback>{fallbackName}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight ms-1">
@@ -62,6 +68,19 @@ export function NavUser() {
             align="end"
             sideOffset={4}
           >
+            <DropdownMenuItem asChild className="gap-3 px-1">
+              <Link
+                href="/profile"
+                onClick={() => isMobile && setOpenMobile(false)}
+              >
+                <UserRoundIcon
+                  size={20}
+                  className="text-muted-foreground/70"
+                  aria-hidden="true"
+                />
+                <span>Mi perfil</span>
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem className="gap-3 px-1" onClick={handleLogout}>
               <LogOutIcon
                 size={20}

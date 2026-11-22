@@ -1,16 +1,19 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
+import { authorize } from "@/lib/auth-utils";
 import { actionClient } from "@/lib/safe-action";
 import { sql } from "@/lib/sql";
 import { CustomError } from "@/utils/custom-error";
-import { revalidatePath } from "next/cache";
 import { createUserSchema } from "./create-user.schema";
 
 export const createUserAction = actionClient
   .inputSchema(createUserSchema)
   .action(
     async ({ parsedInput: { name, email, password, role, mentorId } }) => {
+      await authorize("/users");
+
       // If role is mentor, verify the mentor exists and is not already linked
       if (role === "mentor" && mentorId) {
         const mentorResult = await sql.query(

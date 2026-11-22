@@ -59,6 +59,31 @@ y [apps de pantalla de inicio en iOS/iPadOS](https://webkit.org/blog/13878/web-p
 
 ## Guía de Desarrollo
 
+### Recuperación de contraseña y perfil
+
+Para actualizar una instalación existente, ejecuta la [migración de teléfono de usuario](src/db/migrations/2026-11-22-add-user-phone.sql)
+en PostgreSQL antes de desplegar. Las instalaciones nuevas que carguen `src/db/schema.sql` deben crear
+primero las tablas de Better Auth, como requiere la tabla de mentoras.
+
+Configura estas variables en `.env` para desarrollo y en el entorno del servidor
+para producción:
+
+```dotenv
+BETTER_AUTH_URL=https://panel.example.org
+RESEND_API_KEY=
+RESEND_FROM_EMAIL="AVNES <cuentas@example.org>"
+```
+
+Usa la URL pública del panel en `BETTER_AUTH_URL` y un remitente de un
+[dominio verificado en Resend](https://resend.com/docs/dashboard/domains/introduction).
+Mantén desactivado el seguimiento de clics en el dominio que envía los enlaces
+de recuperación. Guarda la clave únicamente en el entorno del servidor.
+
+En el login, **¿Olvidaste tu contraseña?** envía un enlace de un solo uso con
+vigencia de 30 minutos. Desde el menú de cuenta, **Mi perfil** permite editar
+el nombre, el teléfono personal, la foto y la contraseña. El teléfono es un
+dato de la cuenta, separado de los datos de contacto de la ficha de Mentoras.
+
 ### Migración de notas e historia
 
 Antes de publicar la versión en una instalación existente, ejecuta

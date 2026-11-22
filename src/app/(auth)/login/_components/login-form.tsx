@@ -1,6 +1,7 @@
 "use client";
 
 import { EyeIcon } from "lucide-react";
+import Link from "next/link";
 import { Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -24,7 +25,7 @@ export function LoginForm() {
     useLoginForm();
 
   return (
-    <form id="form-login" onSubmit={form.handleSubmit(onSubmit)}>
+    <form id="form-login" method="post" onSubmit={form.handleSubmit(onSubmit)}>
       <FieldGroup>
         <Controller
           name="email"
@@ -51,7 +52,17 @@ export function LoginForm() {
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="form-login-password">Contraseña</FieldLabel>
+              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                <FieldLabel htmlFor="form-login-password">
+                  Contraseña
+                </FieldLabel>
+                <Link
+                  href="/forgot-password"
+                  className="rounded-sm text-sm font-medium text-blue-subtle-foreground underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+                >
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
 
               <InputGroup className="h-11 md:h-9">
                 <InputGroupInput

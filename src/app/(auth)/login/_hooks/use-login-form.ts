@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { loginAction } from "../_lib/login.action";
-import { LoginFormData, loginSchema } from "../_lib/login.schema";
+import { type LoginFormData, loginSchema } from "../_lib/login.schema";
 
 export function useLoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,8 +14,8 @@ export function useLoginForm() {
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "cesronvasquez@gmail.com",
-      password: "holamundo",
+      email: "",
+      password: "",
       rememberMe: false,
     },
   });

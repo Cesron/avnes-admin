@@ -60,7 +60,12 @@ export function UserCard({ user }: UserCardProps) {
         <div className="flex items-start gap-3 min-w-0">
           <Avatar className="size-12 shrink-0">
             {hasImage ? (
-              <AvatarImage src={user.image ?? undefined} alt={user.name} />
+              <AvatarImage
+                src={user.image ?? undefined}
+                alt=""
+                referrerPolicy="no-referrer"
+                className="object-cover"
+              />
             ) : null}
             <AvatarFallback className="text-sm font-semibold">
               {getInitials(user.name)}

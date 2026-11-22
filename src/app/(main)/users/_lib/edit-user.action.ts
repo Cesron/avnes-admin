@@ -1,14 +1,17 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+import { authorize } from "@/lib/auth-utils";
 import { actionClient } from "@/lib/safe-action";
 import { sql } from "@/lib/sql";
 import { CustomError } from "@/utils/custom-error";
-import { revalidatePath } from "next/cache";
 import { editUserSchema } from "./edit-user.schema";
 
 export const editUserAction = actionClient
   .inputSchema(editUserSchema)
   .action(async ({ parsedInput: { id, name, role, mentorId } }) => {
+    await authorize("/users");
+
     const userExists = await sql.query(`SELECT id FROM "user" WHERE id = $1`, [
       id,
     ]);

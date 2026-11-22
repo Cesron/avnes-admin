@@ -5,6 +5,9 @@
 -- Extensión para UUIDs
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+-- Campo de perfil de la tabla administrada por Better Auth.
+ALTER TABLE "user" ADD COLUMN IF NOT EXISTS phone VARCHAR(30);
+
 -- ==========================================
 -- Drop tables (solo desarrollo)
 -- ==========================================
