@@ -6,6 +6,7 @@ import { ChildCard } from "./child-card";
 
 interface ChildrenCardsGridProps {
   childList: ChildWithFamily[];
+  isMentor?: boolean;
   /**
    * When true, the empty state is shown as "no matches for your filters"
    * instead of "no children registered yet".
@@ -15,6 +16,7 @@ interface ChildrenCardsGridProps {
 
 export function ChildrenCardsGrid({
   childList,
+  isMentor = false,
   isFiltered = false,
 }: ChildrenCardsGridProps) {
   if (childList.length === 0) {
@@ -54,7 +56,10 @@ export function ChildrenCardsGrid({
     >
       {childList.map((child) => (
         <li key={child.id} className="min-w-0">
-          <ChildCard child={child} />
+          <ChildCard
+            child={child}
+            canManage={!isMentor || child.group_id !== null}
+          />
         </li>
       ))}
     </ul>

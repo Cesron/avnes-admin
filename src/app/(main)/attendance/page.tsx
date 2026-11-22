@@ -16,7 +16,7 @@ export default async function AttendancePage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const userInfo = await getSessionUserInfo();
+  const userInfo = await getSessionUserInfo("/attendance");
 
   return (
     <>
@@ -40,9 +40,7 @@ async function AttendanceContent({
 }) {
   // Mentors only see their groups
   const mentorGroupIds =
-    userInfo.role === "mentor" && userInfo.groupIds.length > 0
-      ? userInfo.groupIds
-      : undefined;
+    userInfo.role === "mentor" ? userInfo.groupIds : undefined;
 
   const [query, clubs, groups] = await Promise.all([
     searchParams,
@@ -92,7 +90,6 @@ async function AttendanceContent({
       initialMonthStart={monthStart}
       clubs={clubs}
       groups={filteredGroups}
-      mentorGroupIds={mentorGroupIds}
       defaultClubId={defaultClubId}
       defaultGroupId={defaultGroupId}
     />

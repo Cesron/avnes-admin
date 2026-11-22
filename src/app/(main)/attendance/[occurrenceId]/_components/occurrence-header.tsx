@@ -29,25 +29,16 @@ export function OccurrenceHeader({
   occurrence,
   mentorGroupIds,
 }: OccurrenceHeaderProps) {
-  // Format time for display
-  const formatTime = (date: Date) => {
-    return new Date(date).toLocaleTimeString("es-ES", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  // Format date for display
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("es-ES", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const formattedDate = formatDate(occurrence.start_datetime);
+  // Database timestamps are already in El Salvador wall time.
+  const formattedDate = new Date(
+    `${occurrence.start_datetime}Z`,
+  ).toLocaleDateString("es-SV", {
+    timeZone: "UTC",
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
   const capitalizedDate =
     formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
 
@@ -96,8 +87,8 @@ export function OccurrenceHeader({
         <h1 className="text-2xl font-bold">{occurrence.activity_name}</h1>
         <p className="text-muted-foreground">{capitalizedDate}</p>
         <p className="text-sm text-muted-foreground tabular-nums">
-          {formatTime(occurrence.start_datetime)} -{" "}
-          {formatTime(occurrence.end_datetime)}
+          {occurrence.start_datetime.slice(11)} -{" "}
+          {occurrence.end_datetime.slice(11)}
         </p>
         <div className="flex flex-wrap gap-2 mt-2">
           {visibleGroups.map((group) => (

@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { createFamilyAction } from "../_lib/create-family.action";
 import {
-  CreateFamilyFormData,
+  type CreateFamilyFormData,
   createFamilySchema,
 } from "../_lib/create-family.schema";
 
@@ -23,6 +23,7 @@ export function useCreateFamilyForm({
       penpalCode: suggestedPenpalCode,
       familyBiographyUrl: "",
       familyPhotoUrl: "",
+      history: "",
     },
   });
 
@@ -44,6 +45,7 @@ export function useCreateFamilyForm({
       penpalCode: suggestedPenpalCode,
       familyBiographyUrl: "",
       familyPhotoUrl: "",
+      history: "",
     });
   }
 

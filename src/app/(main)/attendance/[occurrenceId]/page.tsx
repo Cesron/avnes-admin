@@ -15,8 +15,11 @@ interface OccurrencePageProps {
 }
 
 export default async function OccurrencePage({ params }: OccurrencePageProps) {
-  const userInfo = await getSessionUserInfo();
+  const userInfo = await getSessionUserInfo("/attendance");
   const { occurrenceId } = await params;
+  if (!/^[\da-f]{8}-(?:[\da-f]{4}-){3}[\da-f]{12}$/i.test(occurrenceId)) {
+    notFound();
+  }
 
   const occurrence = await getOccurrenceDetail(occurrenceId);
 

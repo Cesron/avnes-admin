@@ -16,6 +16,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useEditFamily } from "../_context/edit-family-context";
 import { useEditFamilyForm } from "../_hooks/use-edit-family-form";
 
@@ -118,6 +119,29 @@ export function EditFamilyForm({
                     type="url"
                   />
 
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="history"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-edit-family-history">
+                    Historia (opcional)
+                  </FieldLabel>
+                  <Textarea
+                    {...field}
+                    id="form-edit-family-history"
+                    rows={6}
+                    className="field-sizing-fixed resize-y"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Describe el estilo de vida de la familia"
+                  />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}

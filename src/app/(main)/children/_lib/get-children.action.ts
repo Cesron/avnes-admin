@@ -1,6 +1,6 @@
 "use server";
 
-import { authorize, getSessionUserInfo } from "@/lib/auth-utils";
+import { getSessionUserInfo } from "@/lib/auth-utils";
 import { getChildren } from "@/services/children/get-children";
 
 type GetChildrenActionParams = {
@@ -10,8 +10,7 @@ type GetChildrenActionParams = {
 };
 
 export async function getChildrenAction(params: GetChildrenActionParams) {
-  await authorize("/children");
-  const user = await getSessionUserInfo();
+  const user = await getSessionUserInfo("/children");
   return await getChildren({
     ...params,
     mentorGroupIds: user.role === "mentor" ? user.groupIds : undefined,

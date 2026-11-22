@@ -2,6 +2,7 @@
 import { ListPagination } from "@/components/list-pagination";
 import { CardsSkeleton } from "@/components/loading-skeletons";
 import { useListNavigation } from "@/hooks/use-list-navigation";
+import { NO_GROUP } from "@/lib/children-filters";
 import type { PageResult } from "@/lib/pagination";
 import type { ChildWithFamily } from "@/services/children/get-children";
 import type { GroupOption } from "@/services/groups/get-groups-options";
@@ -12,12 +13,12 @@ export function ChildrenListView({
   initialChildren,
   clubs,
   groups,
-  mentorGroupIds,
+  isMentor,
 }: {
   initialChildren: PageResult<ChildWithFamily>;
   clubs: { id: string; name: string }[];
   groups: GroupOption[];
-  mentorGroupIds?: string[];
+  isMentor: boolean;
 }) {
   const navigation = useListNavigation();
   const clubId = navigation.params.get("clubId") ?? "all";
@@ -31,7 +32,7 @@ export function ChildrenListView({
           selectedClubId={clubId}
           selectedGroupId={groupId}
           searchValue={navigation.search}
-          showGroupFilters={mentorGroupIds === undefined}
+          showClubFilter={!isMentor}
           onSearchChange={navigation.changeSearch}
           onClubChange={(value) =>
             navigation.navigate({
@@ -43,6 +44,7 @@ export function ChildrenListView({
           onGroupChange={(value) =>
             navigation.navigate({
               groupId: value === "all" ? null : value,
+              ...(value === NO_GROUP ? { clubId: null } : {}),
               search: navigation.search.trim(),
             })
           }
@@ -53,6 +55,7 @@ export function ChildrenListView({
       ) : (
         <ChildrenCardsGrid
           childList={initialChildren.items}
+          isMentor={isMentor}
           isFiltered={
             !!navigation.search.trim() || clubId !== "all" || groupId !== "all"
           }

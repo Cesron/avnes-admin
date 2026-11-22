@@ -1,7 +1,7 @@
 "use client";
 
-import type { WeekOccurrence } from "@/types/attendance";
 import { cn } from "@/lib/cn";
+import type { WeekOccurrence } from "@/types/attendance";
 import { OccurrenceCard } from "./occurrence-card";
 
 interface CalendarDayCellProps {
@@ -58,7 +58,6 @@ export function CalendarDayCell({
         ) : null
       ) : (
         <div className="space-y-1">
-          {/* On mobile, show at most 2 cards and a "+N más" overflow indicator */}
           {occurrences.slice(0, 2).map((occ) => (
             <OccurrenceCard
               key={occ.occurrence_id}
@@ -67,9 +66,14 @@ export function CalendarDayCell({
             />
           ))}
           {occurrences.length > 2 && (
-            <p className="text-[10px] sm:text-xs font-medium text-center text-muted-foreground bg-muted/60 rounded-sm py-0.5 sm:py-1 tabular-nums">
-              +{occurrences.length - 2} más
-            </p>
+            <details className="space-y-1">
+              <summary className="cursor-pointer rounded-sm bg-muted/60 px-1 py-0.5 text-[10px] font-medium tabular-nums text-muted-foreground sm:py-1 sm:text-xs">
+                +{occurrences.length - 2} más
+              </summary>
+              {occurrences.slice(2).map((occ) => (
+                <OccurrenceCard key={occ.occurrence_id} occurrence={occ} />
+              ))}
+            </details>
           )}
         </div>
       )}

@@ -9,15 +9,22 @@ type UpdateFamilyParams = {
   penpalCode: string;
   familyBiographyUrl?: string;
   familyPhotoUrl?: string;
+  history?: string;
 };
 
 type UpdatedFamily = Pick<
   Family,
-  "id" | "penpal_code" | "family_biography_url" | "family_photo_url"
+  "id" | "penpal_code" | "family_biography_url" | "family_photo_url" | "history"
 >;
 
 export async function updateFamily(
-  { id, penpalCode, familyBiographyUrl, familyPhotoUrl }: UpdateFamilyParams,
+  {
+    id,
+    penpalCode,
+    familyBiographyUrl,
+    familyPhotoUrl,
+    history,
+  }: UpdateFamilyParams,
   user: Pick<SessionUserInfo, "userId" | "role">,
 ): Promise<UpdatedFamily> {
   if (!["admin", "coordinator", "mentor"].includes(user.role ?? "")) {
@@ -64,12 +71,14 @@ export async function updateFamily(
   const result = await sql.query<UpdatedFamily>(
     `UPDATE families AS f
      SET penpal_code = CASE WHEN $5::text = 'mentor' THEN f.penpal_code ELSE $1 END,
-         family_biography_url = $2, family_photo_url = $3, updated_at = NOW()
+         family_biography_url = $2, family_photo_url = $3,
+         history = CASE WHEN $7::text IS NULL THEN f.history ELSE NULLIF($7, '') END,
+         updated_at = NOW()
      WHERE f.id = $4 AND (
        $5::text IN ('admin', 'coordinator') OR
        ($5::text = 'mentor' AND ${mentorFamilyAccess("f", "$6")})
      ) AND ($5::text <> 'mentor' OR f.penpal_code = $1)
-     RETURNING f.id, f.penpal_code, f.family_biography_url, f.family_photo_url`,
+     RETURNING f.id, f.penpal_code, f.family_biography_url, f.family_photo_url, f.history`,
     [
       penpalCode,
       familyBiographyUrl || null,
@@ -77,6 +86,7 @@ export async function updateFamily(
       id,
       user.role,
       user.userId,
+      history?.trim() ?? null,
     ],
   );
 

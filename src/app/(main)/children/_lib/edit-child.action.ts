@@ -4,7 +4,10 @@ import { revalidatePath } from "next/cache";
 import { authorize } from "@/lib/auth-utils";
 import { actionClient } from "@/lib/safe-action";
 import { sql } from "@/lib/sql";
-import { mentorFamilyAccess } from "@/services/families/family-access";
+import {
+  mentorChildAccess,
+  mentorFamilyAccess,
+} from "@/services/families/family-access";
 import { CustomError } from "@/utils/custom-error";
 import { editChildSchema } from "./edit-child.schema";
 
@@ -22,6 +25,7 @@ export const editChildAction = actionClient
         birthDate,
         pamphletUrl,
         childPhotoUrl,
+        notes,
       },
     }) => {
       const { user } = await authorize("/children");
@@ -69,14 +73,17 @@ export const editChildAction = actionClient
         const result = await client.query<{ id: string }>(
           `UPDATE children AS c
          SET name = $1, gender = $2, birth_date = $3, family_id = $4,
-             pamphlet_url = $5, child_photo_url = $6, updated_at = NOW()
+             pamphlet_url = $5, child_photo_url = $6,
+             notes = CASE WHEN $10::text IS NULL THEN c.notes ELSE NULLIF($10, '') END,
+             updated_at = NOW()
          WHERE c.id = $7 AND (
-           $8::text IN ('admin', 'coordinator') OR ($8::text = 'mentor' AND EXISTS (
-             SELECT 1 FROM children_groups cg
-             JOIN groups g ON g.id = cg.group_id
-             JOIN mentors m ON m.id = g.mentor_id
-             WHERE cg.child_id = c.id AND cg.active = true AND m.user_id = $9
-           ))
+           $8::text IN ('admin', 'coordinator') OR (
+             $8::text = 'mentor' AND ${mentorChildAccess("c", "$9")}
+             AND ($4::uuid IS NULL OR EXISTS (
+               SELECT 1 FROM families f
+               WHERE f.id = $4 AND ${mentorFamilyAccess("f", "$9")}
+             ))
+           )
          )
          RETURNING c.id`,
           [
@@ -89,6 +96,7 @@ export const editChildAction = actionClient
             id,
             user.role,
             user.id,
+            notes?.trim() ?? null,
           ],
         );
 
@@ -160,6 +168,9 @@ export const editChildAction = actionClient
 
       // Revalidar la página para mostrar los cambios
       revalidatePath("/children");
+      revalidatePath("/children/[childId]", "page");
+      revalidatePath("/families");
+      revalidatePath("/families/[familyId]", "page");
       revalidatePath("/groups/[groupId]", "page");
       if (changingGroup) {
         revalidatePath("/groups");

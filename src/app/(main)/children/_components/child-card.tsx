@@ -9,6 +9,8 @@ import {
 import Link from "next/link";
 import { useId } from "react";
 import { EditButton } from "@/components/edit-button";
+import { PhotoDialog } from "@/components/record-photo";
+import { RecordText } from "@/components/record-text";
 import { ResourceLinks } from "@/components/resource-links";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -34,11 +36,18 @@ function getInitials(name: string): string {
   return `${first}${last}`.toUpperCase() || "?";
 }
 
-export function ChildCard({ child }: { child: ChildWithFamily }) {
+export function ChildCard({
+  child,
+  canManage,
+}: {
+  child: ChildWithFamily;
+  canManage: boolean;
+}) {
   const { openEditDialog } = useEditChild();
   const headingId = useId();
   const age = calculateAge(child.birth_date);
   const photoUrl = convertGoogleDriveImageUrl(child.child_photo_url);
+  const familyPhotoUrl = convertGoogleDriveImageUrl(child.family_photo_url);
   const quickLinks = [
     {
       key: "pamphlet",
@@ -52,13 +61,7 @@ export function ChildCard({ child }: { child: ChildWithFamily }) {
       icon: FileTextIcon,
       url: child.family_biography_url,
     },
-    {
-      key: "photo",
-      label: "Foto",
-      icon: ImageIcon,
-      url: child.family_photo_url,
-    },
-  ].filter((link) => Boolean(link.url));
+  ];
 
   return (
     <article aria-labelledby={headingId} className="h-full min-w-0">
@@ -82,11 +85,13 @@ export function ChildCard({ child }: { child: ChildWithFamily }) {
               {getInitials(child.name)}
             </AvatarFallback>
           </Avatar>
-          <EditButton
-            className="absolute right-3 top-3 size-11 border bg-card hover:bg-accent"
-            aria-label={`Editar a ${child.name}`}
-            onClick={() => openEditDialog(child)}
-          />
+          {canManage && (
+            <EditButton
+              className="absolute right-3 top-3 size-11 border bg-card hover:bg-accent"
+              aria-label={`Editar a ${child.name}`}
+              onClick={() => openEditDialog(child)}
+            />
+          )}
         </div>
         <CardHeader className="gap-3 p-5 pb-0 sm:px-6 sm:pt-6">
           <h2
@@ -112,7 +117,7 @@ export function ChildCard({ child }: { child: ChildWithFamily }) {
           <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-3 text-sm">
             <dt className="text-muted-foreground">Grupo</dt>
             <dd className="font-medium break-words">
-              {child.group_name || "Sin grupo asignado"}
+              {child.group_name || "Sin grupo"}
             </dd>
             <dt className="text-muted-foreground">Club</dt>
             <dd className="break-words">
@@ -133,27 +138,63 @@ export function ChildCard({ child }: { child: ChildWithFamily }) {
               </>
             )}
           </dl>
+          <RecordText label="Notas y comentarios" value={child.notes} />
           <div className="mt-auto border-t pt-4">
-            <ResourceLinks links={quickLinks} owner={child.name} />
+            <ResourceLinks links={quickLinks} owner={child.name}>
+              {familyPhotoUrl && (
+                <PhotoDialog
+                  src={familyPhotoUrl}
+                  title={`Foto familiar de ${child.name}`}
+                >
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="min-h-11"
+                    aria-label={`Ver foto familiar de ${child.name}`}
+                  >
+                    <ImageIcon aria-hidden="true" />
+                    Ver foto familiar
+                  </Button>
+                </PhotoDialog>
+              )}
+            </ResourceLinks>
           </div>
         </CardContent>
-        <CardFooter className="p-5 pt-4 sm:px-6 sm:pb-6">
+        <CardFooter className="flex flex-col items-stretch gap-2 p-5 pt-4 sm:px-6 sm:pb-6">
           <Button
-            variant="outline"
             asChild
-            className="min-h-11 w-full justify-between gap-2"
+            variant="outline"
+            className="min-h-11 justify-between"
           >
             <Link
-              href={`/children/${child.id}/attendance`}
-              aria-label={`Historial de asistencia de ${child.name}`}
+              href={`/children/${child.id}`}
+              aria-label={`Ver perfil de ${child.name}`}
             >
-              <span className="flex items-center gap-2">
-                <CalendarIcon aria-hidden="true" className="size-4" />
-                Historial de asistencia
-              </span>
-              <ArrowRightIcon aria-hidden="true" className="size-4 shrink-0" />
+              Ver perfil
+              <ArrowRightIcon aria-hidden="true" />
             </Link>
           </Button>
+          {canManage && (
+            <Button
+              variant="outline"
+              asChild
+              className="min-h-11 w-full justify-between gap-2"
+            >
+              <Link
+                href={`/children/${child.id}/attendance`}
+                aria-label={`Historial de asistencia de ${child.name}`}
+              >
+                <span className="flex items-center gap-2">
+                  <CalendarIcon aria-hidden="true" className="size-4" />
+                  Historial de asistencia
+                </span>
+                <ArrowRightIcon
+                  aria-hidden="true"
+                  className="size-4 shrink-0"
+                />
+              </Link>
+            </Button>
+          )}
         </CardFooter>
       </Card>
     </article>

@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import type { FamilyOption } from "@/services/families/get-families-options";
 import { useCreateChildForm } from "../_hooks/use-create-child-form";
 
@@ -160,6 +161,26 @@ export function CreateChildForm({ familiesOptions }: CreateChildFormProps) {
                 autoComplete="off"
               />
 
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="notes"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="form-create-child-notes">
+                Notas y comentarios (opcional)
+              </FieldLabel>
+              <Textarea
+                {...field}
+                id="form-create-child-notes"
+                rows={6}
+                className="field-sizing-fixed resize-y"
+                aria-invalid={fieldState.invalid}
+              />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}

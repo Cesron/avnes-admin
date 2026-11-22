@@ -1,7 +1,9 @@
 import { z } from "zod";
+import { optionalLongText } from "@/lib/long-text";
 
 export const editChildSchema = z
   .object({
+    notes: optionalLongText,
     id: z.string().min(1, "ID inválido"),
     familyId: z.string().optional(),
     groupId: z.string().uuid("Selecciona un grupo válido").optional(),

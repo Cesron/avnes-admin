@@ -59,6 +59,13 @@ y [apps de pantalla de inicio en iOS/iPadOS](https://webkit.org/blog/13878/web-p
 
 ## Guía de Desarrollo
 
+### Migración de notas e historia
+
+Antes de publicar la versión en una instalación existente, ejecuta
+[`2026-11-22-add-child-notes-family-history.sql`](src/db/migrations/2026-11-22-add-child-notes-family-history.sql)
+en PostgreSQL. La migración agrega dos columnas opcionales y se puede volver a
+ejecutar. Las instalaciones nuevas ya las incluyen en `src/db/schema.sql`.
+
 ### Historial de asistencia por niño
 
 Desde Niños → Historial de asistencia se accede a
@@ -82,8 +89,9 @@ node --env-file=.env --import tsx --test tests/child-attendance-history.test.ts
 ### Acceso de mentoras a familias
 
 Las mentoras tienen acceso a **Familias** desde el menú. Solo ven las familias
-de niños con membresía activa en sus grupos, y pueden editar sus enlaces de
-foto y biografía. El código penpal es de solo lectura y no pueden crear familias.
+de niños con membresía activa en sus grupos, y pueden editar la historia
+familiar y los enlaces de foto y biografía. El código penpal es de solo lectura
+y no pueden crear familias.
 La búsqueda, la paginación y las opciones de familia en Niños respetan el mismo
 alcance; las tarjetas muestran solo los niños a los que la mentora tiene acceso.
 Una mentora sin vinculación o sin niños activos no obtiene familias.

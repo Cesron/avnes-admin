@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useEditFamily } from "../_context/edit-family-context";
 import { editFamilyAction } from "../_lib/edit-family.action";
 import {
-  EditFamilyFormData,
+  type EditFamilyFormData,
   editFamilySchema,
 } from "../_lib/edit-family.schema";
 
@@ -20,6 +20,7 @@ export function useEditFamilyForm() {
       penpalCode: "",
       familyBiographyUrl: "",
       familyPhotoUrl: "",
+      history: "",
     },
   });
 
@@ -31,6 +32,7 @@ export function useEditFamilyForm() {
         penpalCode: familyToEdit.penpal_code,
         familyBiographyUrl: familyToEdit.family_biography_url || "",
         familyPhotoUrl: familyToEdit.family_photo_url || "",
+        history: familyToEdit.history ?? "",
       });
     }
   }, [familyToEdit, form]);
@@ -39,17 +41,32 @@ export function useEditFamilyForm() {
     const toastId = toast.loading("Actualizando familia...");
     setLoading(true);
 
-    const { serverError } = await editFamilyAction(data);
+    try {
+      const result = await editFamilyAction({
+        ...data,
+        history: form.getFieldState("history").isDirty
+          ? data.history
+          : undefined,
+      });
+      if (result?.serverError || !result?.data) {
+        toast.error(
+          result?.serverError ?? "Revisa los datos e inténtalo de nuevo.",
+          {
+            id: toastId,
+          },
+        );
+        return;
+      }
 
-    if (serverError) {
-      toast.error(serverError, { id: toastId });
+      toast.success("Familia actualizada exitosamente", { id: toastId });
+      closeEditDialog();
+    } catch {
+      toast.error("No se pudieron guardar los cambios. Inténtalo de nuevo.", {
+        id: toastId,
+      });
+    } finally {
       setLoading(false);
-      return;
     }
-
-    toast.success("Familia actualizada exitosamente", { id: toastId });
-    setLoading(false);
-    closeEditDialog();
   }
 
   return { form, onSubmit, loading };

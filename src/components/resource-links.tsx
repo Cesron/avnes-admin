@@ -1,6 +1,7 @@
 "use client";
 
 import { ExternalLinkIcon, type LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 
 export type ResourceLink = {
@@ -13,12 +14,14 @@ export type ResourceLink = {
 export function ResourceLinks({
   links,
   owner,
+  children,
 }: {
   links: ResourceLink[];
   owner: string;
+  children?: ReactNode;
 }) {
   const available = links.filter((link) => Boolean(link.url));
-  if (!available.length)
+  if (!available.length && !children)
     return (
       <p className="py-3 text-sm text-muted-foreground">
         Sin recursos vinculados
@@ -48,6 +51,7 @@ export function ResourceLinks({
           </a>
         </Button>
       ))}
+      {children}
     </fieldset>
   );
 }

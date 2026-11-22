@@ -11,19 +11,13 @@ export type Attendance = {
 
 // For the attendance list page - activities available today
 export type TodayActivity = {
-  activity_id: string;
   activity_name: string;
-  is_recurring: boolean;
   group_id: string;
   group_name: string;
-  club_id: string;
   club_name: string;
   start_time: string;
   end_time: string;
-  // If non-recurring, this will be the existing occurrence id
-  occurrence_id: string | null;
-  // For recurring activities, indicates if occurrence already exists for today
-  has_occurrence_today: boolean;
+  occurrence_id: string;
 };
 
 // For the weekly attendance view - pre-generated occurrences
@@ -58,8 +52,8 @@ export type OccurrenceDetail = {
   activity_id: string;
   activity_name: string;
   activity_description: string | null;
-  start_datetime: Date;
-  end_datetime: Date;
+  start_datetime: string;
+  end_datetime: string;
   status: string;
   groups: { id: string; name: string; club_id: string; club_name: string }[];
 };

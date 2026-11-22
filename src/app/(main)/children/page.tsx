@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { ListSkeleton } from "@/components/loading-skeletons";
-import { authorize, getSessionUserInfo } from "@/lib/auth-utils";
+import { getSessionUserInfo } from "@/lib/auth-utils";
 import { type SearchParams, singleParam } from "@/lib/pagination";
 import { getChildren } from "@/services/children/get-children";
 import { getClubsOptions } from "@/services/clubs/get-clubs-options";
@@ -17,11 +17,10 @@ export default async function ChildrenPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  await authorize("/children");
   const query = await searchParams;
-  const userInfo = await getSessionUserInfo();
+  const userInfo = await getSessionUserInfo("/children");
 
-  // Mentors only see their groups
+  // Mentors see their own groups and children without an active group.
   const mentorGroupIds =
     userInfo.role === "mentor" ? userInfo.groupIds : undefined;
 
@@ -56,7 +55,7 @@ export default async function ChildrenPage({
             childrenPromise={childrenPromise}
             clubs={clubs}
             groups={filteredGroups}
-            mentorGroupIds={mentorGroupIds}
+            isMentor={mentorGroupIds !== undefined}
           />
         </Suspense>
       </div>
@@ -70,12 +69,12 @@ async function ChildResults({
   childrenPromise,
   clubs,
   groups,
-  mentorGroupIds,
+  isMentor,
 }: {
   childrenPromise: ReturnType<typeof getChildren>;
   clubs: { id: string; name: string }[];
   groups: GroupOption[];
-  mentorGroupIds?: string[];
+  isMentor: boolean;
 }) {
   const children = await childrenPromise;
 
@@ -84,7 +83,7 @@ async function ChildResults({
       initialChildren={children}
       clubs={clubs}
       groups={groups}
-      mentorGroupIds={mentorGroupIds}
+      isMentor={isMentor}
     />
   );
 }

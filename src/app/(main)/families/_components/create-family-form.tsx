@@ -1,5 +1,6 @@
 "use client";
 
+import { Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -8,7 +9,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Controller } from "react-hook-form";
+import { Textarea } from "@/components/ui/textarea";
 import { useCreateFamilyForm } from "../_hooks/use-create-family-form";
 
 type CreateFamilyFormProps = {
@@ -86,6 +87,27 @@ export function CreateFamilyForm({
                 type="url"
               />
 
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="history"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="form-create-family-history">
+                Historia (opcional)
+              </FieldLabel>
+              <Textarea
+                {...field}
+                id="form-create-family-history"
+                rows={6}
+                className="field-sizing-fixed resize-y"
+                aria-invalid={fieldState.invalid}
+                placeholder="Describe el estilo de vida de la familia"
+              />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}

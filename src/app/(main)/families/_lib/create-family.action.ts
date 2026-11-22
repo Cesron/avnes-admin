@@ -11,7 +11,7 @@ export const createFamilyAction = actionClient
   .inputSchema(createFamilySchema)
   .action(
     async ({
-      parsedInput: { penpalCode, familyBiographyUrl, familyPhotoUrl },
+      parsedInput: { penpalCode, familyBiographyUrl, familyPhotoUrl, history },
     }) => {
       const { user } = await authorize("/families");
       if (user.role !== "admin" && user.role !== "coordinator") {
@@ -32,10 +32,14 @@ export const createFamilyAction = actionClient
 
       // Crear la nueva familia
       await sql.query(
-        `INSERT INTO families (penpal_code, family_biography_url, family_photo_url) 
-         VALUES ($1, $2, $3) 
-         RETURNING id, penpal_code, family_biography_url, family_photo_url`,
-        [penpalCode, familyBiographyUrl || null, familyPhotoUrl || null],
+        `INSERT INTO families (penpal_code, family_biography_url, family_photo_url, history)
+         VALUES ($1, $2, $3, $4)`,
+        [
+          penpalCode,
+          familyBiographyUrl || null,
+          familyPhotoUrl || null,
+          history?.trim() || null,
+        ],
       );
 
       // Revalidar la página para mostrar los cambios

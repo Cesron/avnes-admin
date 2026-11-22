@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { CalendarSkeleton } from "@/components/loading-skeletons";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { localToday } from "@/lib/dashboard-week";
 import type { GroupOption } from "@/services/groups/get-groups-options";
 import type { WeekOccurrence } from "@/types/attendance";
 import {
@@ -11,7 +12,7 @@ import {
   getMonthEnd,
   getMonthStart,
 } from "@/utils/week-helpers";
-import { getMonthOccurrencesAction } from "../_lib/get-month-occurrences.action";
+import { getWeekOccurrencesAction } from "../_lib/get-week-occurrences.action";
 import { AttendanceAgendaView } from "./attendance-agenda-view";
 import { AttendanceFilters } from "./attendance-filters";
 import { CalendarDayCell } from "./calendar-day-cell";
@@ -29,7 +30,6 @@ interface AttendanceMonthViewProps {
   initialMonthStart: string;
   clubs: ClubOption[];
   groups: GroupOption[];
-  mentorGroupIds?: string[];
   /** Pre-selected club id (or "all" sentinel). Defaults to "all". */
   defaultClubId?: string;
   /** Pre-selected group id (or "all" sentinel). Defaults to "all". */
@@ -41,7 +41,6 @@ export function AttendanceMonthView({
   initialMonthStart,
   clubs,
   groups,
-  mentorGroupIds,
   defaultClubId = "all",
   defaultGroupId = "all",
 }: AttendanceMonthViewProps) {
@@ -86,12 +85,11 @@ export function AttendanceMonthView({
       setError(null);
       startTransition(async () => {
         try {
-          const result = await getMonthOccurrencesAction({
+          const result = await getWeekOccurrencesAction({
             startDate: formatDateLocal(start),
             endDate: formatDateLocal(end),
             clubId: clubId === "all" ? undefined : clubId,
             groupId: groupId === "all" ? undefined : groupId,
-            mentorGroupIds,
           });
           if (id === requestId.current) setOccurrences(result);
         } catch {
@@ -102,7 +100,7 @@ export function AttendanceMonthView({
         }
       });
     },
-    [mentorGroupIds],
+    [],
   );
 
   const handleMonthChange = (newMonthStart: string) => {
@@ -129,7 +127,7 @@ export function AttendanceMonthView({
     occurrencesByDate.set(dateKey, existing);
   }
 
-  const todayStr = formatDateLocal(new Date());
+  const todayStr = localToday();
   const currentMonth = monthStartDate.getMonth();
 
   return (

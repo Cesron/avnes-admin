@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { NO_GROUP } from "../src/lib/children-filters";
 import { PAGE_SIZE, readCursor } from "../src/lib/pagination";
 import { sql } from "../src/lib/sql";
 import { getChildren } from "../src/services/children/get-children";
@@ -57,7 +58,13 @@ test(
           0,
         );
       }
-      assert.equal((await getChildren({ mentorGroupIds: [] })).items.length, 0);
+      const unassigned = await getChildren({ groupId: NO_GROUP });
+      const mentorWithoutGroups = await getChildren({ mentorGroupIds: [] });
+      assert.deepEqual(
+        new Set(mentorWithoutGroups.items.map((item) => item.group_id)),
+        new Set(mentorWithoutGroups.items.length ? [null] : []),
+      );
+      assert.equal(mentorWithoutGroups.items.length, unassigned.items.length);
       const family = (await getFamilies()).items[0];
       if (family) {
         const matches = await getFamilies({ search: family.penpal_code });
@@ -70,7 +77,7 @@ test(
         const { id, club_id } = group.rows[0];
         const page = await getChildren({ groupId: id, clubId: club_id });
         assert.ok(page.items.every((item) => item.group_id === id));
-        const scoped = await getChildren({ mentorGroupIds: [id] });
+        const scoped = await getChildren({ groupId: id, mentorGroupIds: [id] });
         assert.deepEqual(
           page.items.map((item) => item.id),
           scoped.items.map((item) => item.id),

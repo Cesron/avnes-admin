@@ -1,18 +1,17 @@
 "use client";
 
+import { useCallback, useState, useTransition } from "react";
 import type { GroupOption } from "@/services/groups/get-groups-options";
 import type { WeekOccurrence } from "@/types/attendance";
 import {
   formatDateLocal,
   getWeekDays,
-  getWeekMonday,
   getWeekSunday,
 } from "@/utils/week-helpers";
-import { useCallback, useState, useTransition } from "react";
 import { getWeekOccurrencesAction } from "../_lib/get-week-occurrences.action";
 import { AttendanceFilters } from "./attendance-filters";
-import { WeekNavigator } from "./week-navigator";
 import { WeekDayColumn } from "./week-day-column";
+import { WeekNavigator } from "./week-navigator";
 
 type ClubOption = {
   id: string;
@@ -24,8 +23,6 @@ interface AttendanceWeekViewProps {
   initialWeekStart: string; // YYYY-MM-DD (Monday)
   clubs: ClubOption[];
   groups: GroupOption[];
-  /** When set, restricts data to these group IDs (for mentor role) */
-  mentorGroupIds?: string[];
 }
 
 export function AttendanceWeekView({
@@ -33,7 +30,6 @@ export function AttendanceWeekView({
   initialWeekStart,
   clubs,
   groups,
-  mentorGroupIds,
 }: AttendanceWeekViewProps) {
   const [occurrences, setOccurrences] =
     useState<WeekOccurrence[]>(initialOccurrences);
@@ -60,12 +56,11 @@ export function AttendanceWeekView({
           endDate: weekEnd,
           clubId: clubId === "all" ? undefined : clubId,
           groupId: groupId === "all" ? undefined : groupId,
-          mentorGroupIds,
         });
         setOccurrences(result);
       });
     },
-    [mentorGroupIds],
+    [],
   );
 
   const handleWeekChange = (newWeekStart: string) => {

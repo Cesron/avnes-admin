@@ -57,6 +57,7 @@ CREATE TABLE families (
   -- Recursos compartidos
   family_biography_url TEXT,
   family_photo_url TEXT,
+  history TEXT,
 
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW()
@@ -78,6 +79,7 @@ CREATE TABLE children (
   -- Recursos individuales
   pamphlet_url TEXT,
   child_photo_url TEXT,
+  notes TEXT,
 
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW()

@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { createChildAction } from "../_lib/create-child.action";
 import {
-  CreateChildFormData,
+  type CreateChildFormData,
   createChildSchema,
 } from "../_lib/create-child.schema";
 
@@ -20,6 +20,7 @@ export function useCreateChildForm() {
       birthDate: "",
       pamphletUrl: "",
       childPhotoUrl: "",
+      notes: "",
     },
   });
 

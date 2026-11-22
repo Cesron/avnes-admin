@@ -35,15 +35,9 @@ export async function getWeekOccurrences({
     paramIndex++;
   }
 
-  if (mentorGroupIds && mentorGroupIds.length > 0) {
-    const placeholders = mentorGroupIds
-      .map((_, i) => `$${paramIndex + i}`)
-      .join(", ");
-    mentorGroupCondition = `AND g.id IN (${placeholders})`;
-    for (const id of mentorGroupIds) {
-      params.push(id);
-    }
-    paramIndex += mentorGroupIds.length;
+  if (mentorGroupIds !== undefined) {
+    mentorGroupCondition = `AND g.id = ANY($${paramIndex}::uuid[])`;
+    params.push(mentorGroupIds);
   }
 
   const result = await sql.query<WeekOccurrence>(
@@ -65,8 +59,9 @@ export async function getWeekOccurrences({
     INNER JOIN groups g ON g.id = ag.group_id
     INNER JOIN clubs c ON c.id = g.club_id
     LEFT JOIN attendances att ON att.activity_occurrence_id = ao.id
-    WHERE ao.start_datetime::date >= $1::date
-      AND ao.start_datetime::date <= $2::date
+    WHERE ao.start_datetime >= $1::date
+      AND ao.start_datetime < $2::date + INTERVAL '1 day'
+      AND ao.status NOT IN ('cancelled', 'canceled')
       ${clubCondition}
       ${groupCondition}
       ${mentorGroupCondition}

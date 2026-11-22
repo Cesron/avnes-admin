@@ -4,8 +4,10 @@ import { editFamilySchema } from "../src/app/(main)/families/_lib/edit-family.sc
 import { PAGE_SIZE } from "../src/lib/pagination";
 import { getAllowedRoutes, hasAccess } from "../src/lib/permissions";
 import { sql } from "../src/lib/sql";
+import { getChildProfile } from "../src/services/children/get-child-profile";
 import { getFamilies } from "../src/services/families/get-families";
 import { getFamiliesOptions } from "../src/services/families/get-families-options";
+import { getFamilyDetail } from "../src/services/families/get-family-detail";
 import { updateFamily } from "../src/services/families/update-family";
 import type { UserRole } from "../src/types/user";
 import { CustomError } from "../src/utils/custom-error";
@@ -47,6 +49,22 @@ test("family edits reject malformed IDs and users without a permitted role", asy
   );
 });
 
+test("family detail rejects malformed IDs and users without a permitted role", async () => {
+  assert.equal(await getFamilyDetail("invalid", mentor), null);
+  assert.equal(
+    await getFamilyDetail(id(1), { userId: "test", role: null }),
+    null,
+  );
+});
+
+test("child profile rejects malformed IDs and users without a permitted role", async () => {
+  assert.equal(await getChildProfile("invalid", mentor), null);
+  assert.equal(
+    await getChildProfile(id(101), { userId: "test", role: null }),
+    null,
+  );
+});
+
 test(
   "family permissions use active membership for reads and writes",
   { skip: !process.env.DB_HOST },
@@ -71,12 +89,14 @@ test(
       await client.query("BEGIN");
       for (const [name, fields] of Object.entries({
         families: `id uuid PRIMARY KEY, penpal_code char(4) UNIQUE,
-          family_biography_url text, family_photo_url text,
+          family_biography_url text, family_photo_url text, history text,
           created_at timestamp DEFAULT NOW(), updated_at timestamp DEFAULT NOW()`,
-        children:
-          "id uuid PRIMARY KEY, family_id uuid, name text, child_photo_url text, gender text",
+        children: `id uuid PRIMARY KEY, family_id uuid, name text, child_photo_url text,
+          gender text, birth_date date, pamphlet_url text, notes text,
+          created_at timestamp DEFAULT NOW(), updated_at timestamp DEFAULT NOW()`,
+        clubs: "id uuid PRIMARY KEY, name text",
         mentors: "id uuid PRIMARY KEY, user_id text",
-        groups: "id uuid PRIMARY KEY, mentor_id uuid",
+        groups: "id uuid PRIMARY KEY, mentor_id uuid, name text, club_id uuid",
         children_groups: "child_id uuid, group_id uuid, active boolean",
       })) {
         await client.query(
@@ -121,6 +141,156 @@ test(
           [JSON.stringify(rows)],
         );
       }
+
+      await t.test(
+        "family detail exposes complete records only for visible children and groups",
+        async (detailTests) => {
+          await client.query("SAVEPOINT family_detail");
+          try {
+            await client.query(
+              "INSERT INTO clubs VALUES ($1, 'Club de prueba')",
+              [id(500)],
+            );
+            await client.query(
+              "UPDATE groups SET name = 'Grupo ' || right(id::text, 3), club_id = $1",
+              [id(500)],
+            );
+            await client.query(
+              `UPDATE families SET family_photo_url = 'https://example.com/familia.jpg',
+              history = 'Primera línea' || chr(10) || 'Segunda línea' WHERE id = $1`,
+              [id(1)],
+            );
+            await client.query(
+              `UPDATE children SET gender = 'F', birth_date = DATE '2016-08-01',
+              child_photo_url = 'https://example.com/nina.jpg',
+              pamphlet_url = 'https://example.com/panfleto.pdf', notes = 'Nota privada'
+              WHERE id = $1`,
+              [id(101)],
+            );
+            await client.query(
+              "INSERT INTO children_groups VALUES ($1, $2, true), ($1, $3, false)",
+              [id(101), id(302), id(304)],
+            );
+
+            const detail = await getFamilyDetail(id(1), mentor);
+            assert.equal(
+              detail?.family_photo_url,
+              "https://example.com/familia.jpg",
+            );
+            assert.equal(detail.history, "Primera línea\nSegunda línea");
+            assert.deepEqual(
+              detail.children.map((child) => child.id),
+              [id(101)],
+            );
+            const child = detail.children[0];
+            assert.equal(child.birth_date, "2016-08-01");
+            assert.equal(child.gender, "F");
+            assert.equal(child.notes, "Nota privada");
+            assert.equal(child.child_photo_url, "https://example.com/nina.jpg");
+            assert.equal(
+              child.pamphlet_url,
+              "https://example.com/panfleto.pdf",
+            );
+            assert.deepEqual(
+              child.groups.map((group) => group.id),
+              [id(301), id(303)],
+            );
+
+            for (const role of ["admin", "coordinator"] as const) {
+              const staff = { role, userId: "staff" };
+              const full = await getFamilyDetail(id(1), staff);
+              assert.deepEqual(
+                new Set(full?.children.map((member) => member.id)),
+                new Set([id(101), id(1000)]),
+              );
+              assert.equal(
+                full?.children.find((member) => member.id === id(101))?.groups
+                  .length,
+                3,
+              );
+              assert.deepEqual(
+                (await getFamilyDetail(id(PAGE_SIZE + 4), staff))?.children,
+                [],
+              );
+            }
+            for (const familyId of [
+              id(PAGE_SIZE + 2),
+              id(PAGE_SIZE + 3),
+              id(PAGE_SIZE + 4),
+              id(999999),
+            ]) {
+              assert.equal(await getFamilyDetail(familyId, mentor), null);
+            }
+            assert.equal(
+              await getFamilyDetail(id(1), { ...mentor, userId: "unlinked" }),
+              null,
+            );
+            await detailTests.test(
+              "child profiles expose family information only through active assignments",
+              async () => {
+                await client.query(
+                  "UPDATE children SET family_id = $1 WHERE id = $2",
+                  [id(1), id(102)],
+                );
+                await client.query(
+                  "INSERT INTO children (id, family_id, name, notes) VALUES ($1, $2, 'Niña sin grupo', 'Nota reservada')",
+                  [id(1001), id(1)],
+                );
+                const profile = await getChildProfile(id(101), mentor);
+                assert.ok(profile);
+                assert.equal(profile.can_view_private_details, true);
+                assert.equal(profile.notes, "Nota privada");
+                assert.equal(
+                  profile.child_photo_url,
+                  "https://example.com/nina.jpg",
+                );
+                assert.deepEqual(profile.groups, child.groups);
+                assert.equal(profile.family?.id, id(1));
+                assert.equal(profile.family.penpal_code, "0001");
+                assert.equal(profile.family.history, detail.history);
+                assert.equal(
+                  profile.family.family_photo_url,
+                  detail.family_photo_url,
+                );
+                assert.deepEqual(
+                  profile.family.other_children.map((member) => member.id),
+                  [id(102)],
+                );
+
+                for (const candidate of [id(1001), id(101 + PAGE_SIZE + 2)]) {
+                  const unassigned = await getChildProfile(candidate, mentor);
+                  assert.ok(unassigned);
+                  assert.equal(unassigned.can_view_private_details, false);
+                  assert.equal(unassigned.family, null);
+                  assert.equal(unassigned.notes, null);
+                  assert.deepEqual(unassigned.groups, []);
+                }
+                assert.equal(await getChildProfile(id(1000), mentor), null);
+                assert.equal(
+                  await getChildProfile(id(101), {
+                    ...mentor,
+                    userId: "unlinked",
+                  }),
+                  null,
+                );
+
+                const staff = { userId: "staff", role: "coordinator" as const };
+                const unassigned = await getChildProfile(id(1001), staff);
+                assert.equal(unassigned?.notes, "Nota reservada");
+                assert.equal(unassigned.family?.id, id(1));
+                assert.deepEqual(
+                  new Set(
+                    unassigned.family.other_children.map((member) => member.id),
+                  ),
+                  new Set([id(101), id(102), id(1000)]),
+                );
+              },
+            );
+          } finally {
+            await client.query("ROLLBACK TO SAVEPOINT family_detail");
+          }
+        },
+      );
 
       await t.test(
         "search, summaries, options and both page directions stay in scope",
@@ -261,6 +431,34 @@ test(
           assert.equal(cleared.family_biography_url, null);
           assert.equal(cleared.family_photo_url, null);
           assert.equal(cleared.penpal_code, penpal(1));
+        },
+      );
+      await t.test(
+        "family history supports long multiline text, omission and clearing",
+        async () => {
+          const input = { id: id(1), penpalCode: penpal(1) };
+          const history = "Rutina familiar\n\n".repeat(120);
+          const saved = await updateFamily({ ...input, history }, mentor);
+          assert.equal(saved.history, history.trim());
+          const unchanged = await updateFamily(input, mentor);
+          assert.equal(unchanged.history, saved.history);
+          const readable = await getFamilies({
+            mentorUserId: mentor.userId,
+            search: penpal(1),
+          });
+          assert.equal(
+            readable.items.find((family) => family.id === id(1))?.history,
+            saved.history,
+          );
+          await assert.rejects(
+            updateFamily({ ...edit(PAGE_SIZE + 2), history }, mentor),
+            status(403),
+          );
+          const cleared = await updateFamily(
+            { ...input, history: " " },
+            mentor,
+          );
+          assert.equal(cleared.history, null);
         },
       );
 

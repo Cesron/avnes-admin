@@ -25,6 +25,7 @@ export function useEditChildForm() {
       birthDate: "",
       pamphletUrl: "",
       childPhotoUrl: "",
+      notes: "",
     },
   });
 
@@ -47,6 +48,7 @@ export function useEditChildForm() {
         birthDate: birthDateStr,
         pamphletUrl: childToEdit.pamphlet_url || "",
         childPhotoUrl: childToEdit.child_photo_url || "",
+        notes: childToEdit.notes ?? "",
       });
     }
   }, [childToEdit, form]);
@@ -56,7 +58,10 @@ export function useEditChildForm() {
     setLoading(true);
 
     try {
-      const result = await editChildAction(data);
+      const result = await editChildAction({
+        ...data,
+        notes: form.getFieldState("notes").isDirty ? data.notes : undefined,
+      });
 
       if (result?.serverError) {
         toast.error(result.serverError, { id: toastId });

@@ -10,8 +10,8 @@ export async function getOccurrenceDetail(
     activity_id: string;
     activity_name: string;
     activity_description: string | null;
-    start_datetime: Date;
-    end_datetime: Date;
+    start_datetime: string;
+    end_datetime: string;
     status: string;
   }>(
     `
@@ -20,12 +20,12 @@ export async function getOccurrenceDetail(
       a.id as activity_id,
       a.name as activity_name,
       a.description as activity_description,
-      ao.start_datetime,
-      ao.end_datetime,
+      to_char(ao.start_datetime, 'YYYY-MM-DD"T"HH24:MI') AS start_datetime,
+      to_char(ao.end_datetime, 'YYYY-MM-DD"T"HH24:MI') AS end_datetime,
       ao.status
     FROM activity_occurrences ao
     INNER JOIN activities a ON a.id = ao.activity_id
-    WHERE ao.id = $1
+    WHERE ao.id = $1 AND ao.status NOT IN ('cancelled', 'canceled')
     `,
     [occurrenceId],
   );

@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import type { FamilyOption } from "@/services/families/get-families-options";
 import type { GroupOption } from "@/services/groups/get-groups-options";
 import { useEditChild } from "../_context/edit-child-context";
@@ -225,6 +226,28 @@ export function EditChildForm({ familiesOptions, groups }: EditChildFormProps) {
                     autoComplete="off"
                   />
 
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="notes"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-edit-child-notes">
+                    Notas y comentarios (opcional)
+                  </FieldLabel>
+                  <Textarea
+                    {...field}
+                    id="form-edit-child-notes"
+                    rows={6}
+                    className="field-sizing-fixed resize-y"
+                    aria-invalid={fieldState.invalid}
+                  />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}

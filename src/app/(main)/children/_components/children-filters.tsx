@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { NO_GROUP } from "@/lib/children-filters";
 
 type ClubOption = {
   id: string;
@@ -29,7 +30,7 @@ interface ChildrenFiltersProps {
   selectedClubId: string;
   selectedGroupId: string;
   searchValue: string;
-  showGroupFilters: boolean;
+  showClubFilter: boolean;
   onClubChange: (clubId: string) => void;
   onGroupChange: (groupId: string) => void;
   onSearchChange: (value: string) => void;
@@ -41,7 +42,7 @@ export function ChildrenFilters({
   selectedClubId,
   selectedGroupId,
   searchValue,
-  showGroupFilters,
+  showClubFilter,
   onClubChange,
   onGroupChange,
   onSearchChange,
@@ -70,7 +71,7 @@ export function ChildrenFilters({
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             id={searchId}
-            placeholder="Buscar por nombre..."
+            placeholder="Nombre o código Penpal"
             value={searchValue}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-9"
@@ -78,7 +79,7 @@ export function ChildrenFilters({
         </div>
       </div>
 
-      {showGroupFilters && (
+      {showClubFilter && (
         <div className="flex flex-col gap-2 w-full sm:w-auto sm:min-w-[200px]">
           <label
             htmlFor={clubId}
@@ -102,30 +103,29 @@ export function ChildrenFilters({
         </div>
       )}
 
-      {showGroupFilters && (
-        <div className="flex flex-col gap-2 w-full sm:w-auto sm:min-w-[200px]">
-          <label
-            htmlFor={groupId}
-            className="text-sm font-medium text-muted-foreground"
-          >
-            Grupo
-          </label>
-          <SearchableSelect
-            id={groupId}
-            value={selectedGroupId}
-            onValueChange={onGroupChange}
-            placeholder="Seleccionar grupo"
-            searchPlaceholder="Buscar grupo o club..."
-            options={[
-              { value: "all", label: "Todos los grupos" },
-              ...filteredGroups.map((group) => ({
-                value: group.id,
-                label: `${group.name} (${group.club_name})`,
-              })),
-            ]}
-          />
-        </div>
-      )}
+      <div className="flex flex-col gap-2 w-full sm:w-auto sm:min-w-[200px]">
+        <label
+          htmlFor={groupId}
+          className="text-sm font-medium text-muted-foreground"
+        >
+          Grupo
+        </label>
+        <SearchableSelect
+          id={groupId}
+          value={selectedGroupId}
+          onValueChange={onGroupChange}
+          placeholder="Seleccionar grupo"
+          searchPlaceholder="Buscar grupo o club..."
+          options={[
+            { value: "all", label: "Todos" },
+            { value: NO_GROUP, label: "Sin grupo" },
+            ...filteredGroups.map((group) => ({
+              value: group.id,
+              label: `${group.name} (${group.club_name})`,
+            })),
+          ]}
+        />
+      </div>
     </div>
   );
 }

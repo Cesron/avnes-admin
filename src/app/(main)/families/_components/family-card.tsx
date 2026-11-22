@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowRightIcon,
   ChevronDownIcon,
   FileTextIcon,
   ImageIcon,
@@ -9,15 +10,11 @@ import {
 import Link from "next/link";
 import { useId, useState } from "react";
 import { EditButton } from "@/components/edit-button";
+import { PhotoPreview } from "@/components/record-photo";
+import { RecordText } from "@/components/record-text";
 import { ResourceLinks } from "@/components/resource-links";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import type { FamilyWithChildren } from "@/services/families/get-families";
 import {
   convertGoogleDriveImageUrl,
@@ -25,7 +22,6 @@ import {
   getSurnameInitials,
 } from "@/utils/family-helpers";
 import { useEditFamily } from "../_context/edit-family-context";
-import { FamilyPhoto } from "./family-photo";
 
 export function FamilyCard({ family }: { family: FamilyWithChildren }) {
   const { openEditDialog } = useEditFamily();
@@ -57,38 +53,12 @@ export function FamilyCard({ family }: { family: FamilyWithChildren }) {
       <Card className="h-full gap-0 overflow-hidden p-0 shadow-none">
         <div className="relative aspect-square w-full shrink-0 overflow-hidden bg-muted sm:aspect-[4/3]">
           {photoUrl ? (
-            <Dialog>
-              <DialogTrigger asChild>
-                <button
-                  type="button"
-                  aria-label={`Ver foto de la familia ${family.penpal_code} en grande`}
-                  className="absolute inset-0 cursor-zoom-in focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
-                >
-                  <FamilyPhoto
-                    src={photoUrl}
-                    alt={familyName}
-                    className="object-contain"
-                    sizes="(min-width: 1280px) calc((100vw - 352px) / 2), (min-width: 768px) calc(100vw - 320px), calc(100vw - 32px)"
-                  />
-                </button>
-              </DialogTrigger>
-              <DialogContent
-                aria-describedby={undefined}
-                className="border-0 bg-background p-2 sm:max-w-3xl md:max-w-5xl [&_[data-slot=dialog-close]]:size-11 [&_[data-slot=dialog-close]]:bg-background [&_[data-slot=dialog-close]]:opacity-100"
-              >
-                <DialogTitle className="sr-only">
-                  Foto de {familyName}
-                </DialogTitle>
-                <div className="relative h-[80vh] w-full">
-                  <FamilyPhoto
-                    src={photoUrl}
-                    alt={familyName}
-                    sizes="(max-width: 767px) 100vw, 1024px"
-                    className="object-contain"
-                  />
-                </div>
-              </DialogContent>
-            </Dialog>
+            <PhotoPreview
+              src={photoUrl}
+              title={`Foto de ${familyName}`}
+              label={`Ver foto de la familia ${family.penpal_code} en grande`}
+              sizes="(min-width: 1280px) calc((100vw - 352px) / 2), (min-width: 768px) calc(100vw - 320px), calc(100vw - 32px)"
+            />
           ) : (
             <div className="flex h-full items-center justify-center text-5xl font-semibold text-muted-foreground">
               {getSurnameInitials(surnames) || "?"}
@@ -120,12 +90,14 @@ export function FamilyCard({ family }: { family: FamilyWithChildren }) {
                   penpal_code: family.penpal_code,
                   family_biography_url: family.family_biography_url,
                   family_photo_url: family.family_photo_url,
+                  history: family.history,
                   created_at: family.created_at,
                   updated_at: family.updated_at,
                 })
               }
             />
           </div>
+          <RecordText label="Historia" value={family.history} />
           {family.children.length ? (
             <div>
               <Button
@@ -186,6 +158,19 @@ export function FamilyCard({ family }: { family: FamilyWithChildren }) {
           <div className="mt-auto border-t pt-4">
             <ResourceLinks links={quickLinks} owner={familyName} />
           </div>
+          <Button
+            asChild
+            variant="outline"
+            className="min-h-11 w-full justify-between"
+          >
+            <Link
+              href={`/families/${family.id}`}
+              aria-label={`Ver ficha de la familia ${family.penpal_code}`}
+            >
+              Ver ficha familiar
+              <ArrowRightIcon aria-hidden="true" />
+            </Link>
+          </Button>
         </div>
       </Card>
     </article>

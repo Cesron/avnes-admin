@@ -1,9 +1,9 @@
 import { headers } from "next/headers";
-import { auth } from "./auth";
 import { redirect } from "next/navigation";
-import { sql } from "./sql";
 import type { UserRole } from "@/types/user";
+import { auth } from "./auth";
 import { hasAccess } from "./permissions";
+import { sql } from "./sql";
 
 export async function verifySession() {
   const session = await auth.api.getSession({
@@ -43,8 +43,10 @@ export type SessionUserInfo = {
  * Returns the current user's role, linked mentor ID, and their group IDs.
  * Useful for role-based filtering (e.g., attendance).
  */
-export async function getSessionUserInfo(): Promise<SessionUserInfo> {
-  const session = await verifySession();
+export async function getSessionUserInfo(
+  pathname?: string,
+): Promise<SessionUserInfo> {
+  const session = pathname ? await authorize(pathname) : await verifySession();
   const userId = session.user.id;
   const role = (session.user.role as UserRole) || null;
 

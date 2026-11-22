@@ -1,6 +1,8 @@
 import { z } from "zod";
+import { optionalLongText } from "@/lib/long-text";
 
 export const createChildSchema = z.object({
+  notes: optionalLongText,
   familyId: z.string().optional(),
   name: z
     .string()

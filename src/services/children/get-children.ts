@@ -1,3 +1,4 @@
+import { NO_GROUP } from "@/lib/children-filters";
 import {
   makePage,
   PAGE_SIZE,
@@ -8,6 +9,7 @@ import {
 import { searchColumn, searchPattern } from "@/lib/search";
 import { sql } from "@/lib/sql";
 import type { Child } from "@/types/child";
+import { childHasNoActiveGroup } from "./child-record";
 
 export type ChildWithFamily = Child & {
   penpal_code: string | null;
@@ -30,10 +32,13 @@ export async function getChildren(
   params: GetChildrenParams = {},
 ): Promise<PageResult<ChildWithFamily>> {
   const cursor = readCursor(params);
+  const unassignedOnly = params.groupId === NO_GROUP;
+  const groupId = unassignedOnly ? undefined : params.groupId;
   const uuid =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (
-    [params.clubId, params.groupId].some((value) => value && !uuid.test(value))
+    (unassignedOnly && params.clubId) ||
+    [params.clubId, groupId].some((value) => value && !uuid.test(value))
   ) {
     return { items: [], previous: null, next: null };
   }
@@ -45,19 +50,29 @@ export async function getChildren(
     values.push(params.clubId);
     groupConditions.push(`g.club_id = $${values.length}::uuid`);
   }
-  if (params.groupId) {
-    values.push(params.groupId);
+  if (groupId) {
+    values.push(groupId);
     groupConditions.push(`g.id = $${values.length}::uuid`);
   }
   if (params.mentorGroupIds !== undefined) {
     values.push(params.mentorGroupIds);
     groupConditions.push(`g.id = ANY($${values.length}::uuid[])`);
   }
-  if (groupConditions.length)
+  const isMentor = params.mentorGroupIds !== undefined;
+  const hasNoGroup = childHasNoActiveGroup("c");
+  if (unassignedOnly) {
+    conditions.push(hasNoGroup);
+  } else if (isMentor && !params.clubId && !groupId) {
+    conditions.push(`(membership.group_id IS NOT NULL OR ${hasNoGroup})`);
+  } else if (groupConditions.length) {
     conditions.push("membership.group_id IS NOT NULL");
+  }
   if (params.search?.trim()) {
     values.push(searchPattern(params.search));
-    conditions.push(`${searchColumn("c.name")} LIKE $${values.length}`);
+    const pattern = `$${values.length}`;
+    conditions.push(
+      `(${searchColumn("c.name")} LIKE ${pattern} OR f.penpal_code LIKE ${pattern})`,
+    );
   }
   if (cursor) {
     values.push(cursor.key, cursor.id);
@@ -68,10 +83,12 @@ export async function getChildren(
   const direction = backwards ? "DESC" : "ASC";
   const result = await sql.query<ChildWithFamily & { penpal_sort: string }>(
     `
-    SELECT c.*, f.penpal_code, f.family_biography_url, f.family_photo_url,
+    SELECT c.id, c.name, c.gender, c.birth_date, c.pamphlet_url,
+      c.child_photo_url, c.created_at, c.updated_at, f.id AS family_id,
+      ${isMentor ? "CASE WHEN membership.group_id IS NOT NULL THEN c.notes END" : "c.notes"} AS notes,
+      f.penpal_code, f.family_biography_url, f.family_photo_url,
       membership.*, COALESCE(LPAD(f.penpal_code, 4, '0'), '99999') AS penpal_sort
     FROM children c
-    LEFT JOIN families f ON f.id = c.family_id
     LEFT JOIN LATERAL (
       SELECT g.id AS group_id, g.name AS group_name, cl.name AS group_club_name
       FROM children_groups cg
@@ -81,6 +98,8 @@ export async function getChildren(
         ${groupConditions.length ? `AND ${groupConditions.join(" AND ")}` : ""}
       ORDER BY g.name, g.id LIMIT 1
     ) membership ON true
+    LEFT JOIN families f ON f.id = c.family_id
+      ${isMentor ? "AND membership.group_id IS NOT NULL" : ""}
     ${conditions.length ? `WHERE ${conditions.join(" AND ")}` : ""}
     ORDER BY COALESCE(LPAD(f.penpal_code, 4, '0'), '99999') ${direction}, c.id ${direction}
     LIMIT $${values.length}

@@ -1,5 +1,6 @@
 "use server";
 
+import { getSessionUserInfo } from "@/lib/auth-utils";
 import { getWeekOccurrences } from "@/services/attendance/get-week-occurrences";
 
 type GetWeekOccurrencesParams = {
@@ -7,11 +8,14 @@ type GetWeekOccurrencesParams = {
   endDate: string;
   clubId?: string;
   groupId?: string;
-  mentorGroupIds?: string[];
 };
 
 export async function getWeekOccurrencesAction(
   params: GetWeekOccurrencesParams,
 ) {
-  return await getWeekOccurrences(params);
+  const user = await getSessionUserInfo("/attendance");
+  return getWeekOccurrences({
+    ...params,
+    mentorGroupIds: user.role === "mentor" ? user.groupIds : undefined,
+  });
 }

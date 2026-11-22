@@ -38,7 +38,7 @@ test(
     };
     const definitions = {
       children:
-        "id uuid, family_id uuid, name text, child_photo_url text, gender text",
+        "id uuid, family_id uuid, name text, child_photo_url text, gender text, birth_date date, pamphlet_url text, notes text, created_at timestamp, updated_at timestamp",
       families:
         "id uuid, penpal_code text, family_biography_url text, family_photo_url text, created_at timestamp, updated_at timestamp",
       children_groups: "child_id uuid, group_id uuid, active boolean",
@@ -92,14 +92,19 @@ test(
         (await getFamilies({ search: "14" })).items.map((family) => family.id),
         [id(14)],
       );
+      assert.deepEqual(
+        (await getChildren({ search: " 14 " })).items.map((child) => child.id),
+        [id(4)],
+      );
       assert.equal((await getChildren({ search: "missing" })).items.length, 0);
       assert.equal((await getFamilies({ search: "missing" })).items.length, 0);
       assert.equal((await getChildren({ search: "  " })).items.length, 4);
       assert.equal((await getFamilies({ search: "  " })).items.length, 4);
-      assert.equal(
-        (await getChildren({ search: "garcia", mentorGroupIds: [] })).items
-          .length,
-        0,
+      assert.deepEqual(
+        (await getChildren({ search: "garcia", mentorGroupIds: [] })).items.map(
+          (child) => child.id,
+        ),
+        [id(1), id(2), id(3)],
       );
     } finally {
       mocked.mock.restore();

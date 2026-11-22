@@ -51,7 +51,7 @@ export function GroupChildrenList({
               <Input
                 id={searchId}
                 type="search"
-                placeholder="Nombre del niño o niña"
+                placeholder="Nombre o código Penpal"
                 className="pl-9"
                 value={navigation.search}
                 onChange={(event) =>

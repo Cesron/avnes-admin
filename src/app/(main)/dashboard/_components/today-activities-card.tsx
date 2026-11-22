@@ -13,8 +13,8 @@ import { getTodayActivities } from "@/services/attendance/get-today-activities";
 import { getClubDotColor } from "@/utils/club-colors";
 
 type TodayActivitiesCardProps = {
-  /** Empty array = show activities for all groups (admin/coordinator) */
-  groupIds: string[];
+  /** Omit to show activities for all groups (admin/coordinator). */
+  groupIds?: string[];
   /** If set, filters by club. Admin/coordinator can pass undefined to show all. */
   clubId?: string;
   /** Show club & group columns (admin) or hide them (mentor) */
@@ -36,16 +36,7 @@ export async function TodayActivitiesCard({
   showClubs = true,
   className,
 }: TodayActivitiesCardProps) {
-  const activities = await getTodayActivities({
-    clubId,
-    groupId: undefined,
-  });
-
-  // Mentor: filter to only their groups
-  const filtered =
-    groupIds.length > 0
-      ? activities.filter((a) => groupIds.includes(a.group_id))
-      : activities;
+  const activities = await getTodayActivities({ clubId, groupIds });
 
   return (
     <Card className={cn("h-full", className)}>
@@ -56,22 +47,18 @@ export async function TodayActivitiesCard({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {filtered.length === 0 ? (
+        {activities.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-8 text-center text-sm text-muted-foreground">
             <CalendarOffIcon className="size-8 opacity-50" />
             <p>No hay actividades programadas para hoy</p>
           </div>
         ) : (
           <ul className="space-y-2">
-            {filtered.map((activity, idx) => (
-              <li key={`${activity.activity_id}-${activity.group_id}-${idx}`}>
+            {activities.map((activity, idx) => (
+              <li key={`${activity.occurrence_id}-${activity.group_id}`}>
                 {idx > 0 && <Separator className="my-2" />}
                 <Link
-                  href={
-                    activity.occurrence_id
-                      ? `/attendance/${activity.occurrence_id}`
-                      : "/attendance"
-                  }
+                  href={`/attendance/${activity.occurrence_id}`}
                   className="-mx-2 flex items-start gap-3 rounded-md px-2 py-1.5 transition-colors hover:bg-accent/50"
                 >
                   <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">

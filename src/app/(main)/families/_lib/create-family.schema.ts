@@ -1,6 +1,8 @@
 import { z } from "zod";
+import { optionalLongText } from "@/lib/long-text";
 
 export const createFamilySchema = z.object({
+  history: optionalLongText,
   penpalCode: z
     .string()
     .length(4, "El código penpal debe tener exactamente 4 caracteres")

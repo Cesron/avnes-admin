@@ -1,6 +1,8 @@
 import { z } from "zod";
+import { optionalLongText } from "@/lib/long-text";
 
 export const editFamilySchema = z.object({
+  history: optionalLongText,
   id: z.string().uuid("ID inválido"),
   penpalCode: z
     .string()

@@ -51,7 +51,7 @@ export default async function ChildAttendanceHistoryPage({
   } as const;
   return (
     <>
-      <header className="flex min-h-20 items-center gap-3 border-b py-4">
+      <header className="flex min-h-20 flex-wrap items-center gap-3 border-b py-4">
         <SidebarTrigger />
         <Link
           href="/children"
@@ -59,7 +59,18 @@ export default async function ChildAttendanceHistoryPage({
         >
           Niños
         </Link>
-        <span className="text-muted-foreground">/</span>
+        <span aria-hidden="true" className="text-muted-foreground">
+          /
+        </span>
+        <Link
+          href={`/children/${childId}`}
+          className="text-sm text-muted-foreground hover:underline"
+        >
+          Perfil
+        </Link>
+        <span aria-hidden="true" className="text-muted-foreground">
+          /
+        </span>
         <span className="text-sm font-medium">Historial de asistencia</span>
       </header>
       <div className="space-y-6 py-6">

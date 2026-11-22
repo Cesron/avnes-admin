@@ -6,6 +6,7 @@ export type Child = {
   family_id: string | null;
   pamphlet_url: string | null;
   child_photo_url: string | null;
+  notes: string | null;
   created_at: Date;
   updated_at: Date;
 };

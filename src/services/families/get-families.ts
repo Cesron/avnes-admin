@@ -7,6 +7,7 @@ import {
 } from "@/lib/pagination";
 import { searchColumn, searchPattern } from "@/lib/search";
 import { sql } from "@/lib/sql";
+import type { Family } from "@/types/family";
 import { mentorChildAccess, mentorFamilyAccess } from "./family-access";
 
 /**
@@ -20,13 +21,7 @@ export type ChildSummary = {
   gender: string;
 };
 
-export type FamilyWithChildren = {
-  id: string;
-  penpal_code: string;
-  family_biography_url: string | null;
-  family_photo_url: string | null;
-  created_at: Date;
-  updated_at: Date;
+export type FamilyWithChildren = Family & {
   children_count: number;
   children_names: string | null;
   /**

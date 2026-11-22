@@ -17,7 +17,10 @@ export const editFamilyAction = actionClient
     });
 
     revalidatePath("/families");
+    revalidatePath(`/families/${family.id}`);
     revalidatePath("/children");
+    revalidatePath("/children/[childId]", "page");
+    revalidatePath("/groups/[groupId]", "page");
 
     return { family };
   });
